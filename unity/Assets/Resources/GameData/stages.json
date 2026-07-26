@@ -1,22 +1,38 @@
 {
   "items": [
-    { "mapNumber": 1, "label": "부산 출항", "bg": "", "sky": "sky_cyan", "groundCol": "col_grass", "ground": "", "boss": "",
-      "props": [ { "img": "rock_big", "x": 2250, "h": 220 }, { "img": "rock_small", "x": 550, "h": 140 } ] },
-    { "mapNumber": 2, "label": "쓰시마 섬", "bg": "", "sky": "sky_cyan", "groundCol": "col_forest", "ground": "", "boss": "",
-      "props": [ { "img": "pine", "x": 750, "h": 470 }, { "img": "pine", "x": 2050, "h": 420 }, { "img": "log", "x": 1400, "h": 85 } ] },
-    { "mapNumber": 3, "label": "규슈 밀림", "bg": "", "sky": "sky_cyan", "groundCol": "col_forest_light", "ground": "", "boss": "",
-      "props": [ { "img": "pine", "x": 500, "h": 500 }, { "img": "pine", "x": 1250, "h": 450 }, { "img": "pine", "x": 2300, "h": 480 }, { "img": "bush_big", "x": 1750, "h": 95 } ] },
-    { "mapNumber": 4, "label": "남만 바다", "bg": "", "sky": "sky_cyan", "groundCol": "col_ocean", "ground": "", "boss": "",
+    { "mapNumber": 1, "label": "쓰시마 밀림", "bg": "", "sky": "sky_cyan", "skyTint": "#F2E8C8", "groundCol": "col_forest_light", "ground": "", "boss": "", "ambient": "petals", "noClouds": true,
+      "props": [ { "img": "pine", "x": 350, "h": 520 }, { "img": "pine", "x": 620, "h": 430 }, { "img": "pine", "x": 2250, "h": 500 }, { "img": "pine", "x": 2520, "h": 400 }, { "img": "log", "x": 1500, "h": 80 }, { "img": "rock_small", "x": 1000, "h": 110 } ] },
+
+    { "mapNumber": 2, "label": "미지의 이끼동굴", "bg": "stage6bg", "sky": "", "skyTint": "", "groundCol": "col_moss", "ground": "", "boss": "slimeking", "ambient": "sparkle",
       "props": [] },
-    { "mapNumber": 5, "label": "대만 동굴", "bg": "stage5bg", "sky": "", "groundCol": "", "ground": "ground_cave1", "boss": "",
+
+    { "mapNumber": 3, "label": "사하라 사막", "bg": "", "sky": "sky_cyan", "skyTint": "#FFCF8F", "groundCol": "col_sand", "ground": "", "boss": "", "ambient": "sand", "noClouds": true,
+      "props": [ { "img": "rock_small", "x": 800, "h": 130 }, { "img": "rock_small", "x": 2050, "h": 160 }, { "img": "rock_small", "x": 2300, "h": 100 } ] },
+
+    { "mapNumber": 4, "label": "시베리아 설원", "bg": "", "sky": "sky_cyan", "skyTint": "#DCE8F8", "groundCol": "col_snow", "ground": "", "boss": "alphawolf", "ambient": "snow", "noSun": true,
+      "props": [ { "img": "snowpine", "x": 550, "h": 450 }, { "img": "snowpine", "x": 1350, "h": 390 }, { "img": "igloo", "x": 2200, "h": 300 } ] },
+
+    { "mapNumber": 5, "label": "신비의 과자섬", "bg": "", "sky": "sky_candy", "skyTint": "", "groundCol": "col_candy", "ground": "", "boss": "gingerking", "ambient": "sprinkles", "noSun": true, "noClouds": true,
+      "props": [
+        { "img": "donut",    "x": 500,  "h": 620, "alpha": 0.35 },
+        { "img": "lollipop", "x": 1300, "h": 560, "alpha": 0.3 },
+        { "img": "cane",     "x": 2100, "h": 700, "alpha": 0.35 },
+        { "img": "donut",    "x": 2650, "h": 480, "alpha": 0.3 },
+        { "img": "cane",     "x": 380,  "h": 300 },
+        { "img": "donut",    "x": 1150, "h": 220 },
+        { "img": "lollipop", "x": 1750, "h": 210 },
+        { "img": "cane",     "x": 2350, "h": 260 } ] },
+
+    { "mapNumber": 6, "label": "남만 바다", "bg": "", "sky": "sky_cyan", "skyTint": "#8FA8BC", "groundCol": "col_ocean", "ground": "", "boss": "", "ambient": "rain", "noSun": true,
       "props": [] },
-    { "mapNumber": 6, "label": "히말라야 수정굴", "bg": "stage6bg", "sky": "", "groundCol": "", "ground": "ground_cave2", "boss": "slimeking",
+
+    { "mapNumber": 7, "label": "대만 동굴", "bg": "stage5bg", "sky": "", "skyTint": "", "groundCol": "col_rock", "ground": "", "boss": "", "ambient": "fireflies",
       "props": [] },
-    { "mapNumber": 7, "label": "사하라 사막", "bg": "", "sky": "sky_cyan", "groundCol": "col_sand", "ground": "", "boss": "",
-      "props": [ { "img": "rock_small", "x": 900, "h": 130 }, { "img": "rock_big", "x": 1950, "h": 200 } ] },
-    { "mapNumber": 8, "label": "시베리아 설원", "bg": "", "sky": "sky_cyan", "groundCol": "col_snow", "ground": "", "boss": "skullwarrior",
-      "props": [ { "img": "snowpine", "x": 700, "h": 430 }, { "img": "igloo", "x": 2150, "h": 300 }, { "img": "snowpine", "x": 1500, "h": 380 } ] },
-    { "mapNumber": 9, "label": "버뮤다 심연", "bg": "stage9bg", "sky": "", "groundCol": "", "ground": "ground_cave3", "boss": "dragonboss",
+
+    { "mapNumber": 8, "label": "히말라야 운해", "bg": "", "sky": "sky_cyan", "skyTint": "#EAF4FF", "groundCol": "clouds", "ground": "", "boss": "eagleking", "ambient": "", "noSun": true,
+      "props": [] },
+
+    { "mapNumber": 9, "label": "버뮤다 심연", "bg": "stage9bg", "sky": "", "skyTint": "", "groundCol": "col_purple", "ground": "", "boss": "dragonboss", "ambient": "abyss",
       "props": [] }
   ]
 }

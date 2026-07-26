@@ -21,6 +21,12 @@ namespace GameMaker.Data
         public float cooldown;       // 소환 쿨타임(초) — 아군 전용
         public int height;           // 화면 표시 높이(px)
         public string facing;        // 원본 스프라이트가 보는 방향: "left" 또는 ""(오른쪽)
+        public string sprite;        // 프레임 공유: 다른 유닛의 스프라이트 이름 (빈 값 = name 사용)
+        public string tint;          // 색조 "#RRGGBB" — 색만 바꾼 변형 몬스터 (물/얼음/수정 등)
+        public float fly;            // 비행 고도(px) — 0이면 지상 유닛
+        public float sink;           // 발밑 보정(px) — 스프라이트에 그림자/여백이 있어 떠 보일 때 내려앉힘
+
+        public string SpriteName => string.IsNullOrEmpty(sprite) ? name : sprite;
 
         public bool IsCastle => name.Contains("castle");
         public bool IsOur => team != "enemy";
@@ -36,6 +42,7 @@ namespace GameMaker.Data
         public string img;
         public float x;
         public float h;
+        public float alpha;  // 0 또는 1 = 불투명(전경), 0<alpha<1 = 반투명 원경 실루엣
     }
 
     [Serializable]
@@ -48,6 +55,10 @@ namespace GameMaker.Data
         public string groundCol; // 카툰 지면 기둥 (가로 타일링)
         public string ground;    // (구) 지면 타일 — groundCol 이 비었을 때 사용
         public string boss;      // 남은시간 0초에 등장할 보스 이름 (빈 문자열 = 없음)
+        public string ambient;   // 분위기 파티클: snow/leaves/petals/sand/fireflies/sparkle/abyss/sea/rain/sprinkles
+        public bool noSun;       // true 면 하늘 장면에서 태양 생략 (흐림/설원 등)
+        public bool noClouds;    // true 면 떠다니는 구름 생략
+        public string skyTint;   // 하늘 색조 "#RRGGBB" — 스테이지별 시간대/분위기 (빈 값 = 원본)
         public List<PropSpec> props;
     }
 

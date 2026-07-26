@@ -1,27 +1,46 @@
-﻿{
+{
   "items": [
-    { "name": "ourcastle",  "team": "ally",  "hp": 300, "attack": 0,  "range": 0,   "moveSpeed": 0,   "attackInterval": 0,   "cost": 0,  "height": 350, "facing": "" },
-    { "name": "ourbasic",   "team": "ally",  "hp": 100, "attack": 10, "range": 140, "moveSpeed": 230, "attackInterval": 2,   "cost": 20, "cooldown": 2.0, "height": 180, "facing": "" },
-    { "name": "ourtank",    "team": "ally",  "hp": 90,  "attack": 12, "range": 420, "moveSpeed": 180, "attackInterval": 2,   "cost": 20, "cooldown": 4.5, "height": 180, "facing": "" },
-    { "name": "ourbattle",  "team": "ally",  "hp": 240, "attack": 6,  "range": 60,  "moveSpeed": 280, "attackInterval": 3,   "cost": 50, "cooldown": 3.2, "height": 180, "facing": "" },
-    { "name": "ourmass",    "team": "ally",  "hp": 110, "attack": 6,  "range": 260, "moveSpeed": 165, "attackInterval": 1,   "cost": 50, "cooldown": 6.0, "height": 180, "facing": "" },
+    { "name": "ourcastle",  "team": "ally",  "hp": 300, "attack": 0,  "range": 0,   "moveSpeed": 0,   "attackInterval": 0,   "cost": 0,  "cooldown": 0,   "height": 350, "facing": "", "sprite": "", "tint": "" },
+    { "name": "ourbasic",   "team": "ally",  "hp": 100, "attack": 10, "range": 140, "moveSpeed": 230, "attackInterval": 2,   "cost": 20, "cooldown": 2.0, "height": 180, "facing": "", "sprite": "", "tint": "" },
+    { "name": "ourtank",    "team": "ally",  "hp": 90,  "attack": 12, "range": 420, "moveSpeed": 180, "attackInterval": 2,   "cost": 20, "cooldown": 4.5, "height": 180, "facing": "", "sprite": "", "tint": "" },
+    { "name": "ourbattle",  "team": "ally",  "hp": 240, "attack": 6,  "range": 60,  "moveSpeed": 280, "attackInterval": 3,   "cost": 50, "cooldown": 3.2, "height": 180, "facing": "", "sprite": "", "tint": "" },
+    { "name": "ourmass",    "team": "ally",  "hp": 110, "attack": 6,  "range": 260, "moveSpeed": 165, "attackInterval": 1,   "cost": 50, "cooldown": 6.0, "height": 180, "facing": "", "sprite": "", "tint": "" },
 
-    { "name": "yourcastle", "team": "enemy", "hp": 300, "attack": 0,  "range": 0,   "moveSpeed": 0,   "attackInterval": 0,   "cost": 0,  "height": 350, "facing": "" },
+    { "name": "yourcastle", "team": "enemy", "hp": 300, "attack": 0,  "range": 0,   "moveSpeed": 0,   "attackInterval": 0,   "cost": 0, "cooldown": 0, "height": 350, "facing": "", "sprite": "", "tint": "" },
 
-    { "name": "slime",        "team": "enemy", "hp": 70,   "attack": 6,  "range": 75,  "moveSpeed": 120, "attackInterval": 2.3, "cost": 0, "height": 130, "facing": "" },
-    { "name": "stoneslime",   "team": "enemy", "hp": 160,  "attack": 8,  "range": 80,  "moveSpeed": 100, "attackInterval": 2.6, "cost": 0, "height": 135, "facing": "" },
-    { "name": "orangeslime",  "team": "enemy", "hp": 90,   "attack": 9,  "range": 75,  "moveSpeed": 170, "attackInterval": 2.0, "cost": 0, "height": 130, "facing": "" },
-    { "name": "slimeking",    "team": "enemy", "hp": 700,  "attack": 25, "range": 110, "moveSpeed": 110, "attackInterval": 2.4, "cost": 0, "height": 250, "facing": "" },
-    { "name": "goblin",       "team": "enemy", "hp": 130,  "attack": 12, "range": 85,  "moveSpeed": 250, "attackInterval": 1.5, "cost": 0, "height": 170, "facing": "" },
-    { "name": "goblinarcher", "team": "enemy", "hp": 90,   "attack": 11, "range": 280, "moveSpeed": 200, "attackInterval": 1.9, "cost": 0, "height": 170, "facing": "" },
-    { "name": "goblinwarrior","team": "enemy", "hp": 220,  "attack": 16, "range": 90,  "moveSpeed": 180, "attackInterval": 2.0, "cost": 0, "height": 185, "facing": "" },
-    { "name": "skull",        "team": "enemy", "hp": 180,  "attack": 15, "range": 90,  "moveSpeed": 190, "attackInterval": 1.8, "cost": 0, "height": 190, "facing": "" },
-    { "name": "skullarcher",  "team": "enemy", "hp": 120,  "attack": 14, "range": 300, "moveSpeed": 180, "attackInterval": 2.0, "cost": 0, "height": 195, "facing": "" },
-    { "name": "skullwarrior", "team": "enemy", "hp": 350,  "attack": 22, "range": 100, "moveSpeed": 150, "attackInterval": 2.2, "cost": 0, "height": 215, "facing": "" },
-    { "name": "dragonboss",   "team": "enemy", "hp": 1800, "attack": 45, "range": 200, "moveSpeed": 130, "attackInterval": 2.0, "cost": 0, "height": 380, "facing": "" }
+    { "name": "goblin",         "team": "enemy", "hp": 120,  "attack": 11, "range": 85,  "moveSpeed": 250, "attackInterval": 1.6, "cost": 0, "cooldown": 0, "height": 200, "facing": "", "sprite": "", "tint": "" },
+    { "name": "goblinwarrior",  "team": "enemy", "hp": 200,  "attack": 14, "range": 110, "moveSpeed": 180, "attackInterval": 2.0, "cost": 0, "cooldown": 0, "height": 220, "facing": "", "sprite": "", "tint": "" },
+    { "name": "goblinarcher",   "team": "enemy", "hp": 90,   "attack": 10, "range": 320, "moveSpeed": 200, "attackInterval": 1.9, "cost": 0, "cooldown": 0, "height": 200, "facing": "", "sprite": "", "tint": "" },
+
+    { "name": "slime",          "team": "enemy", "hp": 170,  "attack": 13, "range": 80,  "moveSpeed": 150, "attackInterval": 2.0, "cost": 0, "cooldown": 0, "height": 156, "facing": "", "sprite": "", "tint": "" },
+    { "name": "slimeking",      "team": "enemy", "hp": 850,  "attack": 26, "range": 120, "moveSpeed": 110, "attackInterval": 2.4, "cost": 0, "cooldown": 0, "height": 232, "facing": "", "sprite": "", "tint": "" },
+
+    { "name": "skull",          "team": "enemy", "hp": 210,  "attack": 15, "range": 90,  "moveSpeed": 190, "attackInterval": 1.8, "cost": 0, "cooldown": 0, "height": 225, "facing": "", "sprite": "", "tint": "" },
+    { "name": "skullwarrior",   "team": "enemy", "hp": 340,  "attack": 20, "range": 115, "moveSpeed": 150, "attackInterval": 2.2, "cost": 0, "cooldown": 0, "height": 255, "facing": "", "sprite": "", "tint": "" },
+    { "name": "skullarcher",    "team": "enemy", "hp": 140,  "attack": 14, "range": 340, "moveSpeed": 180, "attackInterval": 2.0, "cost": 0, "cooldown": 0, "height": 230, "facing": "", "sprite": "", "tint": "" },
+
+    { "name": "penguin",        "team": "enemy", "hp": 220,  "attack": 14, "range": 80,  "moveSpeed": 170, "attackInterval": 1.9, "cost": 0, "cooldown": 0, "height": 282, "facing": "", "sprite": "", "tint": "", "sink": 6 },
+    { "name": "wolf",           "team": "enemy", "hp": 300,  "attack": 20, "range": 115, "moveSpeed": 260, "attackInterval": 1.7, "cost": 0, "cooldown": 0, "height": 348, "facing": "left", "sprite": "", "tint": "", "sink": 8 },
+    { "name": "alphawolf",      "team": "enemy", "hp": 950,  "attack": 30, "range": 140, "moveSpeed": 160, "attackInterval": 2.1, "cost": 0, "cooldown": 0, "height": 488, "facing": "left", "sprite": "wolf", "tint": "", "sink": 10 },
+
+    { "name": "gingerbread",    "team": "enemy", "hp": 250,  "attack": 17, "range": 90,  "moveSpeed": 200, "attackInterval": 1.8, "cost": 0, "cooldown": 0, "height": 220, "facing": "", "sprite": "", "tint": "", "sink": 6 },
+    { "name": "gummy",          "team": "enemy", "hp": 190,  "attack": 14, "range": 160, "moveSpeed": 160, "attackInterval": 2.0, "cost": 0, "cooldown": 0, "height": 190, "facing": "", "sprite": "", "tint": "", "sink": 4 },
+    { "name": "gingerking",     "team": "enemy", "hp": 1050, "attack": 30, "range": 120, "moveSpeed": 105, "attackInterval": 2.3, "cost": 0, "cooldown": 0, "height": 320, "facing": "", "sprite": "gingerbread", "tint": "", "sink": 9 },
+
+    { "name": "shark",          "team": "enemy", "hp": 260,  "attack": 18, "range": 90,  "moveSpeed": 210, "attackInterval": 1.7, "cost": 0, "cooldown": 0, "height": 259, "facing": "", "sprite": "", "tint": "", "sink": 16 },
+    { "name": "duck",           "team": "enemy", "hp": 240,  "attack": 15, "range": 150, "moveSpeed": 190, "attackInterval": 1.9, "cost": 0, "cooldown": 0, "height": 201, "facing": "left", "sprite": "", "tint": "", "fly": 110 },
+    { "name": "egret",          "team": "enemy", "hp": 180,  "attack": 15, "range": 195, "moveSpeed": 250, "attackInterval": 1.7, "cost": 0, "cooldown": 0, "height": 206, "facing": "left", "sprite": "", "tint": "", "fly": 130 },
+
+    { "name": "bat",            "team": "enemy", "hp": 260,  "attack": 18, "range": 95,  "moveSpeed": 240, "attackInterval": 1.6, "cost": 0, "cooldown": 0, "height": 256, "facing": "", "sprite": "", "tint": "", "fly": 120 },
+    { "name": "stoneslime",     "team": "enemy", "hp": 320,  "attack": 16, "range": 160, "moveSpeed": 100, "attackInterval": 2.4, "cost": 0, "cooldown": 0, "height": 156, "facing": "", "sprite": "", "tint": "" },
+
+    { "name": "bird1",          "team": "enemy", "hp": 190,  "attack": 13, "range": 90,  "moveSpeed": 280, "attackInterval": 1.5, "cost": 0, "cooldown": 0, "height": 154, "facing": "left", "sprite": "", "tint": "", "fly": 140 },
+    { "name": "bird4",          "team": "enemy", "hp": 210,  "attack": 15, "range": 145, "moveSpeed": 300, "attackInterval": 1.5, "cost": 0, "cooldown": 0, "height": 162, "facing": "left", "sprite": "", "tint": "", "fly": 150 },
+    { "name": "eagle",          "team": "enemy", "hp": 400,  "attack": 23, "range": 190, "moveSpeed": 210, "attackInterval": 1.8, "cost": 0, "cooldown": 0, "height": 246, "facing": "left", "sprite": "", "tint": "", "fly": 160 },
+    { "name": "eagleking",      "team": "enemy", "hp": 1300, "attack": 34, "range": 195, "moveSpeed": 140, "attackInterval": 2.2, "cost": 0, "cooldown": 0, "height": 354, "facing": "left", "sprite": "", "tint": "", "fly": 180 },
+
+    { "name": "hood",           "team": "enemy", "hp": 300,  "attack": 20, "range": 340, "moveSpeed": 185, "attackInterval": 2.0, "cost": 0, "cooldown": 0, "height": 266, "facing": "", "sprite": "", "tint": "", "sink": 12 },
+    { "name": "monk",           "team": "enemy", "hp": 500,  "attack": 26, "range": 100, "moveSpeed": 200, "attackInterval": 1.9, "cost": 0, "cooldown": 0, "height": 254, "facing": "", "sprite": "", "tint": "", "sink": 12 },
+    { "name": "dragonboss",     "team": "enemy", "hp": 1800, "attack": 45, "range": 190, "moveSpeed": 130, "attackInterval": 2.0, "cost": 0, "cooldown": 0, "height": 447, "facing": "", "sprite": "", "tint": "" }
   ]
 }
-
-
-
-

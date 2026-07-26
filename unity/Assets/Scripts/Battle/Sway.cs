@@ -18,10 +18,24 @@ namespace GameMaker.Battle
         }
     }
 
+    /// <summary>느린 상하 출렁임 — 바다 수면 등.</summary>
+    public class Bob : MonoBehaviour
+    {
+        public float amplitude = 8f;
+        public float speed = 0.9f;
+        Vector3 basePos;
+
+        void Start() => basePos = transform.position;
+
+        void Update() =>
+            transform.position = basePos + new Vector3(0, Mathf.Sin(Time.time * speed) * amplitude, 0);
+    }
+
     /// <summary>지면 잔디립의 물결 — 좌우로 천천히 밀렸다 돌아오며 바닥이 일렁이는 착각.</summary>
     public class LipWave : MonoBehaviour
     {
         public float amplitude = 8f;   // 좌우 이동폭(px)
+        public float vertAmp = 1.5f;   // 상하 이동폭(px) — 바다는 크게
         public float speed = 1.3f;
         public float phase;
         Vector3 basePos;
@@ -33,7 +47,7 @@ namespace GameMaker.Battle
             float t = Time.time * speed + phase;
             transform.position = basePos + new Vector3(
                 Mathf.Sin(t) * amplitude,
-                Mathf.Sin(t * 2.1f) * 1.5f, 0);
+                Mathf.Sin(t * 2.1f) * vertAmp, 0);
         }
     }
 
