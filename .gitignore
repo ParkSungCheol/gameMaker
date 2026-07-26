@@ -15,5 +15,15 @@ unity/Obj/
 unity/Logs/
 unity/UserSettings/
 unity/Build/
+unity/.utmp/
 unity/*.csproj
 unity/*.sln
+
+# 빌드 산출물 (APK/AAB/압축본)
+build/
+*.apk
+*.aab
+
+# 서명 키 (실수로라도 올라가면 안 됨)
+*.keystore
+*.jks
