@@ -17,7 +17,7 @@ namespace GameMaker.Data
         StageData GetStage(int mapNumber);                   // 스테이지 테마/보스 설정
         PlayerData GetPlayer();                              // 레거시 PlayerDao.getPlayer("A")
         void SavePlayer(PlayerData player);
-        void Clear(int mapNumber);                           // 레거시 PlayerRepository.clear — 클리어 보상
+        int Clear(int mapNumber);                            // 레거시 PlayerRepository.clear — 클리어 보상(획득액 반환)
         int GetUpgradeCount(string monsterName);
         void Upgrade(string monsterName);                    // 레거시 UpgradeActivity 기능 복원(돈 차감 + 레벨업)
     }
@@ -79,14 +79,15 @@ namespace GameMaker.Data
             PlayerPrefs.Save();
         }
 
-        /// <summary>레거시 공식: 보상 = mapNumber * (11 - 클리어횟수), 최소 1.</summary>
-        public void Clear(int mapNumber)
+        /// <summary>레거시 공식: 보상 = mapNumber * (11 - 클리어횟수), 최소 1. 획득액 반환.</summary>
+        public int Clear(int mapNumber)
         {
             player.mapClear[mapNumber]++;
             int clearTime = player.mapClear[mapNumber];
             int money = mapNumber * (11 - clearTime) <= 0 ? 1 : mapNumber * (11 - clearTime);
             player.money += money;
             SavePlayer(player);
+            return money;
         }
 
         public int GetUpgradeCount(string monsterName) => upgrades.Get(monsterName);

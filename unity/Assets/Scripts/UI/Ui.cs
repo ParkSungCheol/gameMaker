@@ -11,8 +11,32 @@ namespace GameMaker.UI
     /// </summary>
     public static class Ui
     {
-        public static Font DefaultFont =>
-            Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        static Font pixelFont;
+        static Font titleFont;
+
+        /// <summary>한글 지원 픽셀 폰트(neodgm). 없으면 내장 폰트로 폴백.</summary>
+        public static Font DefaultFont
+        {
+            get
+            {
+                if (pixelFont == null)
+                    pixelFont = Resources.Load<Font>("Fonts/neodgm");
+                return pixelFont != null
+                    ? pixelFont
+                    : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            }
+        }
+
+        /// <summary>타이틀용 대형 픽셀 폰트(ThaleahFat, 영문 전용).</summary>
+        public static Font TitleFont
+        {
+            get
+            {
+                if (titleFont == null)
+                    titleFont = Resources.Load<Font>("Fonts/ThaleahFat");
+                return titleFont != null ? titleFont : DefaultFont;
+            }
+        }
 
         public static Canvas CreateCanvas(Transform parent, string name = "Canvas")
         {
@@ -164,28 +188,86 @@ namespace GameMaker.UI
             if (text != null) UnityEngine.Object.Destroy(text.gameObject);
         }
 
-        /// <summary>승패 결과 모달 — 텍스트 없이 이미지(보물상자/무너진 성)와 체크 버튼만.</summary>
-        public static void ResultDialog(Transform canvas, Sprite resultImage, Action onOk)
+        /// <summary>모서리 둥근 반투명 패널 — 깔끔한 HUD 배경용.</summary>
+        public static Image RoundedPanel(Transform parent, Color color, string name = "RoundedPanel")
         {
-            var overlay = Panel(canvas, new Color(0, 0, 0, 0.6f), "DialogOverlay");
+            var img = Image(parent, Battle.SpriteBank.Rounded, name);
+            img.type = UnityEngine.UI.Image.Type.Sliced;
+            img.pixelsPerUnitMultiplier = 0.55f; // 모서리 반경 키움
+            img.color = color;
+            return img;
+        }
+
+        /// <summary>원형 아이콘 버튼 — 반투명 다크 원 + 아이콘.</summary>
+        public static Button CircleIconButton(Transform parent, string iconName, float size,
+            Action onClick, string name = "CircleButton")
+        {
+            var bg = Image(parent, Battle.SpriteBank.Circle, name);
+            bg.color = new Color(0.1f, 0.11f, 0.16f, 0.82f);
+            ((RectTransform)bg.transform).sizeDelta = new Vector2(size, size);
+            var btn = bg.gameObject.AddComponent<Button>();
+            btn.onClick.AddListener(() => onClick?.Invoke());
+
+            var icon = Image(bg.transform, Resources.Load<Sprite>("Sprites/env/" + iconName), "Icon");
+            Place((RectTransform)icon.transform, new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(size * 0.55f, size * 0.55f));
+            icon.preserveAspect = true;
+            return btn;
+        }
+
+        /// <summary>승패 결과 모달 — 카툰 프레임 + SUCCESS/FAIL + 보상 내역 + [RETRY]/[HOME].</summary>
+        public static void ResultDialog(Transform canvas, bool win, Sprite resultImage,
+            int reward, int moneyBefore, Action onRetry, Action onHome)
+        {
+            var overlay = Panel(canvas, new Color(0, 0, 0, 0.65f), "DialogOverlay");
             Stretch(overlay);
             overlay.SetAsLastSibling();
 
-            var box = Panel(overlay, new Color(0.12f, 0.13f, 0.2f, 0.98f), "DialogBox");
-            Place(box, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(560, 420));
+            // 에셋 팝업 프레임 (Layer Lab 금테 보드 — 몬스터와 같은 화풍)
+            var board = Image(overlay.transform, Resources.Load<Sprite>("Sprites/env/popup_frame"), "Board");
+            Place((RectTransform)board.transform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(600, 640));
+
+            var title = OutlinedLabel(board.transform, win ? "SUCCESS!" : "FAIL...", 84,
+                win ? new Color(1f, 0.72f, 0.1f) : new Color(0.88f, 0.3f, 0.25f), "Title");
+            title.font = TitleFont;
+            Place((RectTransform)title.transform, new Vector2(0.5f, 1f), new Vector2(0, -110));
 
             if (resultImage != null)
             {
-                var img = Image(box, resultImage, "ResultImage");
-                Place((RectTransform)img.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 50), new Vector2(240, 240));
+                var img = Image(board.transform, resultImage, "ResultImage");
+                Place((RectTransform)img.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 30), new Vector2(150, 150));
                 img.preserveAspect = true;
             }
 
-            var okIcon = Resources.Load<Sprite>("Sprites/env/icon_check");
-            var ok = ImageButton(box, okIcon, new Vector2(110, 90),
-                () => { UnityEngine.Object.Destroy(overlay.gameObject); onOk?.Invoke(); }, "OkButton");
-            Place((RectTransform)ok.transform, new Vector2(0.5f, 0f), new Vector2(0, 25));
-            ok.GetComponent<Image>().preserveAspect = true;
+            // 승리 보상 내역: [코인 +20]  (40 → 60) — 외곽선 흰/골드 글씨 (반투명 배경에서도 선명)
+            if (win && reward > 0)
+            {
+                var gain = IconValue(board.transform, Resources.Load<Sprite>("Sprites/env/icon_coin"),
+                    "+" + reward, 46, new Color(1f, 0.85f, 0.25f), "RewardGain");
+                Place((RectTransform)gain.transform.parent, new Vector2(0.5f, 0.5f), new Vector2(-105, -80));
+
+                var flow = OutlinedLabel(board.transform,
+                    moneyBefore + " → " + (moneyBefore + reward), 36, Color.white, "RewardFlow");
+                Place((RectTransform)flow.transform, new Vector2(0.5f, 0.5f), new Vector2(90, -80));
+            }
+
+            MakeTextButton(board.transform, "RETRY", new Color(1f, 0.82f, 0.25f), new Vector2(-130, 80),
+                () => { UnityEngine.Object.Destroy(overlay.gameObject); onRetry?.Invoke(); });
+            MakeTextButton(board.transform, "HOME", Color.white, new Vector2(130, 80),
+                () => { UnityEngine.Object.Destroy(overlay.gameObject); onHome?.Invoke(); });
+        }
+
+        static void MakeTextButton(Transform parent, string label, Color color, Vector2 pos, Action onClick)
+        {
+            // 매끈한 타원 버튼 (원형 스프라이트를 늘려서 — 지갑/뒤로가기와 같은 계열)
+            var bg = Image(parent, Battle.SpriteBank.Circle, "Btn_" + label);
+            Place((RectTransform)bg.transform, new Vector2(0.5f, 0f), pos, new Vector2(240, 96));
+            bg.color = new Color(0.1f, 0.11f, 0.16f, 0.88f);
+            bg.gameObject.AddComponent<Button>().onClick.AddListener(() => onClick?.Invoke());
+
+            var txt = OutlinedLabel(bg.transform, label, 42, color, "Label");
+            txt.font = TitleFont;
+            Place((RectTransform)txt.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 2));
         }
 
         /// <summary>실패/성공 피드백 — 텍스트 대신 이미지 색 플래시.</summary>

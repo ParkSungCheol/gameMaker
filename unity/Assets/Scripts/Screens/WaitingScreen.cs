@@ -37,12 +37,21 @@ namespace GameMaker.Screens
             unitImg.preserveAspect = true;
             if (frames.Length > 1) StartCoroutine(CycleUiFrames(unitImg, frames));
 
-            // 시작 화살표 (왼쪽 화살표 아이콘을 뒤집어 ▶ 로) — 깜빡임
+            // 게임 타이틀 (ThaleahFat 대형 픽셀 폰트)
+            var title = Ui.OutlinedLabel(canvas.transform, "GAME MAKER", 150, new Color(1f, 0.9f, 0.35f), "Title");
+            title.font = Ui.TitleFont;
+            Ui.Place((RectTransform)title.transform, new Vector2(0.5f, 1f), new Vector2(0, -170));
+
+            // 시작 안내: 화살표 + 문구 깜빡임
             var arrow = Ui.Image(canvas.transform, SpriteBank.GetEnv("icon_return"), "StartArrow");
-            Ui.Place((RectTransform)arrow.transform, new Vector2(0.5f, 0.5f), new Vector2(0, -220), new Vector2(120, 96));
+            Ui.Place((RectTransform)arrow.transform, new Vector2(0.5f, 0.5f), new Vector2(-190, -220), new Vector2(90, 72));
             arrow.preserveAspect = true;
             arrow.transform.localScale = new Vector3(-1f, 1f, 1f); // 좌우 반전 → 오른쪽 화살표
             StartCoroutine(Blink(arrow));
+
+            var hint = Ui.OutlinedLabel(canvas.transform, "화면을 터치하세요", 52, Color.white, "Hint");
+            Ui.Place((RectTransform)hint.transform, new Vector2(0.5f, 0.5f), new Vector2(40, -220));
+            StartCoroutine(BlinkText(hint));
 
             // 화면 전체 클릭 → 메인
             var clickCatcher = Ui.TextButton(canvas.transform, "", 1, Vector2.zero,
@@ -69,6 +78,17 @@ namespace GameMaker.Screens
                 var c = img.color;
                 c.a = 0.45f + 0.55f * Mathf.Abs(Mathf.Sin(Time.time * 3f));
                 img.color = c;
+                yield return null;
+            }
+        }
+
+        System.Collections.IEnumerator BlinkText(Text txt)
+        {
+            while (txt != null)
+            {
+                var c = txt.color;
+                c.a = 0.45f + 0.55f * Mathf.Abs(Mathf.Sin(Time.time * 3f));
+                txt.color = c;
                 yield return null;
             }
         }

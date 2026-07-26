@@ -32,42 +32,41 @@ namespace GameMaker.Screens
             Ui.Place((RectTransform)hero.transform, new Vector2(0.5f, 1f), new Vector2(-190, -220), new Vector2(140, 140));
             hero.preserveAspect = true;
 
-            // 아이콘 버튼 4개
-            MakeMenuButton("icon_map",     new Vector2(-285, -60), false, () => ScreenRouter.I.Show(ScreenId.Map));
-            MakeMenuButton("icon_upgrade", new Vector2(285, -60),  false, () => ScreenRouter.I.Show(ScreenId.Upgrade));
-            MakeMenuButton("icon_chest",   new Vector2(-285, -260), true, null);
-            MakeMenuButton("icon_shield",  new Vector2(285, -260),  true, null);
+            // 아이콘 + 라벨 버튼 4개
+            MakeMenuButton("icon_map",     "맵",       new Vector2(-285, -60), false, () => ScreenRouter.I.Show(ScreenId.Map));
+            MakeMenuButton("icon_upgrade", "업그레이드", new Vector2(285, -60),  false, () => ScreenRouter.I.Show(ScreenId.Upgrade));
+            MakeMenuButton("icon_chest",   "뽑기",      new Vector2(-285, -260), true, null);
+            MakeMenuButton("icon_shield",  "배치",      new Vector2(285, -260),  true, null);
         }
 
-        void MakeMenuButton(string iconName, Vector2 pos, bool locked, System.Action onClick)
+        void MakeMenuButton(string iconName, string label, Vector2 pos, bool locked, System.Action onClick)
         {
             var panel = Ui.Panel(canvas.transform, new Color(0.15f, 0.13f, 0.1f, 0.85f), "Btn_" + iconName);
             Ui.Place(panel, new Vector2(0.5f, 0.5f), pos, new Vector2(380, 160));
 
             var iconSprite = SpriteBank.GetEnv(iconName);
-            Image icon;
-            Button btn;
+            var icon = Ui.Image(panel, iconSprite, "Icon");
+            Ui.Place((RectTransform)icon.transform, new Vector2(0f, 0.5f), new Vector2(90, 0), new Vector2(100, 100));
+            icon.preserveAspect = true;
 
+            var textColor = locked ? new Color(0.6f, 0.6f, 0.6f) : Color.white;
+            var txt = Ui.OutlinedLabel(panel, label, 46, textColor, "Label");
+            Ui.Place((RectTransform)txt.transform, new Vector2(0.5f, 0.5f), new Vector2(50, 0));
+
+            var btn = panel.gameObject.AddComponent<Button>();
             if (locked)
             {
-                icon = Ui.Image(panel, iconSprite, "Icon");
                 icon.color = new Color(0.5f, 0.5f, 0.5f);
                 var lockImg = Ui.Image(panel, SpriteBank.GetEnv("icon_lock"), "Lock");
-                Ui.Place((RectTransform)lockImg.transform, new Vector2(1f, 1f), new Vector2(-10, -10), new Vector2(56, 56));
+                Ui.Place((RectTransform)lockImg.transform, new Vector2(1f, 1f), new Vector2(-14, -14), new Vector2(50, 50));
                 lockImg.preserveAspect = true;
-                btn = panel.gameObject.AddComponent<Button>();
                 var panelImg = panel.GetComponent<Image>();
                 btn.onClick.AddListener(() => Ui.Flash(this, panelImg, new Color(0.6f, 0.15f, 0.15f)));
             }
             else
             {
-                icon = Ui.Image(panel, iconSprite, "Icon");
-                btn = panel.gameObject.AddComponent<Button>();
                 btn.onClick.AddListener(() => onClick?.Invoke());
             }
-
-            Ui.Place((RectTransform)icon.transform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(110, 110));
-            icon.preserveAspect = true;
         }
     }
 }

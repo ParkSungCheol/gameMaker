@@ -17,6 +17,9 @@ namespace GameMaker.Screens
             var bg = Ui.Panel(canvas.transform, new Color(0.09f, 0.11f, 0.16f), "Bg");
             Ui.Stretch(bg);
 
+            var title = Ui.OutlinedLabel(canvas.transform, "보물찾기 여정", 58, Color.white, "Title");
+            Ui.Place((RectTransform)title.transform, new Vector2(0.5f, 1f), new Vector2(0, -70));
+
             // 머니: [코인 + 숫자]
             var player = DataHub.I.GetPlayer();
             var money = Ui.IconValue(canvas.transform, SpriteBank.GetEnv("icon_coin"),
@@ -36,14 +39,17 @@ namespace GameMaker.Screens
                 int col = (s - 1) % 3;
                 var pos = new Vector2((col - 1) * 420, 130 - row * 230);
 
-                var thumb = SpriteBank.GetEnv("stage" + s + "bg");
+                var thumb = SpriteBank.GetEnv("stage" + s + "thumb") ?? SpriteBank.GetEnv("stage" + s + "bg");
                 var btn = Ui.ImageButton(canvas.transform, thumb, new Vector2(380, 190),
                     () => ScreenRouter.I.Show(ScreenId.Battlefield, stageNum), "Stage" + s);
                 Ui.Place((RectTransform)btn.transform, new Vector2(0.5f, 0.5f), pos);
 
-                // 스테이지 숫자 (외곽선)
+                // 스테이지 숫자 + 여행지 이름 (외곽선)
                 var num = Ui.OutlinedLabel(btn.transform, s.ToString(), 52, Color.white, "Num");
                 Ui.Place((RectTransform)num.transform, new Vector2(0f, 1f), new Vector2(34, -34));
+
+                var place = Ui.OutlinedLabel(btn.transform, DataHub.I.GetStage(s).label, 32, Color.white, "Place");
+                Ui.Place((RectTransform)place.transform, new Vector2(0.5f, 0f), new Vector2(0, 26));
 
                 // 클리어 횟수 → 코인 아이콘 나열 (최대 5개)
                 int cleared = Mathf.Min(player.mapClear[s], 5);

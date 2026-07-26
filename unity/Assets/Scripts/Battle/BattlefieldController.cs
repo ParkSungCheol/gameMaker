@@ -45,6 +45,9 @@ namespace GameMaker.Battle
         Image walletImg;
         readonly List<Image> spawnBtnImages = new List<Image>();
         readonly List<int> spawnBtnCosts = new List<int>();
+        readonly List<Image> spawnCdOverlays = new List<Image>();  // 쿨타임 차오름 표시
+        readonly List<float> spawnCooldowns = new List<float>();
+        readonly List<float> spawnTimers = new List<float>();      // 남은 쿨타임
 
         static readonly string[] SpawnableUnits = { "ourbasic", "ourtank", "ourbattle", "ourmass" };
 
@@ -81,9 +84,15 @@ namespace GameMaker.Battle
             cam.backgroundColor = new Color(0.45f, 0.65f, 0.85f); // 하늘
         }
 
-        /// <summary>스테이지 테마 배경 이미지를 전장 전체에 깔아준다.</summary>
+        /// <summary>스테이지 배경 — 하늘 장면(하늘+태양+소품) 또는 통짜 그림.</summary>
         void SetupBackground()
         {
+            if (!string.IsNullOrEmpty(stage.sky))
+            {
+                SetupSkyScene();
+                return;
+            }
+
             var bgSprite = Resources.Load<Sprite>("Sprites/env/" + stage.bg);
             if (bgSprite == null) return;
 
@@ -93,11 +102,12 @@ namespace GameMaker.Battle
             sr.sprite = bgSprite;
             sr.sortingOrder = -20;
 
-            // 전장(2800px + 여유)을 덮도록 균등 스케일, 지면(y=0) 기준 배치
+            // 전장(2800px + 여유)을 덮도록 균등 스케일.
+            // 배경 그림의 자체 지면 실루엣(하단 ~8%)이 우리 지면선(y=0)에 걸치도록 배치
             float scale = (WorldWidth + 900f) / bgSprite.bounds.size.x;
             bg.transform.localScale = new Vector3(scale, scale, 1f);
             float h = bgSprite.bounds.size.y * scale;
-            bg.transform.position = new Vector3(WorldWidth * 0.5f, h * 0.5f - 120f, 0f);
+            bg.transform.position = new Vector3(WorldWidth * 0.5f, h * 0.5f - h * 0.08f, 0f);
 
             // 배경 하단 색으로 카메라 배경도 맞춤 (배경 밖 영역 위화감 제거)
             var tex = bgSprite.texture;
@@ -105,9 +115,132 @@ namespace GameMaker.Battle
                 Camera.main.backgroundColor = tex.GetPixel(tex.width / 2, 5);
         }
 
+        /// <summary>카툰 하늘 장면: 하늘 그라데이션 + 태양 + 스테이지 소품들.</summary>
+        void SetupSkyScene()
+        {
+            var skySprite = Resources.Load<Sprite>("Sprites/env/" + stage.sky);
+            if (skySprite != null)
+            {
+                var sky = new GameObject("Sky");
+                sky.transform.SetParent(transform, false);
+                var sr = sky.AddComponent<SpriteRenderer>();
+                sr.sprite = skySprite;
+                sr.sortingOrder = -20;
+                sky.transform.localScale = new Vector3(
+                    (WorldWidth + 900f) / skySprite.bounds.size.x,
+                    2200f / skySprite.bounds.size.y, 1f);
+                sky.transform.position = new Vector3(WorldWidth * 0.5f, 800f, 0f);
+                Camera.main.backgroundColor = new Color(0.55f, 0.86f, 0.95f);
+            }
+
+            // 떠다니는 구름들 — 화면 전체에 고르게 시작, 왼쪽 밖으로 나가면 오른쪽에서 새 모습으로 재등장
+            for (int i = 0; i < 6; i++)
+            {
+                var cl = new GameObject("Cloud" + i);
+                cl.transform.SetParent(transform, false);
+                var csr = cl.AddComponent<SpriteRenderer>();
+                csr.sprite = SpriteBank.Cloud;
+                csr.color = new Color(1f, 1f, 1f, 0.92f);
+                csr.sortingOrder = -18;
+                float s = 1.5f + (i % 3) * 0.6f;
+                cl.transform.localScale = new Vector3(s, s, 1f);
+                float y = 800f + (i % 3) * 160f + (i % 2) * 70f;
+                cl.transform.position = new Vector3(150f + i * 560f, y, 0f);
+                var drift = cl.AddComponent<Drift>();
+                drift.speed = Random.Range(24f, 55f); // 완전 랜덤 — 서로 다른 속도로 흩어짐
+                drift.baseY = y;
+            }
+
+            var sunSprite = Resources.Load<Sprite>("Sprites/env/sun");
+            if (sunSprite != null)
+            {
+                var sun = new GameObject("Sun");
+                sun.transform.SetParent(transform, false);
+                var sr = sun.AddComponent<SpriteRenderer>();
+                sr.sprite = sunSprite;
+                sr.sortingOrder = -19;
+                float s = 260f / sunSprite.bounds.size.y;
+                sun.transform.localScale = new Vector3(s, s, 1f);
+                sun.transform.position = new Vector3(WorldWidth - 480f, 980f, 0f);
+            }
+
+            if (stage.props == null) return;
+            foreach (var p in stage.props)
+            {
+                var sp = Resources.Load<Sprite>("Sprites/env/" + p.img);
+                if (sp == null) continue;
+
+                // 밑동 루트 — 지면에 깊이 파묻혀 잔디 립이 자연스럽게 덮음
+                var root = new GameObject("Prop_" + p.img);
+                root.transform.SetParent(transform, false);
+                root.transform.position = new Vector3(p.x, -30f, 0f);
+
+                var body = new GameObject("Sprite");
+                body.transform.SetParent(root.transform, false);
+                var sr = body.AddComponent<SpriteRenderer>();
+                sr.sprite = sp;
+                sr.sortingOrder = -12; // 지면(-10)이 밑동을 덮음
+                float s = p.h / sp.bounds.size.y;
+                body.transform.localScale = new Vector3(s, s, 1f);
+                body.transform.localPosition = new Vector3(0, p.h * 0.5f, 0);
+
+                // 나무/덤불만 바람 흔들림 (바위/건물 제외)
+                if (p.img.Contains("pine") || p.img.Contains("bush") || p.img.Contains("tree"))
+                {
+                    var sway = root.AddComponent<Sway>();
+                    sway.amplitude = p.h > 300 ? 1.6f : 2.6f;
+                }
+
+            }
+        }
+
         void SetupGround()
         {
-            var tile = Resources.Load<Sprite>("Sprites/env/" + stage.ground);
+            // 카툰 지면 기둥 (윗면 잔디/모래/파도 립 포함) — 가로로 타일링
+            if (!string.IsNullOrEmpty(stage.groundCol))
+            {
+                var col = Resources.Load<Sprite>("Sprites/env/" + stage.groundCol);
+                if (col != null)
+                {
+                    var g = new GameObject("GroundCol");
+                    g.transform.SetParent(transform, false);
+                    var gsr = g.AddComponent<SpriteRenderer>();
+                    gsr.sprite = col;
+                    gsr.drawMode = SpriteDrawMode.Tiled;
+                    float ch = col.bounds.size.y;
+                    gsr.size = new Vector2(WorldWidth + 900f, ch);
+                    gsr.sortingOrder = -10;
+                    g.transform.position = new Vector3(WorldWidth * 0.5f, -ch * 0.5f + 20f, 0f);
+
+                    // 잔디립 물결: 립 스트립을 두 겹 겹쳐 좌우로 일렁이게 → 바닥 자체가 움직이는 느낌
+                    var lip = Resources.Load<Sprite>("Sprites/env/" + stage.groundCol.Replace("col_", "lip_"));
+                    if (lip != null)
+                    {
+                        float lipH = lip.bounds.size.y;
+                        for (int layer = 0; layer < 2; layer++)
+                        {
+                            var lo = new GameObject("LipWave" + layer);
+                            lo.transform.SetParent(transform, false);
+                            var lsr = lo.AddComponent<SpriteRenderer>();
+                            lsr.sprite = lip;
+                            lsr.drawMode = SpriteDrawMode.Tiled;
+                            lsr.size = new Vector2(WorldWidth + 1000f, lipH);
+                            lsr.sortingOrder = -9;
+                            lsr.color = layer == 0 ? Color.white : new Color(1f, 1f, 1f, 0.85f);
+                            // 지면 윗선(y=20)에 정확히 겹침
+                            lo.transform.position = new Vector3(WorldWidth * 0.5f + layer * 90f, 20f - lipH * 0.5f, 0f);
+                            var wave = lo.AddComponent<LipWave>();
+                            wave.amplitude = layer == 0 ? 7f : 10f;
+                            wave.speed = layer == 0 ? 1.2f : 0.9f;
+                            wave.phase = layer * 2.4f;
+                        }
+                    }
+                    return;
+                }
+            }
+
+            var tile = string.IsNullOrEmpty(stage.ground) ? null
+                     : Resources.Load<Sprite>("Sprites/env/" + stage.ground);
             var ground = new GameObject("Ground");
             ground.transform.SetParent(transform, false);
             var sr = ground.AddComponent<SpriteRenderer>();
@@ -122,73 +255,109 @@ namespace GameMaker.Battle
             }
             else
             {
-                var tex = new Texture2D(1, 1);
-                tex.SetPixel(0, 0, Color.white);
-                tex.Apply();
-                sr.sprite = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
-                sr.color = new Color(0.25f, 0.4f, 0.2f);
-                ground.transform.localScale = new Vector3(WorldWidth + 800f, 800f, 1f);
+                // 배경 그림 하단 색을 샘플링해서 지면을 같은 팔레트로 (조화 보장)
+                sr.sprite = SpriteBank.White;
+                sr.color = SampleBgBottomColor() * 0.8f;
+                ground.transform.localScale = new Vector3(WorldWidth + 900f, 800f, 1f);
                 ground.transform.position = new Vector3(WorldWidth * 0.5f, -400f, 0f);
             }
+        }
+
+        /// <summary>배경 텍스처 맨 아래 줄 평균색 (읽기 불가면 무난한 어두운 녹색).</summary>
+        Color SampleBgBottomColor()
+        {
+            var bgSprite = Resources.Load<Sprite>("Sprites/env/" + stage.bg);
+            var tex = bgSprite != null ? bgSprite.texture : null;
+            if (tex == null || !tex.isReadable) return new Color(0.22f, 0.3f, 0.18f);
+
+            Color sum = Color.black;
+            int n = 0;
+            for (int x = 0; x < tex.width; x += 40)
+            {
+                sum += tex.GetPixel(x, 4);
+                n++;
+            }
+            var c = sum / Mathf.Max(n, 1);
+            c.a = 1f;
+            return c;
         }
 
         void SetupHud()
         {
             hud = Ui.CreateCanvas(transform, "BattleHud");
 
-            // 스테이지 표기: 방패 아이콘 + 숫자 (텍스트 없음)
-            var stageNo = Ui.IconValue(hud.transform, SpriteBank.GetEnv("icon_shield"),
-                mapNumber.ToString(), 46, Color.white, "StageNo");
-            Ui.Place((RectTransform)stageNo.transform.parent, new Vector2(0.5f, 1f), new Vector2(-40, -60));
+            // 여행지 이름: 상단 중앙 — 기존 스타일 (외곽선 흰 글씨)
+            var placeText = Ui.OutlinedLabel(hud.transform, stage.label, 52, Color.white, "Place");
+            Ui.Place((RectTransform)placeText.transform, new Vector2(0.5f, 1f), new Vector2(0, -55));
 
-            // 남은 시간 (레거시 timeText)
-            timeText = Ui.Label(hud.transform, "3:0", 52, Color.white, "Time");
-            Ui.Place((RectTransform)timeText.transform, new Vector2(1f, 1f), new Vector2(-80, -50));
+            // 남은 시간: 양피지 배지 + 짙은 갈색 숫자
+            var timeBadge = Ui.Image(hud.transform, SpriteBank.GetEnv("panel_parchment"), "TimeBadge");
+            Ui.Place((RectTransform)timeBadge.transform, new Vector2(1f, 1f), new Vector2(-115, -55), new Vector2(200, 78));
+            timeText = Ui.Label(timeBadge.transform, "3:00", 46, new Color(0.35f, 0.22f, 0.08f), "Time");
+            Ui.Place((RectTransform)timeText.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 2));
 
-            // 현재 코스트: [코인 아이콘 + 숫자]
-            costText = Ui.IconValue(hud.transform, SpriteBank.GetEnv("icon_coin"), "0", 54,
-                new Color(1f, 0.9f, 0.3f), "Cost");
-            Ui.Place((RectTransform)costText.transform.parent, new Vector2(0f, 1f), new Vector2(70, -70));
+            // 현재 코스트: 양피지 + [코인 + "현재 / 최대"] — 다른 HUD 글씨와 같은 외곽선 흰 글씨
+            var costPanel = Ui.Image(hud.transform, SpriteBank.GetEnv("panel_parchment"), "CostPanel");
+            Ui.Place((RectTransform)costPanel.transform, new Vector2(0f, 1f), new Vector2(160, -55), new Vector2(280, 82));
+            costText = Ui.IconValue(costPanel.transform, SpriteBank.GetEnv("icon_coin"), "0 / 100", 42,
+                Color.white, "Cost");
+            Ui.Place((RectTransform)costText.transform.parent, new Vector2(0.5f, 0.5f), new Vector2(-70, 1));
 
-            // 지갑 업그레이드 버튼: 업그레이드 아이콘 + 위에 Lv 뱃지 + 아래에 [코인+가격]
-            var walletBtn = Ui.ImageButton(hud.transform, SpriteBank.GetEnv("icon_upgrade"),
-                new Vector2(100, 85), UpgradeWallet, "WalletUpgrade");
-            Ui.Place((RectTransform)walletBtn.transform, new Vector2(0f, 1f), new Vector2(90, -160));
+            // 지갑 업그레이드: 소환 버튼 열과 같은 높이·비슷한 크기의 원형 버튼 (좌측)
+            var walletBtn = Ui.CircleIconButton(hud.transform, "icon_coins", 148, UpgradeWallet, "WalletUpgrade");
+            Ui.Place((RectTransform)walletBtn.transform, new Vector2(0f, 0f), new Vector2(110, 85)); // 소환 열(y=85) 정렬
             walletImg = walletBtn.GetComponent<Image>();
-            walletImg.preserveAspect = true;
 
-            walletLevelText = Ui.OutlinedLabel(walletBtn.transform, "Lv.1", 30, Color.white, "WalletLevel");
-            Ui.Place((RectTransform)walletLevelText.transform, new Vector2(0.5f, 1f), new Vector2(0, 34));
+            var lvBadge = Ui.RoundedPanel(walletBtn.transform, new Color(0.15f, 0.6f, 0.3f, 0.95f), "LvBadge");
+            Ui.Place((RectTransform)lvBadge.transform, new Vector2(0.5f, 1f), new Vector2(38, 0), new Vector2(90, 44));
+            walletLevelText = Ui.OutlinedLabel(lvBadge.transform, "Lv.1", 30, Color.white, "WalletLevel");
+            Ui.Place((RectTransform)walletLevelText.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 1));
 
             walletPriceText = Ui.IconValue(walletBtn.transform, SpriteBank.GetEnv("icon_coin"), "50", 30,
                 new Color(1f, 0.9f, 0.3f), "WalletPrice");
-            Ui.Place((RectTransform)walletPriceText.transform.parent, new Vector2(0.5f, 0f), new Vector2(-28, -26));
+            Ui.Place((RectTransform)walletPriceText.transform.parent, new Vector2(0.5f, 0f), new Vector2(-28, -20));
 
-            // 유닛 소환 버튼: 에셋의 초상화(Portrait) 사용, 가격은 버튼 아래 [코인+숫자]로 (이미지 가림 없음)
+            // 유닛 소환 버튼: 나무 버튼 프레임 + 초상화 + 가격
             for (int i = 0; i < SpawnableUnits.Length; i++)
             {
                 string unitName = SpawnableUnits[i];
                 var m = DataHub.I.FindMonster(unitName);
                 var portrait = SpriteBank.GetEnv(unitName.Replace("our", "portrait_"));
 
-                var btn = Ui.ImageButton(hud.transform, portrait, new Vector2(130, 130),
+                var btn = Ui.ImageButton(hud.transform, SpriteBank.GetEnv("btn_wood"), new Vector2(150, 140),
                     () => TrySpawnOur(unitName), "Spawn_" + unitName);
                 Ui.Place((RectTransform)btn.transform, new Vector2(0.5f, 0f),
-                    new Vector2((i - (SpawnableUnits.Length - 1) * 0.5f) * 170f, 80));
+                    new Vector2((i - (SpawnableUnits.Length - 1) * 0.5f) * 175f, 85));
+
+                var face = Ui.Image(btn.transform, portrait, "Portrait");
+                Ui.Place((RectTransform)face.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 8), new Vector2(100, 100));
+                face.preserveAspect = true;
 
                 var price = Ui.IconValue(btn.transform, SpriteBank.GetEnv("icon_coin"),
                     m.cost.ToString(), 30, new Color(1f, 0.9f, 0.3f), "Price");
-                Ui.Place((RectTransform)price.transform.parent, new Vector2(0.5f, 0f), new Vector2(-30, -28));
+                Ui.Place((RectTransform)price.transform.parent, new Vector2(0.5f, 0f), new Vector2(-30, -20));
+
+                // 쿨타임 오버레이 — 위에서부터 걷히며 차오르는 표현 (냥코 스타일)
+                var cd = Ui.Image(btn.transform, SpriteBank.White, "CdOverlay");
+                Ui.Stretch((RectTransform)cd.transform);
+                cd.color = new Color(0f, 0f, 0f, 0.62f);
+                cd.type = Image.Type.Filled;
+                cd.fillMethod = Image.FillMethod.Vertical;
+                cd.fillOrigin = (int)Image.OriginVertical.Top;
+                cd.fillAmount = 0f;
+                cd.raycastTarget = false;
 
                 spawnBtnImages.Add(btn.GetComponent<Image>());
                 spawnBtnCosts.Add(m.cost);
+                spawnCdOverlays.Add(cd);
+                spawnCooldowns.Add(m.cooldown > 0 ? m.cooldown : 1f);
+                spawnTimers.Add(0f);
             }
 
-            // 포기(귀환) 버튼 — 화살표 아이콘
-            var giveUp = Ui.ImageButton(hud.transform, SpriteBank.GetEnv("icon_return"),
-                new Vector2(90, 72), () => ScreenRouter.I.Show(ScreenId.Map), "GiveUp");
-            Ui.Place((RectTransform)giveUp.transform, new Vector2(1f, 0f), new Vector2(-40, 40));
-            giveUp.GetComponent<Image>().preserveAspect = true;
+            // 포기(귀환) 버튼 — 우측 하단 원형 버튼
+            var giveUp = Ui.CircleIconButton(hud.transform, "icon_return", 92,
+                () => ScreenRouter.I.Show(ScreenId.Map), "GiveUp");
+            Ui.Place((RectTransform)giveUp.transform, new Vector2(1f, 0f), new Vector2(-58, 50));
         }
 
         // ────────────────────────── 루프 ──────────────────────────
@@ -222,7 +391,7 @@ namespace GameMaker.Battle
                 }
 
                 timeText.text = enemyCount / 60 + ":" + (enemyCount % 60).ToString("00");
-                if (enemyCount <= 10) timeText.color = new Color(0.9f, 0.4f, 1f); // 레거시 purple_200
+                if (enemyCount <= 10) timeText.color = new Color(0.75f, 0.15f, 0.1f); // 임박 경고(양피지 위 빨강)
 
                 enemyCount = Mathf.Max(0, enemyCount - 1);
                 yield return new WaitForSeconds(1f);
@@ -231,19 +400,33 @@ namespace GameMaker.Battle
 
         void RefreshCostHud()
         {
-            costText.text = cost.ToString();
+            costText.text = cost + " / " + costMax; // 지갑 용량이 보이도록
             walletLevelText.text = "Lv." + WalletLevel;
             walletPriceText.text = (50 * WalletLevel).ToString();
         }
 
-        /// <summary>매 프레임: 살 수 없는 버튼은 어둡게 표시 (텍스트 안내 대신 시각적 피드백).</summary>
+        /// <summary>매 프레임 소환 버튼 3단계 상태:
+        /// 쿨타임 중 = 어둡게 + 오버레이 차오름 / 쿨타임 완료·돈 부족 = 회색 / 준비 = 밝게.</summary>
         void Update()
         {
             if (BattleOver || hud == null) return;
 
             var dim = new Color(0.4f, 0.4f, 0.4f);
+            var cdDim = new Color(0.55f, 0.55f, 0.55f);
             for (int i = 0; i < spawnBtnImages.Count; i++)
-                spawnBtnImages[i].color = cost >= spawnBtnCosts[i] ? Color.white : dim;
+            {
+                if (spawnTimers[i] > 0f)
+                {
+                    spawnTimers[i] -= Time.deltaTime;
+                    spawnCdOverlays[i].fillAmount = Mathf.Clamp01(spawnTimers[i] / spawnCooldowns[i]);
+                    spawnBtnImages[i].color = cdDim;
+                }
+                else
+                {
+                    spawnCdOverlays[i].fillAmount = 0f;
+                    spawnBtnImages[i].color = cost >= spawnBtnCosts[i] ? Color.white : dim;
+                }
+            }
 
             bool canUpgrade = costSpeedMs - 10 >= 100 && cost >= 50 * WalletLevel;
             walletImg.color = canUpgrade ? Color.white : dim;
@@ -271,14 +454,18 @@ namespace GameMaker.Battle
         {
             if (BattleOver) return;
 
+            int idx = System.Array.IndexOf(SpawnableUnits, name);
             var m = DataHub.I.FindMonster(name);
-            if (ourParty.Count >= 10 || cost < m.cost)
+
+            // 쿨타임 미완 / 인원 초과 / 코스트 부족 → 해당 버튼 빨간 플래시
+            if ((idx >= 0 && spawnTimers[idx] > 0f) || ourParty.Count >= 10 || cost < m.cost)
             {
-                foreach (var img in spawnBtnImages) Ui.Flash(this, img, new Color(1f, 0.25f, 0.25f));
+                if (idx >= 0) Ui.Flash(this, spawnBtnImages[idx], new Color(1f, 0.25f, 0.25f));
                 return;
             }
 
             cost -= m.cost;
+            if (idx >= 0) spawnTimers[idx] = spawnCooldowns[idx]; // 쿨타임 시작
             RefreshCostHud();
             SpawnUnit(name);
         }
@@ -342,15 +529,16 @@ namespace GameMaker.Battle
             if (BattleOver) return;
             BattleOver = true;
 
-            // 승리 = 황금 보물상자 / 패배 = 무너진 아군 성 (텍스트 없음)
+            // 승리 = 황금 보물상자 / 패배 = 무너진 아군 성. 승리 시 보상 획득 내역 표시
             var image = win
                 ? SpriteBank.GetEnv("icon_win")
                 : SpriteBank.GetFrames("ourcastle", "defeat")[0];
-            Ui.ResultDialog(hud.transform, image, () =>
-            {
-                if (win) DataHub.I.Clear(mapNumber);
-                ScreenRouter.I.Show(ScreenId.Map);
-            });
+            int before = DataHub.I.GetPlayer().money;
+            int reward = win ? DataHub.I.Clear(mapNumber) : 0;
+
+            Ui.ResultDialog(hud.transform, win, image, reward, before,
+                onRetry: () => ScreenRouter.I.Show(ScreenId.Battlefield, mapNumber),
+                onHome: () => ScreenRouter.I.Show(ScreenId.Map));
         }
     }
 }

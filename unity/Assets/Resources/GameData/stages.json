@@ -1,13 +1,22 @@
 {
   "items": [
-    { "mapNumber": 1, "bg": "stage1bg", "ground": "ground_grass", "boss": "" },
-    { "mapNumber": 2, "bg": "stage2bg", "ground": "ground_grass", "boss": "" },
-    { "mapNumber": 3, "bg": "stage3bg", "ground": "ground_grass", "boss": "" },
-    { "mapNumber": 4, "bg": "stage4bg", "ground": "ground_grass", "boss": "" },
-    { "mapNumber": 5, "bg": "stage5bg", "ground": "ground_cave1", "boss": "" },
-    { "mapNumber": 6, "bg": "stage6bg", "ground": "ground_cave2", "boss": "" },
-    { "mapNumber": 7, "bg": "stage7bg", "ground": "ground_grass", "boss": "" },
-    { "mapNumber": 8, "bg": "stage8bg", "ground": "ground_grass", "boss": "mimic" },
-    { "mapNumber": 9, "bg": "stage9bg", "ground": "ground_cave3", "boss": "dragonboss" }
+    { "mapNumber": 1, "label": "부산 출항", "bg": "", "sky": "sky_cyan", "groundCol": "col_grass", "ground": "", "boss": "",
+      "props": [ { "img": "rock_big", "x": 2250, "h": 220 }, { "img": "rock_small", "x": 550, "h": 140 } ] },
+    { "mapNumber": 2, "label": "쓰시마 섬", "bg": "", "sky": "sky_cyan", "groundCol": "col_forest", "ground": "", "boss": "",
+      "props": [ { "img": "pine", "x": 750, "h": 470 }, { "img": "pine", "x": 2050, "h": 420 }, { "img": "log", "x": 1400, "h": 85 } ] },
+    { "mapNumber": 3, "label": "규슈 밀림", "bg": "", "sky": "sky_cyan", "groundCol": "col_forest_light", "ground": "", "boss": "",
+      "props": [ { "img": "pine", "x": 500, "h": 500 }, { "img": "pine", "x": 1250, "h": 450 }, { "img": "pine", "x": 2300, "h": 480 }, { "img": "bush_big", "x": 1750, "h": 95 } ] },
+    { "mapNumber": 4, "label": "남만 바다", "bg": "", "sky": "sky_cyan", "groundCol": "col_ocean", "ground": "", "boss": "",
+      "props": [] },
+    { "mapNumber": 5, "label": "대만 동굴", "bg": "stage5bg", "sky": "", "groundCol": "", "ground": "ground_cave1", "boss": "",
+      "props": [] },
+    { "mapNumber": 6, "label": "히말라야 수정굴", "bg": "stage6bg", "sky": "", "groundCol": "", "ground": "ground_cave2", "boss": "slimeking",
+      "props": [] },
+    { "mapNumber": 7, "label": "사하라 사막", "bg": "", "sky": "sky_cyan", "groundCol": "col_sand", "ground": "", "boss": "",
+      "props": [ { "img": "rock_small", "x": 900, "h": 130 }, { "img": "rock_big", "x": 1950, "h": 200 } ] },
+    { "mapNumber": 8, "label": "시베리아 설원", "bg": "", "sky": "sky_cyan", "groundCol": "col_snow", "ground": "", "boss": "skullwarrior",
+      "props": [ { "img": "snowpine", "x": 700, "h": 430 }, { "img": "igloo", "x": 2150, "h": 300 }, { "img": "snowpine", "x": 1500, "h": 380 } ] },
+    { "mapNumber": 9, "label": "버뮤다 심연", "bg": "stage9bg", "sky": "", "groundCol": "", "ground": "ground_cave3", "boss": "dragonboss",
+      "props": [] }
   ]
 }

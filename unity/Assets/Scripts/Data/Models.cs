@@ -18,7 +18,9 @@ namespace GameMaker.Data
         public float moveSpeed;      // 이동속도(px/초)
         public float attackInterval; // 공격 주기(초)
         public int cost;             // 소환 비용
+        public float cooldown;       // 소환 쿨타임(초) — 아군 전용
         public int height;           // 화면 표시 높이(px)
+        public string facing;        // 원본 스프라이트가 보는 방향: "left" 또는 ""(오른쪽)
 
         public bool IsCastle => name.Contains("castle");
         public bool IsOur => team != "enemy";
@@ -27,13 +29,26 @@ namespace GameMaker.Data
     }
 
     /// <summary>스테이지 테마: 배경/지면/보스 (Resources/GameData/stages.json)</summary>
+    /// <summary>스테이지 배경 소품 (하늘 장면용): env 스프라이트를 x 위치에 h 높이로.</summary>
+    [Serializable]
+    public class PropSpec
+    {
+        public string img;
+        public float x;
+        public float h;
+    }
+
     [Serializable]
     public class StageData
     {
         public int mapNumber;
-        public string bg;      // Resources/Sprites/env/{bg}
-        public string ground;  // Resources/Sprites/env/{ground} (타일)
-        public string boss;    // 남은시간 0초에 등장할 보스 이름 (빈 문자열 = 없음)
+        public string label;     // 여행지 이름 (보물찾기 여정 컨셉)
+        public string bg;        // 통짜 배경 그림 (동굴 등) — sky 가 비어있을 때 사용
+        public string sky;       // 하늘 장면: env 하늘 스프라이트 (지정 시 sun+props 조합 장면)
+        public string groundCol; // 카툰 지면 기둥 (가로 타일링)
+        public string ground;    // (구) 지면 타일 — groundCol 이 비었을 때 사용
+        public string boss;      // 남은시간 0초에 등장할 보스 이름 (빈 문자열 = 없음)
+        public List<PropSpec> props;
     }
 
     [Serializable]
