@@ -6,7 +6,10 @@ using UnityEngine.UI;
 
 namespace GameMaker.Screens
 {
-    /// <summary>로비 — 텍스트 없이 아이콘 버튼 4개 (맵 / 업그레이드 / 뽑기(잠김) / 배치(잠김)).</summary>
+    /// <summary>
+    /// 로비 — 타이틀 화면과 같은 야외 배경/행진 연출을 공유하고,
+    /// 메뉴는 전투 소환 버튼과 같은 나무 프레임 한 줄(게임 속 아트 아이콘 + 라벨)로 구성한다.
+    /// </summary>
     public class MainScreen : MonoBehaviour
     {
         Canvas canvas;
@@ -15,53 +18,48 @@ namespace GameMaker.Screens
         {
             canvas = Ui.CreateCanvas(transform, "MainCanvas");
 
-            // 배경: 스테이지1 하늘 (밝고 귀여운 톤)
-            var bgSprite = SpriteBank.GetEnv("stage1bg");
-            if (bgSprite != null)
-            {
-                var bg = Ui.Image(canvas.transform, bgSprite, "Bg");
-                Ui.Stretch((RectTransform)bg.transform);
-            }
+            MenuBackdrop.Build(this, canvas);
+            MenuBackdrop.BuildParade(this, canvas);
 
-            // 타이틀: 아군 성 + 유닛 행진 이미지 연출
-            var castle = Ui.Image(canvas.transform, SpriteBank.GetFrames("ourcastle", "move")[0], "TitleCastle");
-            Ui.Place((RectTransform)castle.transform, new Vector2(0.5f, 1f), new Vector2(0, -160), new Vector2(260, 260));
-            castle.preserveAspect = true;
+            // 타이틀 화면과 같은 게임명 (조금 작게, 상단)
+            MenuBackdrop.TitleLabel(canvas, 92, new Vector2(0.5f, 1f), new Vector2(0, -105));
 
-            var hero = Ui.Image(canvas.transform, SpriteBank.GetFrames("ourbasic", "move")[0], "TitleHero");
-            Ui.Place((RectTransform)hero.transform, new Vector2(0.5f, 1f), new Vector2(-190, -220), new Vector2(140, 140));
-            hero.preserveAspect = true;
-
-            // 아이콘 + 라벨 버튼 4개
-            MakeMenuButton("icon_map",     "맵",       new Vector2(-285, -60), false, () => ScreenRouter.I.Show(ScreenId.Map));
-            MakeMenuButton("icon_upgrade", "업그레이드", new Vector2(285, -60),  false, () => ScreenRouter.I.Show(ScreenId.Upgrade));
-            MakeMenuButton("icon_chest",   "뽑기",      new Vector2(-285, -260), true, null);
-            MakeMenuButton("icon_shield",  "배치",      new Vector2(285, -260),  true, null);
+            // 메뉴 4개 — 전투 소환 버튼과 같은 나무 프레임, 2x2 큰 버튼. 아이콘은 게임 속 아트 재사용
+            MakeMenuButton(SpriteBank.GetEnv("stage1thumb"), new Vector2(180, 96),
+                "맵", new Vector2(-504, -150), false, () => ScreenRouter.I.Show(ScreenId.Map));
+            MakeMenuButton(SpriteBank.GetEnv("icon_arrowup"), new Vector2(118, 118),
+                "업그레이드", new Vector2(-168, -150), false, () => ScreenRouter.I.Show(ScreenId.Upgrade));
+            MakeMenuButton(SpriteBank.GetEnv("icon_chest_closed"), new Vector2(150, 94),
+                "뽑기", new Vector2(168, -150), true, null);
+            MakeMenuButton(SpriteBank.GetEnv("portrait_tank"), new Vector2(126, 126),
+                "배치", new Vector2(504, -150), true, null);
         }
 
-        void MakeMenuButton(string iconName, string label, Vector2 pos, bool locked, System.Action onClick)
+        void MakeMenuButton(Sprite iconSprite, Vector2 iconSize, string label, Vector2 pos, bool locked, System.Action onClick)
         {
-            var panel = Ui.Panel(canvas.transform, new Color(0.15f, 0.13f, 0.1f, 0.85f), "Btn_" + iconName);
-            Ui.Place(panel, new Vector2(0.5f, 0.5f), pos, new Vector2(380, 160));
+            // 나무 프레임 원본 비율(150:140) 유지 — 옆으로 늘리면 무늬가 왜곡되어 조잡해진다
+            var btn = Ui.ImageButton(canvas.transform, SpriteBank.GetEnv("btn_wood"), new Vector2(300, 280),
+                null, "Btn_" + label);
+            Ui.Place((RectTransform)btn.transform, new Vector2(0.5f, 0.5f), pos);
+            Ui.PressedSwap(btn, SpriteBank.GetEnv("btn_wood_pressed"));
+            var btnImg = btn.GetComponent<Image>();
 
-            var iconSprite = SpriteBank.GetEnv(iconName);
-            var icon = Ui.Image(panel, iconSprite, "Icon");
-            Ui.Place((RectTransform)icon.transform, new Vector2(0f, 0.5f), new Vector2(90, 0), new Vector2(100, 100));
+            var icon = Ui.Image(btn.transform, iconSprite, "Icon");
+            Ui.Place((RectTransform)icon.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 42), iconSize);
             icon.preserveAspect = true;
 
-            var textColor = locked ? new Color(0.6f, 0.6f, 0.6f) : Color.white;
-            var txt = Ui.OutlinedLabel(panel, label, 46, textColor, "Label");
-            Ui.Place((RectTransform)txt.transform, new Vector2(0.5f, 0.5f), new Vector2(50, 0));
+            var txt = Ui.OutlinedLabel(btn.transform, label, 40, Color.white, "Label");
+            Ui.Place((RectTransform)txt.transform, new Vector2(0.5f, 0f), new Vector2(0, 40), new Vector2(270, 44));
 
-            var btn = panel.gameObject.AddComponent<Button>();
             if (locked)
             {
-                icon.color = new Color(0.5f, 0.5f, 0.5f);
-                var lockImg = Ui.Image(panel, SpriteBank.GetEnv("icon_lock"), "Lock");
-                Ui.Place((RectTransform)lockImg.transform, new Vector2(1f, 1f), new Vector2(-14, -14), new Vector2(50, 50));
+                // 시스템 공통 '불가' 표현: 회색 + 반투명 + 자물쇠
+                btnImg.color = new Color(0.4f, 0.4f, 0.4f);
+                btn.gameObject.AddComponent<CanvasGroup>().alpha = 0.55f;
+                var lockImg = Ui.Image(btn.transform, SpriteBank.GetEnv("icon_lock"), "Lock");
+                Ui.Place((RectTransform)lockImg.transform, new Vector2(1f, 1f), new Vector2(-16, -16), new Vector2(54, 54));
                 lockImg.preserveAspect = true;
-                var panelImg = panel.GetComponent<Image>();
-                btn.onClick.AddListener(() => Ui.Flash(this, panelImg, new Color(0.6f, 0.15f, 0.15f)));
+                btn.onClick.AddListener(() => Ui.Flash(this, btnImg, new Color(0.75f, 0.3f, 0.28f)));
             }
             else
             {

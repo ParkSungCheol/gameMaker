@@ -47,6 +47,9 @@ namespace GameMaker.Battle
         const string SpeedPrefKey = "gameSpeed"; // 배속은 스테이지가 바뀌어도 유지
         Image walletImg;
         readonly List<Image> spawnBtnImages = new List<Image>();
+        readonly List<CanvasGroup> spawnBtnGroups = new List<CanvasGroup>(); // 불가 상태 반투명 처리
+        readonly List<float> spawnFlashUntil = new List<float>();            // 빨간 플래시 유지 시각
+        CanvasGroup walletGroup;
         readonly List<int> spawnBtnCosts = new List<int>();
         readonly List<Image> spawnCdOverlays = new List<Image>();  // 쿨타임 차오름 표시
         readonly List<float> spawnCooldowns = new List<float>();
@@ -395,6 +398,7 @@ namespace GameMaker.Battle
             var walletBtn = Ui.CircleIconButton(hud.transform, "icon_coins", 148, UpgradeWallet, "WalletUpgrade");
             Ui.Place((RectTransform)walletBtn.transform, new Vector2(0f, 0f), new Vector2(110, 85)); // 소환 열(y=85) 정렬
             walletImg = walletBtn.GetComponent<Image>();
+            walletGroup = walletBtn.gameObject.AddComponent<CanvasGroup>(); // 불가 상태 반투명 (소환 버튼과 통일)
 
             var lvBadge = Ui.RoundedPanel(walletBtn.transform, new Color(0.15f, 0.6f, 0.3f, 0.95f), "LvBadge");
             Ui.Place((RectTransform)lvBadge.transform, new Vector2(0.5f, 1f), new Vector2(38, 0), new Vector2(90, 44));
@@ -435,7 +439,10 @@ namespace GameMaker.Battle
                 cd.fillAmount = 0f;
                 cd.raycastTarget = false;
 
+                Ui.PressedSwap(btn, SpriteBank.GetEnv("btn_wood_pressed"));
                 spawnBtnImages.Add(btn.GetComponent<Image>());
+                spawnBtnGroups.Add(btn.gameObject.AddComponent<CanvasGroup>());
+                spawnFlashUntil.Add(0f);
                 spawnBtnCosts.Add(m.cost);
                 spawnCdOverlays.Add(cd);
                 spawnCooldowns.Add(m.cooldown > 0 ? m.cooldown : 1f);
@@ -452,9 +459,8 @@ namespace GameMaker.Battle
                 partyPips.Add(pip);
             }
 
-            // 포기(귀환) 버튼 — 우측 하단 원형 버튼
-            var giveUp = Ui.CircleIconButton(hud.transform, "icon_return", 92,
-                () => ScreenRouter.I.Show(ScreenId.Map), "GiveUp");
+            // 포기(귀환) 버튼 — 우측 하단 원형 버튼, 누르면 확인 팝업
+            var giveUp = Ui.CircleIconButton(hud.transform, "icon_return", 92, ConfirmGiveUp, "GiveUp");
             Ui.Place((RectTransform)giveUp.transform, new Vector2(1f, 0f), new Vector2(-58, 50));
 
             // 배속 버튼 — 타이머 아래, x1 → x2 → x3 순환
@@ -469,6 +475,17 @@ namespace GameMaker.Battle
             // 저장된 배속 복원 (스테이지를 옮겨도 유지)
             gameSpeed = Mathf.Clamp(PlayerPrefs.GetInt(SpeedPrefKey, 1), 1, 3);
             ApplySpeed();
+        }
+
+        /// <summary>귀환 확인 팝업 — 뜨는 동안 전투 일시정지, 계속하기를 누르면 배속 복원.</summary>
+        void ConfirmGiveUp()
+        {
+            Time.timeScale = 0f;
+            Ui.ConfirmDialog(hud.transform, "잠깐!", "보물을 두고 돌아갈까요?",
+                "계속하기", "돌아가기",
+                onStay: ApplySpeed,
+                onLeave: () => ScreenRouter.I.Show(ScreenId.Map),
+                image: SpriteBank.GetEnv("icon_chest_closed")); // SUCCESS 황금상자와 같은 상자의 닫힌 모습
         }
 
         /// <summary>배속 순환 x1→x2→x3. 노랑(x2)/빨강(x3)으로 상태 표시.</summary>
@@ -558,22 +575,31 @@ namespace GameMaker.Battle
 
             for (int i = 0; i < spawnBtnImages.Count; i++)
             {
+                bool ready;
                 if (spawnTimers[i] > 0f)
                 {
                     spawnTimers[i] -= Time.deltaTime;
                     spawnCdOverlays[i].fillAmount = Mathf.Clamp01(spawnTimers[i] / spawnCooldowns[i]);
-                    spawnBtnImages[i].color = partyFull ? fullRed : cdDim;
+                    ready = false;
                 }
                 else
                 {
                     spawnCdOverlays[i].fillAmount = 0f;
-                    spawnBtnImages[i].color = partyFull ? fullRed
-                        : cost >= spawnBtnCosts[i] ? Color.white : dim;
+                    ready = cost >= spawnBtnCosts[i];
                 }
+
+                // 빨간 실패 플래시 중엔 색만 덮지 않는다 (투명도는 상태 그대로 유지)
+                if (Time.time >= spawnFlashUntil[i])
+                    spawnBtnImages[i].color = partyFull ? fullRed
+                        : spawnTimers[i] > 0f ? cdDim
+                        : ready ? Color.white : dim;
+                // 뽑을 수 없는 상태는 반투명 — 업그레이드 화면과 같은 표현 (정원 초과 빨강은 불투명 유지)
+                spawnBtnGroups[i].alpha = partyFull || ready ? 1f : 0.55f;
             }
 
             bool canUpgrade = costSpeedMs - 10 >= 100 && cost >= 50 * WalletLevel;
             walletImg.color = canUpgrade ? Color.white : dim;
+            walletGroup.alpha = canUpgrade ? 1f : 0.55f;
 
             // 부대 정원 게이지 갱신 — 가득 차면 크게 고동치는 빨간 점
             int count = ourParty.Count - 1; // 성 제외
@@ -623,7 +649,11 @@ namespace GameMaker.Battle
             // 쿨타임 미완 / 인원 초과 / 코스트 부족 → 해당 버튼 빨간 플래시
             if ((idx >= 0 && spawnTimers[idx] > 0f) || ourParty.Count - 1 >= 10 || cost < m.cost)
             {
-                if (idx >= 0) Ui.Flash(this, spawnBtnImages[idx], new Color(1f, 0.25f, 0.25f));
+                if (idx >= 0)
+                {
+                    spawnFlashUntil[idx] = Time.time + 0.25f; // Update 가 플래시를 덮지 않도록
+                    Ui.Flash(this, spawnBtnImages[idx], new Color(1f, 0.25f, 0.25f));
+                }
                 return;
             }
 
@@ -709,10 +739,10 @@ namespace GameMaker.Battle
             BattleOver = true;
             Time.timeScale = 1f; // 결과창은 항상 정상 속도
 
-            // 승리 = 황금 보물상자 / 패배 = 무너진 아군 성. 승리 시 보상 획득 내역 표시
+            // 승리 = 열린 황금 보물상자 / 패배 = 텅 빈 나무 상자 (같은 상자 팩 — 화풍 통일)
             var image = win
                 ? SpriteBank.GetEnv("icon_win")
-                : SpriteBank.GetFrames("ourcastle", "defeat")[0];
+                : SpriteBank.GetEnv("icon_fail");
             int before = DataHub.I.GetPlayer().money;
             int reward = win ? DataHub.I.Clear(mapNumber) : 0;
 

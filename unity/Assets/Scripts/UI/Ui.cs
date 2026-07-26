@@ -144,6 +144,31 @@ namespace GameMaker.UI
             return txt;
         }
 
+        /// <summary>[아이콘 + 숫자]를 통째로 가운데 정렬하는 수치 표시 — 자릿수가 바뀌어도 중앙 유지.</summary>
+        public static Text CenteredIconValue(Transform parent, Sprite icon, string initial, int fontSize, Color color, string name = "IconValue")
+        {
+            var root = new GameObject(name, typeof(RectTransform));
+            root.transform.SetParent(parent, false);
+            var lay = root.AddComponent<HorizontalLayoutGroup>();
+            lay.childAlignment = TextAnchor.MiddleCenter;
+            lay.spacing = fontSize * 0.25f;
+            lay.childForceExpandWidth = false;
+            lay.childForceExpandHeight = false;
+            var fit = root.AddComponent<ContentSizeFitter>();
+            fit.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+            fit.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+            var iconImg = Image(root.transform, icon, "Icon");
+            iconImg.preserveAspect = true;
+            var le = iconImg.gameObject.AddComponent<LayoutElement>();
+            le.preferredWidth = fontSize * 1.1f;
+            le.preferredHeight = fontSize * 1.1f;
+
+            var txt = OutlinedLabel(root.transform, initial, fontSize, color, "Value");
+            txt.alignment = TextAnchor.MiddleCenter;
+            return txt;
+        }
+
         // ── RectTransform 배치 헬퍼 ──────────────────────────────
 
         public static void Stretch(RectTransform rt)
@@ -227,7 +252,7 @@ namespace GameMaker.UI
             var board = Image(overlay.transform, Resources.Load<Sprite>("Sprites/env/popup_frame"), "Board");
             Place((RectTransform)board.transform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(600, 640));
 
-            var title = OutlinedLabel(board.transform, win ? "SUCCESS!" : "FAIL...", 84,
+            var title = OutlinedLabel(board.transform, win ? "SUCCESS" : "FAIL", 84,
                 win ? new Color(1f, 0.72f, 0.1f) : new Color(0.88f, 0.3f, 0.25f), "Title");
             title.font = TitleFont;
             Place((RectTransform)title.transform, new Vector2(0.5f, 1f), new Vector2(0, -110));
@@ -251,13 +276,13 @@ namespace GameMaker.UI
                 Place((RectTransform)flow.transform, new Vector2(0.5f, 0.5f), new Vector2(90, -80));
             }
 
-            MakeTextButton(board.transform, "RETRY", new Color(1f, 0.82f, 0.25f), new Vector2(-130, 80),
-                () => { UnityEngine.Object.Destroy(overlay.gameObject); onRetry?.Invoke(); });
-            MakeTextButton(board.transform, "HOME", Color.white, new Vector2(130, 80),
-                () => { UnityEngine.Object.Destroy(overlay.gameObject); onHome?.Invoke(); });
+            MakeTextButton(board.transform, "재시도", new Color(1f, 0.82f, 0.25f), new Vector2(-130, 80),
+                () => { UnityEngine.Object.Destroy(overlay.gameObject); onRetry?.Invoke(); }, koreanFont: true);
+            MakeTextButton(board.transform, "돌아가기", Color.white, new Vector2(130, 80),
+                () => { UnityEngine.Object.Destroy(overlay.gameObject); onHome?.Invoke(); }, koreanFont: true);
         }
 
-        static void MakeTextButton(Transform parent, string label, Color color, Vector2 pos, Action onClick)
+        static void MakeTextButton(Transform parent, string label, Color color, Vector2 pos, Action onClick, bool koreanFont = false)
         {
             // 매끈한 타원 버튼 (원형 스프라이트를 늘려서 — 지갑/뒤로가기와 같은 계열)
             var bg = Image(parent, Battle.SpriteBank.Circle, "Btn_" + label);
@@ -265,9 +290,50 @@ namespace GameMaker.UI
             bg.color = new Color(0.1f, 0.11f, 0.16f, 0.88f);
             bg.gameObject.AddComponent<Button>().onClick.AddListener(() => onClick?.Invoke());
 
-            var txt = OutlinedLabel(bg.transform, label, 42, color, "Label");
-            txt.font = TitleFont;
+            var txt = OutlinedLabel(bg.transform, label, koreanFont ? 36 : 42, color, "Label");
+            if (!koreanFont) txt.font = TitleFont;
             Place((RectTransform)txt.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 2));
+        }
+
+        /// <summary>확인 팝업 — 결과 모달과 같은 카툰 프레임 재활용. 그림 + 메시지 + [계속]/[확인] 두 버튼.</summary>
+        public static void ConfirmDialog(Transform canvas, string title, string message,
+            string stayLabel, string leaveLabel, Action onStay, Action onLeave, Sprite image = null)
+        {
+            var overlay = Panel(canvas, new Color(0, 0, 0, 0.65f), "ConfirmOverlay");
+            Stretch(overlay);
+            overlay.SetAsLastSibling();
+
+            var board = Image(overlay.transform, Resources.Load<Sprite>("Sprites/env/popup_frame"), "Board");
+            Place((RectTransform)board.transform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(600, 640));
+
+            var titleTxt = OutlinedLabel(board.transform, title, 70, new Color(1f, 0.72f, 0.1f), "Title");
+            Place((RectTransform)titleTxt.transform, new Vector2(0.5f, 1f), new Vector2(0, -115));
+
+            if (image != null)
+            {
+                var img = Image(board.transform, image, "ConfirmImage");
+                Place((RectTransform)img.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 45), new Vector2(150, 150));
+                img.preserveAspect = true;
+            }
+
+            var msg = OutlinedLabel(board.transform, message, 38, Color.white, "Message");
+            Place((RectTransform)msg.transform, new Vector2(0.5f, 0.5f), new Vector2(0, -75));
+
+            MakeTextButton(board.transform, stayLabel, new Color(1f, 0.82f, 0.25f), new Vector2(-130, 80),
+                () => { UnityEngine.Object.Destroy(overlay.gameObject); onStay?.Invoke(); }, koreanFont: true);
+            MakeTextButton(board.transform, leaveLabel, Color.white, new Vector2(130, 80),
+                () => { UnityEngine.Object.Destroy(overlay.gameObject); onLeave?.Invoke(); }, koreanFont: true);
+        }
+
+        /// <summary>나무 버튼 눌림 피드백 — 누르는 동안만 눌린 스프라이트로 교체 (투명도 변화 없음).</summary>
+        public static void PressedSwap(Button btn, Sprite pressed)
+        {
+            if (pressed == null) return;
+            btn.targetGraphic = btn.GetComponent<Image>();
+            btn.transition = Selectable.Transition.SpriteSwap;
+            var ss = btn.spriteState;
+            ss.pressedSprite = pressed;
+            btn.spriteState = ss;
         }
 
         /// <summary>실패/성공 피드백 — 텍스트 대신 이미지 색 플래시.</summary>
