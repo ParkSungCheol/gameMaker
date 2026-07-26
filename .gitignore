@@ -1,2 +1,19 @@
-/build
 .claude/
+.gradle/
+
+# Legacy Android
+legacy/android/build/
+legacy/android/.gradle/
+
+# 1회용 에셋 목록 덤프
+unity/myassets.json
+
+# Unity
+unity/Library/
+unity/Temp/
+unity/Obj/
+unity/Logs/
+unity/UserSettings/
+unity/Build/
+unity/*.csproj
+unity/*.sln

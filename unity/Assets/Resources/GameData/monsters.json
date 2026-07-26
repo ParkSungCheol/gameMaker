@@ -1,0 +1,21 @@
+{
+  "items": [
+    { "name": "ourcastle",  "team": "ally",  "hp": 300, "attack": 0,  "range": 0,   "moveSpeed": 0,   "attackInterval": 0,   "cost": 0,  "height": 350 },
+    { "name": "ourbasic",   "team": "ally",  "hp": 100, "attack": 10, "range": 300, "moveSpeed": 230, "attackInterval": 2,   "cost": 20, "height": 180 },
+    { "name": "ourtank",    "team": "ally",  "hp": 220, "attack": 6,  "range": 200, "moveSpeed": 280, "attackInterval": 3.5, "cost": 20, "height": 180 },
+    { "name": "ourbattle",  "team": "ally",  "hp": 100, "attack": 12, "range": 400, "moveSpeed": 185, "attackInterval": 2,   "cost": 50, "height": 180 },
+    { "name": "ourmass",    "team": "ally",  "hp": 110, "attack": 6,  "range": 220, "moveSpeed": 165, "attackInterval": 1,   "cost": 50, "height": 180 },
+
+    { "name": "yourcastle", "team": "enemy", "hp": 300, "attack": 0,  "range": 0,   "moveSpeed": 0,   "attackInterval": 0,   "cost": 0,  "height": 350 },
+
+    { "name": "slime",      "team": "enemy", "hp": 70,   "attack": 6,  "range": 100, "moveSpeed": 110, "attackInterval": 2.5, "cost": 0, "height": 100 },
+    { "name": "mushroom",   "team": "enemy", "hp": 140,  "attack": 12, "range": 130, "moveSpeed": 100, "attackInterval": 2.6, "cost": 0, "height": 150 },
+    { "name": "goblin",     "team": "enemy", "hp": 130,  "attack": 12, "range": 130, "moveSpeed": 270, "attackInterval": 1.4, "cost": 0, "height": 160 },
+    { "name": "rat",        "team": "enemy", "hp": 45,   "attack": 5,  "range": 100, "moveSpeed": 300, "attackInterval": 1.0, "cost": 0, "height": 90  },
+    { "name": "bat",        "team": "enemy", "hp": 60,   "attack": 7,  "range": 120, "moveSpeed": 330, "attackInterval": 1.2, "cost": 0, "height": 110 },
+    { "name": "mimic",      "team": "enemy", "hp": 320,  "attack": 22, "range": 120, "moveSpeed": 90,  "attackInterval": 2.8, "cost": 0, "height": 140 },
+    { "name": "flyingeye",  "team": "enemy", "hp": 90,   "attack": 13, "range": 250, "moveSpeed": 260, "attackInterval": 1.8, "cost": 0, "height": 130 },
+    { "name": "skeleton",   "team": "enemy", "hp": 240,  "attack": 18, "range": 160, "moveSpeed": 170, "attackInterval": 2.0, "cost": 0, "height": 190 },
+    { "name": "dragonboss", "team": "enemy", "hp": 1800, "attack": 45, "range": 240, "moveSpeed": 130, "attackInterval": 2.0, "cost": 0, "height": 320 }
+  ]
+}
