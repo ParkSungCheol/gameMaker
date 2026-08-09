@@ -25,6 +25,9 @@ namespace GameMaker.Data
         public string tint;          // 색조 "#RRGGBB" — 색만 바꾼 변형 몬스터 (물/얼음/수정 등)
         public float fly;            // 비행 고도(px) — 0이면 지상 유닛
         public float sink;           // 발밑 보정(px) — 스프라이트에 그림자/여백이 있어 떠 보일 때 내려앉힘
+        public string projectile;    // 발사체 종류: "arrow"/"bullet"/"rock"/"orb" (빈 값 = 근접 타격)
+        public float aoe;            // 범위공격 반경(px) — 보스 전용, 3회 공격마다 내리찍기
+        public string melee;         // 근접 타입: "pounce"(점프덮치기)/"ram"(들이받기)/"stomp"(내려찍기)/빈 값(기본 런지)
 
         public string SpriteName => string.IsNullOrEmpty(sprite) ? name : sprite;
 
@@ -48,18 +51,27 @@ namespace GameMaker.Data
     [Serializable]
     public class StageData
     {
-        public int mapNumber;
+        public int mapNumber;    // 테마 번호 (1~12)
         public string label;     // 여행지 이름 (보물찾기 여정 컨셉)
         public string bg;        // 통짜 배경 그림 (동굴 등) — sky 가 비어있을 때 사용
         public string sky;       // 하늘 장면: env 하늘 스프라이트 (지정 시 sun+props 조합 장면)
         public string groundCol; // 카툰 지면 기둥 (가로 타일링)
         public string ground;    // (구) 지면 타일 — groundCol 이 비었을 때 사용
-        public string boss;      // 남은시간 0초에 등장할 보스 이름 (빈 문자열 = 없음)
+        public string boss;      // (구) 테마 단일 보스 — subBosses 로 대체, 폴백용
         public string ambient;   // 분위기 파티클: snow/leaves/petals/sand/fireflies/sparkle/abyss/sea/rain/sprinkles
         public bool noSun;       // true 면 하늘 장면에서 태양 생략 (흐림/설원 등)
         public bool noClouds;    // true 면 떠다니는 구름 생략
         public string skyTint;   // 하늘 색조 "#RRGGBB" — 스테이지별 시간대/분위기 (빈 값 = 원본)
+        public int subCount = 1;          // 테마 내 서브스테이지 수 (1-1, 1-2 ...)
+        public List<string> subBosses;    // 서브스테이지별 보스 (index = sub-1, 빈 문자열 = 없음)
         public List<PropSpec> props;
+
+        /// <summary>서브스테이지 보스 이름 (sub 는 1부터).</summary>
+        public string BossOf(int sub)
+        {
+            if (subBosses != null && sub >= 1 && sub <= subBosses.Count) return subBosses[sub - 1];
+            return boss;
+        }
     }
 
     [Serializable]
@@ -80,13 +92,14 @@ namespace GameMaker.Data
     [Serializable]
     public class EnemySpawnList { public List<EnemySpawn> items; }
 
-    /// <summary>레거시 Room 엔티티 Player 에 대응. mapClear[map] = 클리어 횟수 (index 1~9 사용).</summary>
+    /// <summary>레거시 Room 엔티티 Player 에 대응.
+    /// mapClear[stageId] = 클리어 횟수. stageId = 테마*10+서브 (11~123). 구버전 1~9 인덱스는 로드시 이관.</summary>
     [Serializable]
     public class PlayerData
     {
         public string name = "A";
         public int money = 0;
-        public int[] mapClear = new int[10];
+        public int[] mapClear = new int[130];
     }
 
     /// <summary>유닛별 업그레이드 상태(레거시 UpgradeActivity 기능 복원).</summary>

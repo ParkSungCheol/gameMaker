@@ -46,7 +46,7 @@ namespace GameMaker.Dev
             yield return new WaitForSecondsRealtime(0.8f);
             yield return Shot("04_upgrade");
 
-            for (int stage = 1; stage <= 9; stage++)
+            for (int stage = 1; stage <= 12; stage++) // 테마 번호 → 각 테마 첫 서브스테이지(t-1)
             {
                 ScreenRouter.I.Show(ScreenId.Battlefield, stage);
                 yield return new WaitForSecondsRealtime(0.6f);

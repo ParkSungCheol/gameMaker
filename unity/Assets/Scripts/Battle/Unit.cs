@@ -120,27 +120,210 @@ namespace GameMaker.Battle
             }
         }
 
+        int strikeCount; // 보스 범위공격 주기 카운터
+
         void Strike(Unit target)
         {
             striking = true;
             currentAction = "attack";
             anim.Play(SpriteBank.GetFrames(data.SpriteName, "attack"), false,
                 () => { striking = false; currentAction = ""; });
+            strikeCount++;
             if (data.name == "ourmass")
             {
                 // 마법사: 하늘에서 화염이 내리꽂히고, "떨어진 순간" 광역 데미지
                 StartCoroutine(MeteorStrike(target.X));
             }
-            else if (!IsCastle && data.range >= 200)
+            else if (!IsCastle && data.aoe > 0 && strikeCount % 3 == 0)
             {
-                // 원거리: 화살이 "닿는 순간" 데미지 (FireProjectile 안에서 처리)
+                // 보스: 3회마다 점프 내리찍기 — 착지 순간 반경 내 광역 데미지
+                StartCoroutine(BossSlam(target));
+            }
+            else if (!IsCastle && (data.range >= 200 || !string.IsNullOrEmpty(data.projectile)))
+            {
+                // 원거리: 발사체가 "닿는 순간" 데미지 (FireProjectile 안에서 처리)
                 StartCoroutine(FireProjectile(target));
+            }
+            else if (!IsCastle && data.melee == "pounce")
+            {
+                StartCoroutine(PounceAttack(target)); // 점프해서 덮치기 — 착지 순간 데미지
+            }
+            else if (!IsCastle && data.melee == "ram")
+            {
+                StartCoroutine(RamAttack(target));    // 빠르게 들이받기 — 최대 전진 순간 데미지
+            }
+            else if (!IsCastle && data.melee == "stomp")
+            {
+                StartCoroutine(StompAttack(target));  // 묵직한 내려찍기 — 착지 순간 데미지 + 흙먼지
             }
             else
             {
                 if (!IsCastle) StartCoroutine(Lunge());
                 target.TakeDamage(data.attack); // 근접: 휘두르는 순간 데미지
             }
+        }
+
+        /// <summary>점프 덮치기 — 포물선으로 뛰어올라 적 위로 떨어지며 타격 (개·고양이·개구리류).</summary>
+        IEnumerator PounceAttack(Unit target)
+        {
+            float dir = IsOur ? 1f : -1f;
+            float dist = targetHeight * 0.45f;
+            float rise = targetHeight * 0.4f;
+            float dur = 0.28f;
+            float t = 0f;
+            while (t < dur)
+            {
+                t += Time.deltaTime;
+                float k = Mathf.Clamp01(t / dur);
+                var p = body.localPosition;
+                p.x = dir * dist * k;
+                p.y = bodyBaseY + rise * 4f * k * (1f - k); // 포물선 점프
+                body.localPosition = p;
+                yield return null;
+            }
+            if (target != null && !target.Dead) target.TakeDamage(data.attack);
+            // 복귀
+            t = 0f;
+            while (t < 0.12f)
+            {
+                t += Time.deltaTime;
+                var p = body.localPosition;
+                p.x = dir * dist * (1f - Mathf.Clamp01(t / 0.12f));
+                p.y = bodyBaseY;
+                body.localPosition = p;
+                yield return null;
+            }
+            var end = body.localPosition;
+            end.x = 0f;
+            end.y = bodyBaseY;
+            body.localPosition = end;
+        }
+
+        /// <summary>들이받기 — 잠깐 움츠렸다가 빠르고 길게 돌진 (돼지·소·멧돼지·숫양류).</summary>
+        IEnumerator RamAttack(Unit target)
+        {
+            float dir = IsOur ? 1f : -1f;
+            float back = targetHeight * 0.12f;
+            float dist = targetHeight * 0.6f;
+            float t = 0f;
+            while (t < 0.12f) // 움츠리기
+            {
+                t += Time.deltaTime;
+                var p = body.localPosition;
+                p.x = -dir * back * Mathf.Clamp01(t / 0.12f);
+                body.localPosition = p;
+                yield return null;
+            }
+            t = 0f;
+            while (t < 0.08f) // 폭발적 돌진
+            {
+                t += Time.deltaTime;
+                var p = body.localPosition;
+                p.x = Mathf.Lerp(-dir * back, dir * dist, Mathf.Clamp01(t / 0.08f));
+                body.localPosition = p;
+                yield return null;
+            }
+            if (target != null && !target.Dead) target.TakeDamage(data.attack);
+            t = 0f;
+            while (t < 0.16f) // 복귀
+            {
+                t += Time.deltaTime;
+                var p = body.localPosition;
+                p.x = dir * dist * (1f - Mathf.Clamp01(t / 0.16f));
+                body.localPosition = p;
+                yield return null;
+            }
+            var end = body.localPosition;
+            end.x = 0f;
+            body.localPosition = end;
+        }
+
+        /// <summary>내려찍기 — 몸을 들어올렸다 쿵 찍기, 착지 흙먼지 (곰·판다·거인류).</summary>
+        IEnumerator StompAttack(Unit target)
+        {
+            float rise = targetHeight * 0.28f;
+            float t = 0f;
+            while (t < 0.18f)
+            {
+                t += Time.deltaTime;
+                var p = body.localPosition;
+                p.y = bodyBaseY + rise * Mathf.Clamp01(t / 0.18f);
+                body.localPosition = p;
+                yield return null;
+            }
+            t = 0f;
+            while (t < 0.07f)
+            {
+                t += Time.deltaTime;
+                var p = body.localPosition;
+                p.y = bodyBaseY + rise * (1f - Mathf.Clamp01(t / 0.07f));
+                body.localPosition = p;
+                yield return null;
+            }
+            var end = body.localPosition;
+            end.y = bodyBaseY;
+            body.localPosition = end;
+            // 착지 흙먼지 링 (작게) + 데미지
+            StartCoroutine(ShockRing(new Vector3(X + (IsOur ? 60f : -60f), GroundY + 22f, 0), targetHeight * 0.5f));
+            if (target != null && !target.Dead) target.TakeDamage(data.attack);
+        }
+
+        /// <summary>보스 내리찍기 — 몸이 떠올랐다 쾅 떨어지며 충격파 링 + 범위 데미지.</summary>
+        IEnumerator BossSlam(Unit target)
+        {
+            float centerX = target != null ? target.X : X + (IsOur ? 200f : -200f);
+            float rise = targetHeight * 0.45f;
+            float t = 0f;
+            // 떠오르기 (0.22초)
+            while (t < 0.22f)
+            {
+                t += Time.deltaTime;
+                var p = body.localPosition;
+                p.y = bodyBaseY + rise * Mathf.Sin(Mathf.Clamp01(t / 0.22f) * Mathf.PI * 0.5f);
+                body.localPosition = p;
+                yield return null;
+            }
+            // 내리찍기 (0.09초)
+            t = 0f;
+            while (t < 0.09f)
+            {
+                t += Time.deltaTime;
+                var p = body.localPosition;
+                p.y = bodyBaseY + rise * (1f - Mathf.Clamp01(t / 0.09f));
+                body.localPosition = p;
+                yield return null;
+            }
+            var end = body.localPosition;
+            end.y = bodyBaseY;
+            body.localPosition = end;
+
+            // 착지: 충격파 링 + 광역 데미지 (연출-피해 동기화)
+            StartCoroutine(ShockRing(new Vector3(centerX, GroundY + 30f, 0), data.aoe));
+            if (ctrl != null && !ctrl.BattleOver && !Dead)
+                ctrl.DamageArea(this, centerX, data.aoe, Mathf.RoundToInt(data.attack * 1.5f));
+        }
+
+        /// <summary>바닥에서 퍼지는 충격파 링 — 범위공격 반경 시각화.</summary>
+        IEnumerator ShockRing(Vector3 center, float radius)
+        {
+            var go = new GameObject("ShockRing");
+            go.transform.position = center;
+            var sr2 = go.AddComponent<SpriteRenderer>();
+            sr2.sprite = SpriteBank.Circle;
+            sr2.sortingOrder = 28;
+            float dur = 0.32f;
+            float t = 0f;
+            while (t < dur)
+            {
+                t += Time.deltaTime;
+                if (go == null) yield break;
+                float k = Mathf.Clamp01(t / dur);
+                float d = radius * 2f * (0.25f + 0.75f * k) / 64f; // Circle 스프라이트 64px 기준
+                go.transform.localScale = new Vector3(d, d * 0.38f, 1f); // 납작한 지면 링
+                sr2.color = new Color(1f, 0.75f, 0.35f, 0.55f * (1f - k));
+                yield return null;
+            }
+            Destroy(go);
         }
 
         /// <summary>공격 순간 몸을 적 쪽으로 내질렀다 돌아오는 연출 — 칼이 닿는 타격감.</summary>
@@ -165,14 +348,52 @@ namespace GameMaker.Battle
             body.localPosition = end;
         }
 
-        /// <summary>원거리 공격 발사체 — 화살이 목표까지 날아간다.</summary>
+        /// <summary>원거리 공격 발사체 — 종류별 모양/속도/궤적: arrow(직선 화살), bullet(빠른 탄환),
+        /// rock(포물선 돌덩이), orb(마법 구슬+착탄 burst).</summary>
         IEnumerator FireProjectile(Unit target)
         {
+            string kind = string.IsNullOrEmpty(data.projectile) ? "arrow" : data.projectile;
+
             var go = new GameObject("Projectile");
             var psr = go.AddComponent<SpriteRenderer>();
             psr.sortingOrder = 30;
-            psr.sprite = SpriteBank.Arrow;
-            go.transform.localScale = new Vector3(3.2f, 3.2f, 1f);
+
+            float dur = 0.16f;
+            float arc = 0f; // 포물선 최고 높이
+            switch (kind)
+            {
+                case "bullet":
+                    psr.sprite = SpriteBank.Circle;
+                    psr.color = new Color(1f, 0.9f, 0.4f);
+                    go.transform.localScale = new Vector3(0.28f, 0.16f, 1f); // 길쭉한 탄환
+                    dur = 0.07f;
+                    break;
+                case "rock":
+                    psr.sprite = SpriteBank.Circle;
+                    psr.color = new Color(0.55f, 0.52f, 0.48f);
+                    go.transform.localScale = new Vector3(0.55f, 0.5f, 1f);
+                    dur = 0.34f;
+                    arc = 140f;
+                    break;
+                case "orb":
+                    psr.sprite = SpriteBank.Circle;
+                    psr.color = new Color(0.75f, 0.45f, 1f);
+                    go.transform.localScale = new Vector3(0.5f, 0.5f, 1f);
+                    var glow = new GameObject("Glow");
+                    glow.transform.SetParent(go.transform, false);
+                    var gsr = glow.AddComponent<SpriteRenderer>();
+                    gsr.sprite = SpriteBank.Circle;
+                    gsr.color = new Color(0.6f, 0.3f, 1f, 0.4f);
+                    gsr.sortingOrder = 29;
+                    glow.transform.localScale = new Vector3(1.7f, 1.7f, 1f);
+                    dur = 0.24f;
+                    arc = 60f;
+                    break;
+                default: // arrow
+                    psr.sprite = SpriteBank.Arrow;
+                    go.transform.localScale = new Vector3(3.2f, 3.2f, 1f);
+                    break;
+            }
 
             // 발사/명중 지점 모두 몸 중심 기준 (비행 고도 반영)
             Vector3 from = transform.position + new Vector3(0, bodyBaseY + targetHeight * 0.1f, 0);
@@ -182,22 +403,29 @@ namespace GameMaker.Battle
 
             // 화살은 진행 방향으로 회전
             var d = to - from;
-            go.transform.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(d.y, d.x) * Mathf.Rad2Deg);
+            if (kind == "arrow" || kind == "bullet")
+                go.transform.rotation = Quaternion.Euler(0, 0, Mathf.Atan2(d.y, d.x) * Mathf.Rad2Deg);
 
-            float dur = 0.16f;
             float t = 0f;
             while (t < dur)
             {
                 t += Time.deltaTime;
                 if (go == null) yield break;
-                go.transform.position = Vector3.Lerp(from, to, t / dur);
+                float k = Mathf.Clamp01(t / dur);
+                var pos = Vector3.Lerp(from, to, k);
+                pos.y += arc * 4f * k * (1f - k); // 포물선 궤적 (arc=0 이면 직선)
+                go.transform.position = pos;
+                if (kind == "rock") go.transform.Rotate(0, 0, 620f * Time.deltaTime); // 돌덩이 회전
                 yield return null;
             }
             Destroy(go);
 
-            // 화살이 닿는 순간 데미지 (날아가는 동안 죽었으면 무효)
+            // 발사체가 닿는 순간 데미지 (날아가는 동안 죽었으면 무효)
             if (target != null && !target.Dead)
+            {
+                if (kind == "orb") SpawnBurst(to); // 마법구: 착탄 이펙트
                 target.TakeDamage(data.attack);
+            }
         }
 
         /// <summary>마법사 화염 강타 — 하늘에서 불덩이가 내리꽂히고 착탄 순간 광역 데미지.</summary>
@@ -317,6 +545,8 @@ namespace GameMaker.Battle
         public void TakeDamage(int damage)
         {
             if (Dead) return;
+            // [DEV] 테스트 모드: 아군 성 무적 — 적군 관찰 중 패배 방지 (출시 전 Dev.InvincibleOurCastle=false)
+            if (Core.Dev.InvincibleOurCastle && data.IsCastle && data.IsOur) return;
             hp -= damage;
             UpdateHpBar();
             StartCoroutine(HitFlash());

@@ -55,6 +55,7 @@ namespace GameMaker.Data
             player = PlayerPrefs.HasKey(PlayerKey)
                 ? JsonUtility.FromJson<PlayerData>(PlayerPrefs.GetString(PlayerKey))
                 : new PlayerData();
+            MigrateProgress();
             upgrades = PlayerPrefs.HasKey(UpgradeKey)
                 ? JsonUtility.FromJson<UpgradeState>(PlayerPrefs.GetString(UpgradeKey))
                 : new UpgradeState();
@@ -79,12 +80,24 @@ namespace GameMaker.Data
             PlayerPrefs.Save();
         }
 
-        /// <summary>레거시 공식: 보상 = mapNumber * (11 - 클리어횟수), 최소 1. 획득액 반환.</summary>
+        /// <summary>구버전 저장(테마 1~9 인덱스, 배열 10칸)을 stageId 체계(테마*10+서브)로 이관.</summary>
+        void MigrateProgress()
+        {
+            if (player.mapClear != null && player.mapClear.Length >= 130) return;
+            var old = player.mapClear ?? new int[0];
+            player.mapClear = new int[130];
+            for (int t = 1; t <= 9 && t < old.Length; t++)
+                if (old[t] > 0) player.mapClear[t * 10 + 1] = old[t]; // 테마 클리어 → 첫 서브 클리어로 인정
+        }
+
+        /// <summary>보상 = 난이도기준 * (11 - 클리어횟수), 최소 1. 획득액 반환.
+        /// 난이도기준: stageId(테마*10+서브) 기준 테마*3+서브 (레거시 1~9 는 그대로).</summary>
         public int Clear(int mapNumber)
         {
             player.mapClear[mapNumber]++;
             int clearTime = player.mapClear[mapNumber];
-            int money = mapNumber * (11 - clearTime) <= 0 ? 1 : mapNumber * (11 - clearTime);
+            int baseVal = mapNumber >= 10 ? (mapNumber / 10) * 3 + (mapNumber % 10) : mapNumber;
+            int money = baseVal * (11 - clearTime) <= 0 ? 1 : baseVal * (11 - clearTime);
             player.money += money;
             SavePlayer(player);
             return money;

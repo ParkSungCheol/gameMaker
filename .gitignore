@@ -27,3 +27,8 @@ build/
 # 서명 키 (실수로라도 올라가면 안 됨)
 *.keystore
 *.jks
+
+
+# 에셋 원본 아카이브 — 게임은 베이킹된 PNG만 사용, zip은 로컬 보관
+*.zip
+*.zip.meta

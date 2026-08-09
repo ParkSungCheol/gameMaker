@@ -19,7 +19,11 @@ namespace GameMaker.Battle
         public const float WorldWidth = 2800f;   // 레거시 width = 2800 (absolute)
         public const float OurBaseX = 25f;       // 레거시 translationX 25
 
-        public int mapNumber = 1;
+        public int mapNumber = 11; // stageId = 테마*10 + 서브 (예: 11 = 1-1). 10 미만이면 테마 첫 판으로 해석.
+
+        int Theme => mapNumber >= 10 ? mapNumber / 10 : mapNumber;
+        int Sub => mapNumber >= 10 ? mapNumber % 10 : 1;
+        string bossName;
 
         // ── 전투 상태 ──
         readonly List<Unit> ourParty = new List<Unit>();
@@ -60,7 +64,9 @@ namespace GameMaker.Battle
 
         void Start()
         {
-            stage = DataHub.I.GetStage(mapNumber);
+            if (mapNumber < 10) mapNumber = mapNumber * 10 + 1; // 레거시 호출 호환
+            stage = DataHub.I.GetStage(Theme);
+            bossName = stage.BossOf(Sub);
             SetupCamera();
             SetupBackground();
             SetupGround();
@@ -378,7 +384,8 @@ namespace GameMaker.Battle
             hud = Ui.CreateCanvas(transform, "BattleHud");
 
             // 여행지 이름: 상단 중앙 — 기존 스타일 (외곽선 흰 글씨)
-            var placeText = Ui.OutlinedLabel(hud.transform, stage.label, 52, Color.white, "Place");
+            var placeText = Ui.OutlinedLabel(hud.transform,
+                stage.label + "  " + Theme + "-" + Sub, 52, Color.white, "Place");
             Ui.Place((RectTransform)placeText.transform, new Vector2(0.5f, 1f), new Vector2(0, -55));
 
             // 남은 시간: 양피지 배지 + 짙은 갈색 숫자
@@ -472,8 +479,9 @@ namespace GameMaker.Battle
             Ui.Place((RectTransform)speedText.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 2));
             speedBg.gameObject.AddComponent<Button>().onClick.AddListener(CycleSpeed);
 
-            // 저장된 배속 복원 (스테이지를 옮겨도 유지)
-            gameSpeed = Mathf.Clamp(PlayerPrefs.GetInt(SpeedPrefKey, 1), 1, 3);
+            // 저장된 배속 복원 (스테이지를 옮겨도 유지) — 허용 목록에 없으면 x1
+            gameSpeed = PlayerPrefs.GetInt(SpeedPrefKey, 1);
+            if (System.Array.IndexOf(Speeds, gameSpeed) < 0) gameSpeed = 1;
             ApplySpeed();
         }
 
@@ -488,10 +496,16 @@ namespace GameMaker.Battle
                 image: SpriteBank.GetEnv("icon_chest_closed")); // SUCCESS 황금상자와 같은 상자의 닫힌 모습
         }
 
-        /// <summary>배속 순환 x1→x2→x3. 노랑(x2)/빨강(x3)으로 상태 표시.</summary>
+        /// <summary>배속 순환 x1→x2→x3 (+테스트 모드: →x10→x20→x30). 색으로 상태 표시.</summary>
+        static int[] Speeds => Core.Dev.TestSpeeds
+            ? new[] { 1, 2, 3, 10, 20, 30 }
+            : new[] { 1, 2, 3 };
+
         void CycleSpeed()
         {
-            gameSpeed = gameSpeed >= 3 ? 1 : gameSpeed + 1;
+            var speeds = Speeds;
+            int i = System.Array.IndexOf(speeds, gameSpeed);
+            gameSpeed = speeds[(i + 1) % speeds.Length]; // 못 찾으면 i=-1 → 첫 단계
             PlayerPrefs.SetInt(SpeedPrefKey, gameSpeed);
             ApplySpeed();
         }
@@ -502,7 +516,8 @@ namespace GameMaker.Battle
             speedText.text = "x" + gameSpeed;
             speedText.color = gameSpeed == 1 ? Color.white
                             : gameSpeed == 2 ? new Color(1f, 0.85f, 0.3f)
-                                             : new Color(1f, 0.45f, 0.35f);
+                            : gameSpeed == 3 ? new Color(1f, 0.45f, 0.35f)
+                                             : new Color(0.7f, 0.5f, 1f); // x10 이상 = 보라 (테스트 배속)
         }
 
         void OnDestroy() => Time.timeScale = 1f; // 화면 이탈 시 배속 복구
@@ -532,10 +547,10 @@ namespace GameMaker.Battle
                 }
 
                 // 보스는 종료 45초 전 등장 — 시간 내 처치/성 파괴 압박
-                if (!bossSpawned && enemyCount == 45 && !string.IsNullOrEmpty(stage.boss))
+                if (!bossSpawned && enemyCount == 45 && !string.IsNullOrEmpty(bossName))
                 {
                     bossSpawned = true;
-                    SpawnUnit(stage.boss);
+                    SpawnUnit(bossName);
                 }
 
                 timeText.text = enemyCount / 60 + ":" + (enemyCount % 60).ToString("00");
