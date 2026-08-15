@@ -3,6 +3,7 @@ using GameMaker.Data;
 using GameMaker.UI;
 using UnityEngine;
 using UnityEngine.UI;
+using GameMaker.Battle;
 
 namespace GameMaker.Dev
 {
@@ -84,7 +85,7 @@ namespace GameMaker.Dev
 
         void Populate(RectTransform root)
         {
-            var monsters = Data.DataHub.I.GetMonsters();
+            var monsters = DataHub.I.GetMonsters();
             float x = 0f;
             foreach (var m in monsters)
             {

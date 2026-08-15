@@ -44,7 +44,7 @@ namespace GameMaker.Screens
                     () => {
                         // 씬 전환 방식(테스트 모드 전용 씬 사용)
                         GameObject loader = new GameObject("_TestModeSceneLoaderCall");
-                        var t = loader.AddComponent<GameMaker.Screens.TestModeSceneLoader>();
+                        var t = loader.AddComponent<TestModeSceneLoader>();
                         t.OpenTestModeScene();
                     });
             }
