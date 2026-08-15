@@ -2,6 +2,7 @@ using GameMaker.Data;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using GameMaker.Battle;
 
 public class TestUnitPreviewRuntime : MonoBehaviour
 {
