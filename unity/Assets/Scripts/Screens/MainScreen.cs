@@ -33,6 +33,21 @@ namespace GameMaker.Screens
                 "뽑기", new Vector2(168, -150), true, null);
             MakeMenuButton(SpriteBank.GetEnv("portrait_tank"), new Vector2(126, 126),
                 "배치", new Vector2(504, -150), true, null);
+
+            // 개발/테스트 옵션: PlayerPrefs 또는 DevConfig에서 TestModeEnabled가 켜져 있으면
+            // 메인 메뉴에 "테스트" 버튼을 추가합니다. (누르면 TestMode 씬으로 전환)
+            if (GameMaker.Dev.DevConfig.TestModeEnabled)
+            {
+                // 버튼을 아래쪽 중앙에 추가 (기존 2x2 그리드의 아래에 위치)
+                MakeMenuButton(SpriteBank.GetEnv("stage1thumb"), new Vector2(140, 76),
+                    "테스트", new Vector2(0, -360), false,
+                    () => {
+                        // 씬 전환 방식(테스트 모드 전용 씬 사용)
+                        GameObject loader = new GameObject("_TestModeSceneLoaderCall");
+                        var t = loader.AddComponent<GameMaker.Screens.TestModeSceneLoader>();
+                        t.OpenTestModeScene();
+                    });
+            }
         }
 
         void MakeMenuButton(Sprite iconSprite, Vector2 iconSize, string label, Vector2 pos, bool locked, System.Action onClick)
