@@ -213,7 +213,7 @@ namespace GameMaker.Screens
         public void ResetToIdle()
         {
             var frames = SpriteBank.GetFrames(data.SpriteName, "move");
-            if ((frames == null || frames.Length == 0)) frames = SpriteBank.GetFrames(data.SpriteName);
+            if ((frames == null || frames.Length == 0)) frames = SpriteBank.GetFrames(data.SpriteName, "move");
             if (frames != null && frames.Length > 0)
             {
                 var anim = go.GetComponent<SimpleSpriteAnimator>();
