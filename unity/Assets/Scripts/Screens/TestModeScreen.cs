@@ -2,6 +2,7 @@ using GameMaker.UI;
 using UnityEngine;
 using UnityEngine.UI;
 using GameMaker.Battle;
+using GameMaker.Data;
 using System.Collections.Generic;
 
 namespace GameMaker.Screens
@@ -125,8 +126,12 @@ namespace GameMaker.Screens
             go = new GameObject("Visual");
             go.transform.SetParent(panel.transform, false);
             var sr = go.AddComponent<SpriteRenderer>();
-            // placeholder 사용: SpriteBank 에서 기본 프레임을 가져오도록 시도
-            var frames = SpriteBank.GetFrames(m.spriteId);
+
+            // Try common action frames first, then fall back to default frames
+            var frames = SpriteBank.GetFrames(m.SpriteName, "move");
+            if ((frames == null || frames.Length == 0)) frames = SpriteBank.GetFrames(m.SpriteName, "walk");
+            if ((frames == null || frames.Length == 0)) frames = SpriteBank.GetFrames(m.SpriteName);
+
             if (frames != null && frames.Length > 0)
             {
                 sr.sprite = frames[0];
@@ -161,7 +166,8 @@ namespace GameMaker.Screens
 
         public void PlayWalk()
         {
-            var frames = SpriteBank.GetFrames(data.spriteId, "walk");
+            var frames = SpriteBank.GetFrames(data.SpriteName, "move");
+            if ((frames == null || frames.Length == 0)) frames = SpriteBank.GetFrames(data.SpriteName, "walk");
             if (frames != null && frames.Length > 0)
             {
                 var sr = go.GetComponent<SpriteRenderer>();
@@ -174,7 +180,7 @@ namespace GameMaker.Screens
 
         public void PlayAttack()
         {
-            var frames = SpriteBank.GetFrames(data.spriteId, "attack");
+            var frames = SpriteBank.GetFrames(data.SpriteName, "attack");
             if (frames != null && frames.Length > 0)
             {
                 var sr = go.GetComponent<SpriteRenderer>();
@@ -187,7 +193,8 @@ namespace GameMaker.Screens
 
         public void PlayDie()
         {
-            var frames = SpriteBank.GetFrames(data.spriteId, "death");
+            var frames = SpriteBank.GetFrames(data.SpriteName, "defeat");
+            if ((frames == null || frames.Length == 0)) frames = SpriteBank.GetFrames(data.SpriteName, "death");
             if (frames != null && frames.Length > 0)
             {
                 var sr = go.GetComponent<SpriteRenderer>();
@@ -204,7 +211,8 @@ namespace GameMaker.Screens
 
         public void ResetToIdle()
         {
-            var frames = SpriteBank.GetFrames(data.spriteId);
+            var frames = SpriteBank.GetFrames(data.SpriteName, "move");
+            if ((frames == null || frames.Length == 0)) frames = SpriteBank.GetFrames(data.SpriteName);
             if (frames != null && frames.Length > 0)
             {
                 var anim = go.GetComponent<SimpleSpriteAnimator>();
