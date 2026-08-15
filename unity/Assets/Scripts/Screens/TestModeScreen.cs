@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using GameMaker.Battle;
 using GameMaker.Data;
+using GameMaker.Core;
 using System.Collections.Generic;
 
 namespace GameMaker.Screens
@@ -130,7 +131,7 @@ namespace GameMaker.Screens
             // Try common action frames first, then fall back to default frames
             var frames = SpriteBank.GetFrames(m.SpriteName, "move");
             if ((frames == null || frames.Length == 0)) frames = SpriteBank.GetFrames(m.SpriteName, "walk");
-            if ((frames == null || frames.Length == 0)) frames = SpriteBank.GetFrames(m.SpriteName);
+            if ((frames == null || frames.Length == 0)) frames = SpriteBank.GetFrames(m.SpriteName, "move");
 
             if (frames != null && frames.Length > 0)
             {
