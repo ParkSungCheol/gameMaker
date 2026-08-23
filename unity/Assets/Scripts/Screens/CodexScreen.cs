@@ -52,7 +52,7 @@ namespace GameMaker.Screens
             var title = Ui.OutlinedLabel(canvas.transform, "도감", 48, Color.white, "Title");
             Ui.Place((RectTransform)title.transform, new Vector2(0.5f, 1f), new Vector2(0, -50));
 
-            countText = Ui.OutlinedLabel(canvas.transform, "", 24, new Color(1f, 1f, 1f, 0.8f), "Count");
+            countText = Ui.OutlinedLabel(canvas.transform, "", 26, Color.white, "Count");
             Ui.Place((RectTransform)countText.transform, new Vector2(1f, 1f), new Vector2(-190, -50), new Vector2(300, 34));
 
             var back = Ui.CircleIconButton(canvas.transform, "icon_return", 92,
@@ -184,7 +184,7 @@ namespace GameMaker.Screens
                 if (!revealed) img.color = new Color(0.08f, 0.08f, 0.1f, 0.95f); // 실루엣
 
                 string nm = revealed ? m.DisplayName : "???";
-                var txt = Ui.OutlinedLabel(card.transform, nm, 24, revealed ? Color.white : new Color(0.7f, 0.7f, 0.7f), "Name");
+                var txt = Ui.OutlinedLabel(card.transform, nm, 24, revealed ? Color.white : new Color(0.85f, 0.85f, 0.85f), "Name");
                 txt.raycastTarget = false;
                 Ui.Place((RectTransform)txt.transform, new Vector2(0.5f, 0f), new Vector2(0, 10), new Vector2(cw - 20, 32));
 
@@ -215,8 +215,6 @@ namespace GameMaker.Screens
             if (m.facing == "left") img.rectTransform.localScale = new Vector3(-1, 1, 1);
             Ui.Place(img.rectTransform, new Vector2(0f, 1f), new Vector2(260, -560), new Vector2(360, 400));
             img.rectTransform.pivot = new Vector2(0.5f, 0f); // 발 바닥 고정 + 좌우반전 시 제자리
-            var groundLine = Ui.Panel(board, new Color(1f, 1f, 1f, 0.25f), "GroundLine");
-            Ui.Place(groundLine, new Vector2(0f, 1f), new Vector2(60, -562), new Vector2(400, 2));
             if (!revealed) img.color = new Color(0.08f, 0.08f, 0.1f, 0.95f);
             else if (frames.Length > 1) StartCoroutine(MenuBackdrop.CycleFrames(img, frames, 0.16f));
 
@@ -268,15 +266,13 @@ namespace GameMaker.Screens
             y -= 64f;
             foreach (var line in lines)
             {
-                var t = Ui.OutlinedLabel(board, line, 26, Color.white, "Stat");
+                var t = Ui.OutlinedLabel(board, line, 28, Color.white, "Stat");
                 t.alignment = TextAnchor.MiddleLeft;
                 Ui.Place((RectTransform)t.transform, new Vector2(0f, 1f), new Vector2(x, y), new Vector2(520, 36));
                 y -= 46f;
             }
 
             // 아래: 병맛 설명 — 배경 없이 글씨만 또렷하게
-            var sep = Ui.Panel(board, new Color(1f, 0.82f, 0.35f, 0.4f), "DescRule");
-            Ui.Place(sep, new Vector2(0.5f, 1f), new Vector2(0, -600), new Vector2(960, 1));
             var desc = Ui.OutlinedLabel(board, revealed ? (string.IsNullOrEmpty(m.desc) ? "..." : m.desc) : "아직 만나지 못한 상대다.",
                 30, new Color(1f, 0.95f, 0.75f), "Desc");
             desc.alignment = TextAnchor.MiddleCenter;

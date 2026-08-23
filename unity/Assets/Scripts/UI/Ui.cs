@@ -125,8 +125,12 @@ namespace GameMaker.UI
         {
             var t = Label(parent, text, size, color, name);
             var o = t.gameObject.AddComponent<Outline>();
-            o.effectColor = new Color(0f, 0f, 0f, 0.9f);
+            o.effectColor = new Color(0f, 0f, 0f, 1f);
             o.effectDistance = new Vector2(2.5f, -2.5f);
+            // 반대 방향 외곽선 한 겹 더 — 네 방향 모두 테두리가 생겨 어떤 배경에서도 또렷
+            var o2 = t.gameObject.AddComponent<Outline>();
+            o2.effectColor = new Color(0f, 0f, 0f, 1f);
+            o2.effectDistance = new Vector2(-2f, 2f);
             return t;
         }
 
@@ -316,9 +320,6 @@ namespace GameMaker.UI
 
             var titleTxt = OutlinedLabel(board, title, 48, new Color(1f, 0.82f, 0.3f), "Title");
             Place((RectTransform)titleTxt.transform, new Vector2(0.5f, 1f), new Vector2(0, -44));
-            var rule = Panel(board, new Color(1f, 0.82f, 0.35f, 0.5f), "TitleRule");
-            Place(rule, new Vector2(0.5f, 1f), new Vector2(0, -92), new Vector2(size.x - 120, 2));
-
             var hint = OutlinedLabel(overlay.transform, "바깥쪽을 누르면 닫힙니다", 28, Color.white, "CloseHint");
             hint.raycastTarget = false;
             Place((RectTransform)hint.transform, new Vector2(0.5f, 0.5f), new Vector2(0, -size.y * 0.5f - 44), new Vector2(600, 40));
@@ -363,23 +364,18 @@ namespace GameMaker.UI
         /// <summary>눈에 띄는 도움말 버튼 — 금색 원 + 진한 ? (단순 글자 버튼보다 존재감 있게).</summary>
         public static Button HelpButton(Transform parent, float size, Action onClick, string name = "HelpButton")
         {
+            // 금색 테두리 원 위에 어두운 원 — 되돌아가기(CircleIconButton)와 같은 톤, 장식 없이 단정하게
             var btn = ImageButton(parent, Battle.SpriteBank.Circle, new Vector2(size, size), onClick, name);
-            var img = btn.GetComponent<Image>();
-            img.color = new Color(1f, 0.84f, 0.3f);
-            var ring = Image(btn.transform, Battle.SpriteBank.Circle, "Ring");
-            ring.color = new Color(0.3f, 0.2f, 0.05f, 0.9f);
-            ring.raycastTarget = false;
-            Place(ring.rectTransform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(size - 8, size - 8));
+            btn.GetComponent<Image>().color = new Color(1f, 0.84f, 0.3f);
             var core = Image(btn.transform, Battle.SpriteBank.Circle, "Core");
-            core.color = new Color(1f, 0.9f, 0.5f);
+            core.color = new Color(0.12f, 0.09f, 0.05f, 0.95f);
             core.raycastTarget = false;
-            Place(core.rectTransform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(size - 14, size - 14));
-            var q = Label(btn.transform, "?", Mathf.RoundToInt(size * 0.62f), new Color(0.3f, 0.18f, 0.04f), "Q");
-            q.fontStyle = FontStyle.Bold;
+            Place(core.rectTransform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(size - 6, size - 6));
+            // 글자는 금색 — 글리프 위치 편차를 없애려고 박스를 원 전체로 잡고 정중앙 정렬 (오프셋 없음)
+            var q = Label(btn.transform, "?", Mathf.RoundToInt(size * 0.6f), new Color(1f, 0.84f, 0.3f), "Q");
             q.alignment = TextAnchor.MiddleCenter;
             q.raycastTarget = false;
             Stretch(q.rectTransform);
-            ((RectTransform)q.transform).anchoredPosition = new Vector2(0, 2);
             return btn;
         }
 

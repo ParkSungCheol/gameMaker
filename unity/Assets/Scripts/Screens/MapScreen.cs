@@ -93,13 +93,13 @@ namespace GameMaker.Screens
             if (!themeOpen)
             {
                 btnImg.color = new Color(0.3f, 0.3f, 0.35f);
-                place.color = new Color(0.65f, 0.65f, 0.65f);
+                place.color = new Color(0.82f, 0.82f, 0.82f);
                 var lockImg = Ui.Image(btn.transform, SpriteBank.GetEnv("icon_lock"), "Lock");
                 Ui.Place((RectTransform)lockImg.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 16), new Vector2(56, 56));
                 lockImg.preserveAspect = true;
                 btn.onClick.AddListener(() => Ui.Flash(this, btnImg, new Color(0.55f, 0.15f, 0.15f)));
                 // 잠긴 테마도 서브 표시줄 자리는 유지 (레이아웃 정렬)
-                var lockedLbl = Ui.OutlinedLabel(canvas.transform, "???", 26, new Color(0.7f, 0.7f, 0.7f), "Sub" + theme);
+                var lockedLbl = Ui.OutlinedLabel(canvas.transform, "???", 28, new Color(0.85f, 0.85f, 0.85f), "Sub" + theme);
                 Ui.Place((RectTransform)lockedLbl.transform, new Vector2(0.5f, 0.5f), pos + new Vector2(0, -85));
                 return;
             }
@@ -108,7 +108,7 @@ namespace GameMaker.Screens
             var subLabel = Ui.OutlinedLabel(canvas.transform, "", 30, Color.white, "Sub" + theme);
             Ui.Place((RectTransform)subLabel.transform, new Vector2(0.5f, 0.5f), pos + new Vector2(-30, -85), new Vector2(120, 40));
 
-            var rewardLbl = Ui.OutlinedLabel(canvas.transform, "", 24, new Color(1f, 0.88f, 0.3f), "Reward" + theme);
+            var rewardLbl = Ui.OutlinedLabel(canvas.transform, "", 28, new Color(1f, 0.88f, 0.3f), "Reward" + theme);
             rewardLbl.alignment = TextAnchor.MiddleLeft;
             Ui.Place((RectTransform)rewardLbl.transform, new Vector2(0.5f, 0.5f), pos + new Vector2(75, -85), new Vector2(110, 36));
 
@@ -124,7 +124,7 @@ namespace GameMaker.Screens
                     int clears = player.mapClear[stageId];
                     int reward = LocalDataService.ClearReward(stageId, clears + 1); // 다음 클리어 보상 (10단위)
                     rewardLbl.text = "+" + reward;
-                    rewardLbl.color = clears >= 10 ? new Color(0.6f, 0.6f, 0.6f) : new Color(1f, 0.88f, 0.3f);
+                    rewardLbl.color = clears >= 10 ? new Color(0.85f, 0.85f, 0.85f) : new Color(1f, 0.88f, 0.3f);
                 }
                 else rewardLbl.text = "";
             };

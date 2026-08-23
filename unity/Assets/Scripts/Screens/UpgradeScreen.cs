@@ -92,7 +92,7 @@ namespace GameMaker.Screens
             // 하단 가로 스크롤바 — 각진 트랙 + 금색 손잡이, 항상 표시 (페이드 없음)
             var sb = Ui.CleanScrollbar(canvas.transform, true, new Vector2(0.5f, 0f), new Vector2(0, 26), new Vector2(1200, 16));
             scroll.horizontalScrollbar = sb;
-            scroll.horizontalScrollbarVisibility = ScrollRect.ScrollbarVisibility.Permanent;
+            scroll.horizontalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide; // 내용이 다 보이면 숨김
 
             // 직업(포지션) 안내 — 등급명 오른쪽 ? 버튼
             var helpBtn = Ui.HelpButton(canvas.transform, 64, ShowRoleGuide, "RoleHelp");
@@ -134,7 +134,7 @@ namespace GameMaker.Screens
         /// <summary>직업(포지션) 안내 팝업 — 승/패 팝업과 같은 보드.</summary>
         void ShowRoleGuide()
         {
-            var board = Ui.Popup(canvas.transform, "포지션 안내", new Vector2(1040, 900));
+            var board = Ui.Popup(canvas.transform, "포지션 안내", new Vector2(1100, 820));
             string[][] rows = {
                 new[] { "탱커",   "근접 · 단일", "체력이 높고 공격은 약하다. 맨 앞에서 적을 막아 뒤를 지킨다." },
                 new[] { "전사",   "근접 · 단일", "체력과 공격이 균형. 어디에 넣어도 무난한 근접 주력." },
@@ -144,25 +144,20 @@ namespace GameMaker.Screens
             };
             for (int i = 0; i < rows.Length; i++)
             {
-                float y = -130f - i * 150f; // 행 간격 150: 배지 / 타입 / 설명이 서로 안 겹치게
+                float y = -124f - i * 134f; // 행 간격 134: 배지 / 타입 / 설명이 서로 안 겹치게 (구분선 없음)
                 var rc = RoleColor(rows[i][0]);
                 var pill = Ui.RoundedPanel(board, new Color(rc.r, rc.g, rc.b, 0.95f), "Pill" + i);
-                Ui.Place((RectTransform)pill.transform, new Vector2(0f, 1f), new Vector2(70, y - 4), new Vector2(130, 46));
+                Ui.Place((RectTransform)pill.transform, new Vector2(0f, 1f), new Vector2(80, y - 2), new Vector2(140, 48));
                 var pt = Ui.Label(pill.transform, rows[i][0], 24, Color.white, "PillText");
                 pt.alignment = TextAnchor.MiddleCenter;
                 Ui.Stretch(pt.rectTransform);
-                var kind = Ui.OutlinedLabel(board, rows[i][1], 22, new Color(1f, 0.85f, 0.45f), "Kind" + i);
+                var kind = Ui.OutlinedLabel(board, rows[i][1], 26, new Color(1f, 0.85f, 0.45f), "Kind" + i);
                 kind.alignment = TextAnchor.MiddleLeft;
-                Ui.Place((RectTransform)kind.transform, new Vector2(0f, 1f), new Vector2(230, y), new Vector2(300, 36));
-                var body = Ui.OutlinedLabel(board, rows[i][2], 24, Color.white, "Body" + i);
+                Ui.Place((RectTransform)kind.transform, new Vector2(0f, 1f), new Vector2(250, y), new Vector2(300, 40));
+                var body = Ui.OutlinedLabel(board, rows[i][2], 26, Color.white, "Body" + i);
                 body.alignment = TextAnchor.UpperLeft;
                 body.horizontalOverflow = HorizontalWrapMode.Wrap;
-                Ui.Place((RectTransform)body.transform, new Vector2(0f, 1f), new Vector2(230, y - 44), new Vector2(740, 80));
-                if (i < rows.Length - 1)
-                {
-                    var sep = Ui.Panel(board, new Color(1f, 1f, 1f, 0.12f), "Sep" + i);
-                    Ui.Place(sep, new Vector2(0f, 1f), new Vector2(70, y - 128), new Vector2(900, 1));
-                }
+                Ui.Place((RectTransform)body.transform, new Vector2(0f, 1f), new Vector2(250, y - 46), new Vector2(780, 72));
             }
         }
 
@@ -232,7 +227,7 @@ namespace GameMaker.Screens
             // 도감 병맛 설명 — 가격 버튼 아래 섹션
             if (!string.IsNullOrEmpty(m.desc))
             {
-                var desc = Ui.OutlinedLabel(content, m.desc, 20, new Color(1f, 0.95f, 0.8f, 0.92f), "Desc_" + m.name);
+                var desc = Ui.OutlinedLabel(content, m.desc, 22, new Color(1f, 0.95f, 0.8f), "Desc_" + m.name);
                 desc.horizontalOverflow = HorizontalWrapMode.Wrap;
                 desc.alignment = TextAnchor.UpperCenter;
                 var descRt = (RectTransform)desc.transform;
@@ -253,7 +248,7 @@ namespace GameMaker.Screens
                 lockRt.anchoredPosition = new Vector2(x, 692f);
                 lockRt.sizeDelta = new Vector2(64, 64);
 
-                var hint = Ui.OutlinedLabel(content, "뽑기로 획득", 30, new Color(1f, 1f, 1f, 0.7f), "Hint_" + m.name);
+                var hint = Ui.OutlinedLabel(content, "뽑기로 획득", 30, Color.white, "Hint_" + m.name);
                 var hintRt = (RectTransform)hint.transform;
                 hintRt.anchorMin = hintRt.anchorMax = new Vector2(0f, 0f);
                 hintRt.pivot = new Vector2(0.5f, 0.5f);

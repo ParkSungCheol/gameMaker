@@ -242,12 +242,12 @@ namespace GameMaker.Screens
             walkPhase = (((RectTransform)transform).anchoredPosition.x + basePos.x) * 0.037f;
 
             // 한글명 (크게) + 내부 id (작게 — 수정 요청 시 함께 확인용)
-            var label = Ui.Label(card, m.DisplayName, 22, new Color(1f, 1f, 1f, 0.95f), "Name");
+            var label = Ui.OutlinedLabel(card, m.DisplayName, 22, Color.white, "Name");
             label.alignment = TextAnchor.MiddleCenter;
             Ui.Place(label.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 30), new Vector2(cellW - 12, 28));
             // 적군은 소속 스테이지(테마-서브)도 함께 — 수정 요청 시 특정용
             string idStr = m.stage > 0 ? (m.stage / 10) + "-" + (m.stage % 10) + " · " + m.name : m.name;
-            var idText = Ui.Label(card, idStr, 14, new Color(1f, 1f, 1f, 0.45f), "Id");
+            var idText = Ui.OutlinedLabel(card, idStr, 16, new Color(1f, 1f, 1f, 0.9f), "Id");
             idText.alignment = TextAnchor.MiddleCenter;
             Ui.Place(idText.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 10), new Vector2(cellW - 12, 20));
 

@@ -68,9 +68,8 @@ namespace GameMaker.Screens
             var title = Ui.OutlinedLabel(root, "뽑기", 52, Color.white, "Title");
             Ui.Place((RectTransform)title.transform, new Vector2(0.5f, 1f), new Vector2(0, -55));
             // 확률표 ? 버튼
-            var rateBtn = Ui.TextButton(root, "확률 ?", 28, new Vector2(130, 54), ShowRates,
-                new Color(0.3f, 0.26f, 0.18f, 0.95f), "RateBtn");
-            Ui.Place((RectTransform)rateBtn.transform, new Vector2(0.5f, 1f), new Vector2(190, -55));
+            var rateBtn = Ui.HelpButton(root, 64, ShowRates, "RateBtn");
+            Ui.Place((RectTransform)rateBtn.transform, new Vector2(0.5f, 1f), new Vector2(110, -55));
 
             var moneyPanel = Ui.Image(root, SpriteBank.GetEnv("panel_parchment"), "MoneyPanel");
             Ui.Place((RectTransform)moneyPanel.transform, new Vector2(0f, 1f), new Vector2(160, -55), new Vector2(280, 82));
@@ -116,9 +115,9 @@ namespace GameMaker.Screens
         void ShowRates()
         {
             if (drawing) return;
-            var board = Ui.Popup(canvas.transform, "뽑기 확률", new Vector2(1180, 900));
+            var board = Ui.Popup(canvas.transform, "뽑기 확률", new Vector2(1100, 820));
             var viewport = Ui.Panel(board, new Color(0, 0, 0, 0), "RateViewport");
-            Ui.Place(viewport, new Vector2(0.5f, 1f), new Vector2(-20, -120), new Vector2(1020, 740));
+            Ui.Place(viewport, new Vector2(0.5f, 1f), new Vector2(-20, -110), new Vector2(960, 680));
             viewport.gameObject.AddComponent<RectMask2D>();
             var content = Ui.Panel(viewport, new Color(0, 0, 0, 0), "Content");
             content.anchorMin = new Vector2(0f, 1f); content.anchorMax = new Vector2(1f, 1f);
@@ -127,9 +126,9 @@ namespace GameMaker.Screens
             var sr = viewport.gameObject.AddComponent<ScrollRect>();
             sr.viewport = viewport; sr.content = content; sr.horizontal = false; sr.vertical = true;
             sr.movementType = ScrollRect.MovementType.Clamped; sr.scrollSensitivity = 40f;
-            var vbar = Ui.CleanScrollbar(board, false, new Vector2(1f, 1f), new Vector2(-44, -120), new Vector2(16, 740));
+            var vbar = Ui.CleanScrollbar(board, false, new Vector2(1f, 1f), new Vector2(-34, -110), new Vector2(16, 680));
             sr.verticalScrollbar = vbar;
-            sr.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.Permanent;
+            sr.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide; // 내용이 다 보이면 숨김
 
             var all = DataHub.I.GetMonsters().Where(m => m.IsOur && !m.IsCastle && m.tier > 0).ToList();
             float y = -8f;
@@ -141,25 +140,23 @@ namespace GameMaker.Screens
                 var head = Ui.OutlinedLabel(content, new string('★', t) + " " + TierNames[t] + "  " + TierRates[t] + "%   (" +
                     units.Count + "종 · 1종당 " + each.ToString("0.00") + "%)", 28, TierColors[t], "Head" + t);
                 head.alignment = TextAnchor.MiddleLeft;
-                Ui.Place((RectTransform)head.transform, new Vector2(0f, 1f), new Vector2(24, y), new Vector2(980, 44));
-                var rule = Ui.Panel(content, new Color(TierColors[t].r, TierColors[t].g, TierColors[t].b, 0.45f), "Rule" + t);
-                Ui.Place(rule, new Vector2(0f, 1f), new Vector2(24, y - 46), new Vector2(960, 1));
-                y -= 58f;
+                Ui.Place((RectTransform)head.transform, new Vector2(0f, 1f), new Vector2(24, y), new Vector2(900, 44));
+                y -= 56f;
                 foreach (var u in units)
                 {
                     var fr = SpriteBank.GetFrames(u.SpriteName, "move");
                     var img = Ui.Image(content, fr.Length > 0 ? fr[0] : null, "Img_" + u.name);
                     img.preserveAspect = true; img.raycastTarget = false;
                     Ui.Place((RectTransform)img.transform, new Vector2(0f, 1f), new Vector2(60, y), new Vector2(46, 46));
-                    var nm = Ui.OutlinedLabel(content, u.DisplayName, 24, Color.white, "Nm_" + u.name);
+                    var nm = Ui.OutlinedLabel(content, u.DisplayName, 26, Color.white, "Nm_" + u.name);
                     nm.alignment = TextAnchor.MiddleLeft;
                     Ui.Place((RectTransform)nm.transform, new Vector2(0f, 1f), new Vector2(120, y - 8), new Vector2(300, 32));
-                    var role = Ui.OutlinedLabel(content, u.role, 22, new Color(1f, 0.9f, 0.6f), "Role_" + u.name);
+                    var role = Ui.OutlinedLabel(content, u.role, 24, new Color(1f, 0.9f, 0.6f), "Role_" + u.name);
                     role.alignment = TextAnchor.MiddleLeft;
                     Ui.Place((RectTransform)role.transform, new Vector2(0f, 1f), new Vector2(480, y - 8), new Vector2(160, 32));
-                    var pr = Ui.OutlinedLabel(content, each.ToString("0.00") + "%", 24, Color.white, "Pr_" + u.name);
+                    var pr = Ui.OutlinedLabel(content, each.ToString("0.00") + "%", 26, Color.white, "Pr_" + u.name);
                     pr.alignment = TextAnchor.MiddleRight;
-                    Ui.Place((RectTransform)pr.transform, new Vector2(1f, 1f), new Vector2(-30, y - 8), new Vector2(160, 32));
+                    Ui.Place((RectTransform)pr.transform, new Vector2(1f, 1f), new Vector2(-40, y - 8), new Vector2(160, 32));
                     y -= 50f;
                 }
                 y -= 26f;
