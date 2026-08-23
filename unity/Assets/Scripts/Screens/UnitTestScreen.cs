@@ -86,14 +86,16 @@ namespace GameMaker.Screens
             MakeAction("사망", "defeat", new Vector2(-280, -50));
 
             // 페이지 넘김
+            // 좌우 버튼은 페이지 라벨(폭 640) 바깥에 배치 — 라벨과 겹치면 클릭이 막힌다
             var prev = Ui.CircleIconButton(canvas.transform, "icon_return", 64,
                 () => { page = (page + PageCount - 1) % PageCount; Rebuild(); }, "PrevPage");
-            Ui.Place((RectTransform)prev.transform, new Vector2(0.5f, 0f), new Vector2(-140, 55));
+            Ui.Place((RectTransform)prev.transform, new Vector2(0.5f, 0f), new Vector2(-390, 55));
             var next = Ui.CircleIconButton(canvas.transform, "icon_return", 64,
                 () => { page = (page + 1) % PageCount; Rebuild(); }, "NextPage");
             ((RectTransform)next.transform).localScale = new Vector3(-1f, 1f, 1f);
-            Ui.Place((RectTransform)next.transform, new Vector2(0.5f, 0f), new Vector2(140, 55));
+            Ui.Place((RectTransform)next.transform, new Vector2(0.5f, 0f), new Vector2(390, 55));
             pageText = Ui.OutlinedLabel(canvas.transform, "", 34, Color.white, "Page");
+            pageText.raycastTarget = false; // 라벨이 아래 버튼 클릭을 가로채지 않게
             Ui.Place((RectTransform)pageText.transform, new Vector2(0.5f, 0f), new Vector2(0, 55), new Vector2(640, 44));
 
             grid = Ui.Panel(canvas.transform, new Color(0, 0, 0, 0), "Grid");
