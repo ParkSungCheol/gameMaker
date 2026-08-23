@@ -518,52 +518,91 @@ namespace GameMaker.Screens
             if (img != null) Destroy(img.gameObject);
         }
 
-        /// <summary>금열쇠 — 옆에서 날아와 자물쇠에 꽂히고 두 번 '철컥' 돌아간다.
-        /// 돌 때마다 상자가 움찔(펀치 스케일).</summary>
+        /// <summary>금열쇠 — 왼쪽/오른쪽 걸쇠(자물쇠)를 하나씩: 구멍에 꽂아 '철컥' 돌리면
+        /// 걸쇠가 툭 튕겨 떨어진다. 회전축은 열쇠 꽂힌 지점(pivot).</summary>
         IEnumerator KeyTurn()
         {
             var key = Ui.Image(root, SpriteBank.GetEnv("gacha_key"), "Key");
             key.preserveAspect = true;
             key.raycastTarget = false;
             var keyRt = (RectTransform)key.transform;
-            Ui.Place(keyRt, new Vector2(0.5f, 0.5f), new Vector2(230, -140), new Vector2(96, 64));
+            keyRt.anchorMin = keyRt.anchorMax = new Vector2(0.5f, 0.5f);
+            keyRt.pivot = new Vector2(0.18f, 0.5f); // 회전축 = 열쇠 끝(구멍에 꽂힌 지점)
+            keyRt.sizeDelta = new Vector2(96, 64);
+            keyRt.anchoredPosition = new Vector2(240, -150);
             key.color = new Color(1f, 1f, 1f, 0f);
             var chestRt2 = (RectTransform)chest.transform;
 
-            float t = 0f; // 슬라이드 인
-            while (t < 0.28f)
+            // 왼쪽 걸쇠 → 오른쪽 걸쇠
+            float[] holes = { -60f, 66f };
+            for (int h = 0; h < 2; h++)
             {
-                t += Time.deltaTime;
-                float k = Mathf.Clamp01(t / 0.28f);
-                float e = 1f - (1f - k) * (1f - k);
-                keyRt.anchoredPosition = new Vector2(Mathf.Lerp(230f, 4f, e), Mathf.Lerp(-140f, -206f, e)); // 자물쇠 위치로
-                key.color = new Color(1f, 1f, 1f, k);
-                yield return null;
-            }
-            yield return new WaitForSeconds(0.22f);
+                Vector2 from = keyRt.anchoredPosition;
+                Vector2 to = new Vector2(holes[h], -232f); // 걸쇠(열쇠 구멍) 위치
+                float t = 0f;
+                const float slide = 0.26f;
+                while (t < slide)
+                {
+                    t += Time.deltaTime;
+                    float k = Mathf.Clamp01(t / slide);
+                    float e = 1f - (1f - k) * (1f - k);
+                    keyRt.anchoredPosition = Vector2.Lerp(from, to, e);
+                    if (h == 0) key.color = new Color(1f, 1f, 1f, k);
+                    yield return null;
+                }
+                yield return new WaitForSeconds(0.18f);
 
-            // 철컥 — 좌에서 우로 한 번만 돌린다 (열쇠 구멍 축 기준)
-            t = 0f;
-            while (t < 0.14f)
-            {
-                t += Time.deltaTime;
-                float k = Mathf.Clamp01(t / 0.14f);
-                keyRt.localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(0f, -90f, k));
-                float p = 1f + 0.05f * Mathf.Sin(k * Mathf.PI); // 상자 움찔
-                chestRt2.localScale = new Vector3(p, p, 1f);
-                yield return null;
+                t = 0f; // 철컥 — 구멍 축으로 좌→우 1회전
+                while (t < 0.14f)
+                {
+                    t += Time.deltaTime;
+                    float k = Mathf.Clamp01(t / 0.14f);
+                    keyRt.localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(0f, -90f, k));
+                    float p = 1f + 0.05f * Mathf.Sin(k * Mathf.PI); // 상자 움찔
+                    chestRt2.localScale = new Vector3(p, p, 1f);
+                    yield return null;
+                }
+                chestRt2.localScale = Vector3.one;
+                StartCoroutine(LatchPop(holes[h])); // 걸쇠가 툭 — 자물쇠 해제 효과
+                yield return new WaitForSeconds(0.28f);
+                keyRt.localRotation = Quaternion.identity; // 다음 구멍으로 빼며 원위치
             }
-            chestRt2.localScale = Vector3.one;
-            yield return new WaitForSeconds(0.3f);
 
-            t = 0f; // 열쇠 퇴장
-            while (t < 0.18f)
+            float ft = 0f; // 열쇠 퇴장
+            while (ft < 0.18f)
             {
-                t += Time.deltaTime;
-                key.color = new Color(1f, 1f, 1f, 1f - Mathf.Clamp01(t / 0.18f));
+                ft += Time.deltaTime;
+                key.color = new Color(1f, 1f, 1f, 1f - Mathf.Clamp01(ft / 0.18f));
                 yield return null;
             }
             Destroy(key.gameObject);
+        }
+
+        /// <summary>걸쇠가 바깥으로 젖혀지며 떨어져 사라진다 — 자물쇠 열림 효과.</summary>
+        IEnumerator LatchPop(float x)
+        {
+            var latch = Ui.Image(root, null, "Latch");
+            latch.raycastTarget = false;
+            latch.color = new Color(0.5f, 0.34f, 0.12f, 1f); // 걸쇠 쇠붙이 톤
+            var rt = (RectTransform)latch.transform;
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0.5f, 1f); // 위쪽 경첩 기준으로 젖혀진다
+            rt.sizeDelta = new Vector2(24, 22);
+            rt.anchoredPosition = new Vector2(x, -224f);
+            float sign = x < 0 ? 1f : -1f; // 바깥쪽으로
+            float t = 0f;
+            const float dur = 0.34f;
+            while (t < dur)
+            {
+                t += Time.deltaTime;
+                if (latch == null) yield break;
+                float k = Mathf.Clamp01(t / dur);
+                rt.localRotation = Quaternion.Euler(0, 0, 115f * sign * k);
+                rt.anchoredPosition = new Vector2(x + 14f * sign * k, -224f - 34f * k * k);
+                latch.color = new Color(0.5f, 0.34f, 0.12f, 1f - k * k);
+                yield return null;
+            }
+            if (latch != null) Destroy(latch.gameObject);
         }
 
         /// <summary>'똭' — 마지막 프레임, 완전 개방.</summary>

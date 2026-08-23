@@ -66,7 +66,7 @@ namespace GameMaker.Screens
             Ui.Place(slotRow, new Vector2(0.5f, 0.5f), new Vector2(0, -18), new Vector2(1200, 250));
 
             // ── 하단 섹션: 보유 유닛 (별도 배경 밴드) ──
-            var botBand = Ui.Panel(canvas.transform, new Color(0.05f, 0.08f, 0.13f, 0.42f), "BotBand");
+            var botBand = Ui.Panel(canvas.transform, new Color(0.15f, 0.11f, 0.07f, 0.5f), "BotBand" /* 나무 그늘 톤 — 메뉴의 목재/양피지 팔레트와 동계열 */);
             Ui.Place(botBand, new Vector2(0.5f, 0f), new Vector2(0, 90), new Vector2(1820, 480));
             var botHeader = Ui.OutlinedLabel(botBand, "보유 유닛 — 위 칸으로 드래그해 배치, 배치된 유닛은 클릭으로 해제",
                 24, new Color(1f, 1f, 1f, 0.8f), "BotHeader");
@@ -190,8 +190,8 @@ namespace GameMaker.Screens
 
                 bool deployed = System.Array.IndexOf(slots, m.name) >= 0;
                 var card = Ui.Panel(slot.transform, deployed
-                    ? new Color(0.32f, 0.26f, 0.12f, 0.95f)
-                    : new Color(0.11f, 0.13f, 0.18f, 0.9f), "Card");
+                    ? new Color(1f, 0.85f, 0.35f, 0.2f)   // 배치됨 = 은은한 금빛만
+                    : new Color(0, 0, 0, 0), "Card");    // 나머지는 배경 그대로
                 Ui.Place(card, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(cellW - 10, cellH - 10));
                 BuildUnitCard(card, m, new Vector2(cellW - 10, cellH - 10), -1);
                 if (deployed)
