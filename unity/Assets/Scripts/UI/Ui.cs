@@ -47,6 +47,9 @@ namespace GameMaker.UI
             var scaler = go.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1920, 1080);
+            // 세로 기준 스케일 — 와이드 화면에서 가로가 남는 건 괜찮지만,
+            // 가로 기준이면 세로가 1080 미만으로 줄어 상하 레이아웃이 겹친다
+            scaler.matchWidthOrHeight = 1f;
             scaler.matchWidthOrHeight = 0.5f;
             go.AddComponent<GraphicRaycaster>();
             return canvas;

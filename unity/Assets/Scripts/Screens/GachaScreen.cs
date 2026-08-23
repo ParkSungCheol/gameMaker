@@ -86,8 +86,9 @@ namespace GameMaker.Screens
             chest.raycastTarget = false;
             Ui.Place((RectTransform)chest.transform, new Vector2(0.5f, 0.5f), new Vector2(0, -190), new Vector2(320, 320));
 
-            drawBtn = Ui.ImageButton(root, SpriteBank.GetEnv("btn_wood"), new Vector2(320, 130), TryDraw, "DrawBtn");
-            Ui.Place((RectTransform)drawBtn.transform, new Vector2(0.5f, 0f), new Vector2(0, 110));
+            // 뽑기 버튼 — 우측 하단, 되돌아가기 왼쪽 (결과 무대를 가리지 않게)
+            drawBtn = Ui.ImageButton(root, SpriteBank.GetEnv("btn_wood"), new Vector2(300, 122), TryDraw, "DrawBtn");
+            Ui.Place((RectTransform)drawBtn.transform, new Vector2(1f, 0f), new Vector2(-290, 62));
             Ui.PressedSwap(drawBtn, SpriteBank.GetEnv("btn_wood_pressed"));
             drawBtnImg = drawBtn.GetComponent<Image>();
             var priceText = Ui.CenteredIconValue(drawBtn.transform, SpriteBank.GetEnv("icon_coin"),
@@ -130,6 +131,7 @@ namespace GameMaker.Screens
             Color tierCol = TierColors[tier];
             var chestRt = (RectTransform)chest.transform;
             chest.sprite = SpriteBank.GetEnv("gacha_chest_0"); // 닫힌 상자로 리셋
+            chest.color = Color.white;                          // (지난 연출에서 사라졌다면 복귀)
 
             // 0) 암전 — 무대에 집중
             yield return Fade(dimmer, 0f, 0.6f, 0.18f);
@@ -177,7 +179,8 @@ namespace GameMaker.Screens
             if (tier >= 4) StartCoroutine(ShakeRoot(0.4f, tier == 5 ? 24f : 13f));
             yield return new WaitForSeconds(0.2f);
 
-            // 3) 스포트라이트 — 위에서 아래로 넓게 비추는 원뿔 조명
+            // 3) 상자는 역할 끝 — 사라지고, 스포트라이트가 정중앙 무대를 비춘다
+            StartCoroutine(ChestFadeOut());
             Spotlight();
 
             // 4) 유닛 등장 — 정면 프레임이 있으면 "화면 앞으로 달려오는" 등장,
@@ -190,7 +193,7 @@ namespace GameMaker.Screens
             unitImg.raycastTarget = false;
             unitImg.preserveAspect = true;
             var unitRt = (RectTransform)unitImg.transform;
-            Ui.Place(unitRt, new Vector2(0.5f, 0.5f), new Vector2(0, -30), new Vector2(340, 340));
+            Ui.Place(unitRt, new Vector2(0.5f, 0.5f), new Vector2(0, -120), new Vector2(380, 380));
             float pt = 0f;
 
             if (hasFront)
@@ -210,7 +213,7 @@ namespace GameMaker.Screens
                     float e = 1f - (1f - k) * (1f - k);
                     float s = Mathf.Lerp(0.22f, 1.12f, e);
                     unitRt.localScale = new Vector3(s, s, 1f);
-                    unitRt.anchoredPosition = new Vector2(0, Mathf.Lerp(-150, -30, e) + Mathf.Abs(Mathf.Sin(pt * 16f)) * 14f * (1f - k));
+                    unitRt.anchoredPosition = new Vector2(0, Mathf.Lerp(-320, -120, e) + Mathf.Abs(Mathf.Sin(pt * 16f)) * 14f * (1f - k));
                     yield return null;
                 }
                 unitImg.sprite = front[0];
@@ -236,7 +239,7 @@ namespace GameMaker.Screens
                     float k = Mathf.Clamp01(pt / 0.3f);
                     float s = Mathf.Lerp(0.25f, 1f, 1f - (1f - k) * (1f - k));
                     unitRt.localScale = new Vector3(s, s, 1f);
-                    unitRt.anchoredPosition = new Vector2(0, Mathf.Lerp(-170, -30, k));
+                    unitRt.anchoredPosition = new Vector2(0, Mathf.Lerp(-320, -120, k));
                     yield return null;
                 }
                 yield return new WaitForSeconds(0.22f); // "누구지?" 한 박자
@@ -300,7 +303,7 @@ namespace GameMaker.Screens
             // 6) 전설 피날레: 2차 금빛 광선 + 콘페티 세례
             if (tier == 5)
             {
-                SpawnRays(resultRoot, new Vector2(0, -30), new Color(1f, 0.85f, 0.35f), 14, 700f);
+                SpawnRays(resultRoot, new Vector2(0, -120), new Color(1f, 0.85f, 0.35f), 14, 700f);
                 Confetti(30, 5);
                 StartCoroutine(ShakeRoot(0.3f, 10f));
             }
@@ -416,16 +419,16 @@ namespace GameMaker.Screens
                 seg.color = new Color(1f, 0.97f, 0.85f, Mathf.Lerp(0.3f, 0.08f, k));
                 var rt = (RectTransform)seg.transform;
                 rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-                rt.anchoredPosition = new Vector2(0, Mathf.Lerp(340f, -120f, k));
-                rt.sizeDelta = new Vector2(Mathf.Lerp(150f, 760f, k), Mathf.Lerp(210f, 280f, k));
+                rt.anchoredPosition = new Vector2(0, Mathf.Lerp(360f, -160f, k));
+                rt.sizeDelta = new Vector2(Mathf.Lerp(150f, 820f, k), Mathf.Lerp(210f, 280f, k));
             }
             var pool = Ui.Image(spot, SpriteBank.Circle, "Pool");
             pool.raycastTarget = false;
             pool.color = new Color(1f, 0.95f, 0.8f, 0.3f);
             var prt = (RectTransform)pool.transform;
             prt.anchorMin = prt.anchorMax = new Vector2(0.5f, 0.5f);
-            prt.anchoredPosition = new Vector2(0, -165f);
-            prt.sizeDelta = new Vector2(640f, 150f);
+            prt.anchoredPosition = new Vector2(0, -315f);
+            prt.sizeDelta = new Vector2(700f, 150f);
         }
 
         /// <summary>콘페티 — 색색 조각이 위에서 쏟아지며 회전 낙하.</summary>
@@ -545,6 +548,19 @@ namespace GameMaker.Screens
             {
                 chest.sprite = SpriteBank.GetEnv("gacha_chest_" + i);
                 yield return new WaitForSeconds(0.05f);
+            }
+        }
+
+        /// <summary>캐릭터 등장 직전, 상자가 스르르 사라진다 — 무대는 캐릭터의 것.</summary>
+        IEnumerator ChestFadeOut()
+        {
+            float t = 0f;
+            const float dur = 0.25f;
+            while (t < dur)
+            {
+                t += Time.deltaTime;
+                chest.color = new Color(1f, 1f, 1f, 1f - Mathf.Clamp01(t / dur));
+                yield return null;
             }
         }
 
