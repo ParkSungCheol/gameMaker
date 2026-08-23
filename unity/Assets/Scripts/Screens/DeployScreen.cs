@@ -122,15 +122,11 @@ namespace GameMaker.Screens
             DataHub.I.SetLoadout(list);
         }
 
-        /// <summary>또렷한 사각 섹션 — 얇은 밝은 테두리 + 진한 속판 (번짐 없는 마감).</summary>
+        /// <summary>섹션 보드 — 승/패 팝업과 같은 Layer Lab 금테 보드로 게임 화풍 통일.</summary>
         RectTransform CrispBand(Transform parent, string name)
         {
-            var border = Ui.Panel(parent, new Color(0.8f, 0.72f, 0.5f, 0.55f), name);
-            var fill = Ui.Panel(border, new Color(0.07f, 0.09f, 0.13f, 0.96f), "Fill");
-            Ui.Stretch(fill);
-            fill.offsetMin = new Vector2(2, 2);
-            fill.offsetMax = new Vector2(-2, -2);
-            return border;
+            var img = Ui.Image(parent, SpriteBank.GetEnv("popup_frame"), name);
+            return (RectTransform)img.transform;
         }
 
         // ─────────── 출전 슬롯 ───────────
@@ -145,22 +141,19 @@ namespace GameMaker.Screens
                 bool filled = slots[i] != null;
 
                 // 금테(테두리) + 진한 속판 — 배경과 확실히 구분되는 출전 슬롯
-                var border = Ui.Panel(slotRow, filled
-                    ? new Color(0.95f, 0.75f, 0.25f, 0.95f)
-                    : new Color(0.5f, 0.46f, 0.38f, 0.9f), "Slot" + i);
-                var rt = border;
+                // 메인 메뉴 버튼과 같은 나무 프레임 (원본 비율 150:140 유지)
+                var frameImg = Ui.Image(slotRow, SpriteBank.GetEnv("btn_wood"), "Slot" + i);
+                frameImg.color = filled ? Color.white : new Color(0.5f, 0.5f, 0.5f, 0.85f);
+                var rt = (RectTransform)frameImg.transform;
                 rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
                 rt.anchoredPosition = new Vector2((i - (LocalDataService.LoadoutMax - 1) * 0.5f) * gap, 0);
-                rt.sizeDelta = new Vector2(gap - 14, 250);
+                float fw = gap - 14;
+                rt.sizeDelta = new Vector2(fw, fw * 140f / 150f);
                 slotRects[i] = rt;
-
-                var inner = Ui.Panel(border, filled
-                    ? new Color(0.22f, 0.18f, 0.1f, 1f)
-                    : new Color(0.13f, 0.12f, 0.1f, 1f), "Inner");
-                Ui.Place(inner, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(gap - 20, 244));
+                var inner = rt; // 카드 내용은 프레임 안쪽에 직접
 
                 // 슬롯 번호
-                var num = Ui.Label(border, (i + 1).ToString(), 20, new Color(1f, 1f, 1f, 0.5f), "Num");
+                var num = Ui.Label(rt, (i + 1).ToString(), 20, new Color(1f, 1f, 1f, 0.5f), "Num");
                 num.alignment = TextAnchor.MiddleCenter;
                 Ui.Place(num.rectTransform, new Vector2(0f, 1f), new Vector2(20, -18), new Vector2(30, 26));
 
@@ -171,13 +164,13 @@ namespace GameMaker.Screens
                     Ui.Stretch(plus.rectTransform);
                     var hint = Ui.Label(inner, "드래그로 배치", 16, new Color(1f, 1f, 1f, 0.35f), "Hint");
                     hint.alignment = TextAnchor.MiddleCenter;
-                    Ui.Place(hint.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 20), new Vector2(gap - 30, 22));
+                    Ui.Place(hint.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 42), new Vector2(gap - 60, 22));
                     continue;
                 }
 
                 var m = DataHub.I.FindMonster(slots[i]);
                 if (m == null) { slots[i] = null; continue; }
-                BuildUnitCard(inner, m, inner.sizeDelta, i);
+                BuildUnitCard(inner, m, inner.sizeDelta * 0.84f, i); // 나무 테두리 안쪽 여백
             }
         }
 

@@ -136,13 +136,28 @@ namespace GameMaker.Screens
             // 0) 암전 — 무대에 집중
             yield return Fade(dimmer, 0f, 0.6f, 0.18f);
 
-            // 1) 어두운 분위기 속 상자만 — 뚜껑이 '띡' 조금 열리고, 긴장의 정지
+            // 1) 어두운 분위기 속 상자만 — 금열쇠가 날아와 꽂히고, 두 번 '철컥' 돌린다
             yield return Fade(dimmer, 0.6f, 0.78f, 0.25f); // 더 깊은 암전, 상자만 남는다
-            yield return new WaitForSeconds(0.25f);
-            chest.sprite = SpriteBank.GetEnv("gacha_chest_1"); // 띡 — 실눈만큼 열림
+            yield return new WaitForSeconds(0.2f);
+            yield return KeyTurn();
+
+            // 2) 뚜껑이 '띡' 조금 열리고 — 틈새로 빛이 새며, 긴장의 정지
+            chest.sprite = SpriteBank.GetEnv("gacha_chest_1");
+            var leak = Ui.Image(root, SpriteBank.Circle, "Leak");
+            leak.raycastTarget = false;
+            leak.color = new Color(1f, 0.95f, 0.7f, 0.25f);
+            Ui.Place((RectTransform)leak.transform, new Vector2(0.5f, 0.5f), new Vector2(0, -120), new Vector2(190, 10));
             yield return new WaitForSeconds(0.3f);
             chest.sprite = SpriteBank.GetEnv("gacha_chest_2");
-            yield return new WaitForSeconds(0.55f);              // ...정적 (긴장감)
+            ((RectTransform)leak.transform).sizeDelta = new Vector2(250, 14);
+            leak.color = new Color(1f, 0.95f, 0.7f, 0.45f);
+            // 심장박동 — 암전이 두 번 꿀렁이며 조여온다
+            yield return Fade(dimmer, 0.78f, 0.88f, 0.12f);
+            yield return Fade(dimmer, 0.88f, 0.78f, 0.12f);
+            yield return Fade(dimmer, 0.78f, 0.88f, 0.12f);
+            yield return Fade(dimmer, 0.88f, 0.78f, 0.12f);
+            yield return new WaitForSeconds(0.18f);
+            Destroy(leak.gameObject);
 
             // 2) 개봉 — 뚜껑이 벌컥 열리는 프레임 애니메이션 + 섬광 + 폭발 + 파동 링 + 광선 (전부 금빛)
             var gold = new Color(1f, 0.9f, 0.55f);
@@ -161,7 +176,7 @@ namespace GameMaker.Screens
             //    없으면 실루엣 서스펜스 → 컬러 공개
             var front = SpriteBank.GetFrames(result.unit.SpriteName, "front");
             var move = SpriteBank.GetFrames(result.unit.SpriteName, "move");
-            bool hasFront = front.Length > 0 && (move.Length == 0 || front[0] != move[0]);
+            bool hasFront = false; // 등장은 실루엣 → 공개로 통일 (front 프레임은 다른 연출용으로 보존)
 
             var unitImg = Ui.Image(resultRoot, null, "Unit");
             unitImg.raycastTarget = false;
@@ -243,9 +258,12 @@ namespace GameMaker.Screens
             }
             starText.text += " " + TierNames[tier];
 
-            var nameLabel = Ui.OutlinedLabel(resultRoot, result.unit.DisplayName, 54, Color.white, "Name");
-            var nameRt = (RectTransform)nameLabel.transform;
-            Ui.Place(nameRt, new Vector2(0.5f, 0.5f), new Vector2(0, 256), new Vector2(900, 66));
+            var plate = Ui.Image(resultRoot, SpriteBank.GetEnv("panel_parchment_m"), "NamePlate");
+            plate.raycastTarget = false;
+            var nameRt = (RectTransform)plate.transform;
+            Ui.Place(nameRt, new Vector2(0.5f, 0.5f), new Vector2(0, 262), new Vector2(560, 88));
+            var nameLabel = Ui.OutlinedLabel(nameRt, result.unit.DisplayName, 48, Color.white, "Name");
+            Ui.Place((RectTransform)nameLabel.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 2), new Vector2(540, 62));
             pt = 0f;
             while (pt < 0.16f)
             {
@@ -506,6 +524,57 @@ namespace GameMaker.Screens
                 yield return null;
             }
             if (img != null) Destroy(img.gameObject);
+        }
+
+        /// <summary>금열쇠 — 옆에서 날아와 자물쇠에 꽂히고 두 번 '철컥' 돌아간다.
+        /// 돌 때마다 상자가 움찔(펀치 스케일).</summary>
+        IEnumerator KeyTurn()
+        {
+            var key = Ui.Image(root, SpriteBank.GetEnv("gacha_key"), "Key");
+            key.preserveAspect = true;
+            key.raycastTarget = false;
+            var keyRt = (RectTransform)key.transform;
+            Ui.Place(keyRt, new Vector2(0.5f, 0.5f), new Vector2(210, -110), new Vector2(120, 80));
+            key.color = new Color(1f, 1f, 1f, 0f);
+            var chestRt2 = (RectTransform)chest.transform;
+
+            float t = 0f; // 슬라이드 인
+            while (t < 0.28f)
+            {
+                t += Time.deltaTime;
+                float k = Mathf.Clamp01(t / 0.28f);
+                float e = 1f - (1f - k) * (1f - k);
+                keyRt.anchoredPosition = new Vector2(Mathf.Lerp(210f, 26f, e), Mathf.Lerp(-110f, -178f, e));
+                key.color = new Color(1f, 1f, 1f, k);
+                yield return null;
+            }
+            yield return new WaitForSeconds(0.22f);
+
+            for (int turn = 0; turn < 2; turn++) // 철컥 x2
+            {
+                float from = -90f * turn, to = -90f * (turn + 1);
+                t = 0f;
+                while (t < 0.1f)
+                {
+                    t += Time.deltaTime;
+                    float k = Mathf.Clamp01(t / 0.1f);
+                    keyRt.localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(from, to, k));
+                    float p = 1f + 0.05f * Mathf.Sin(k * Mathf.PI); // 상자 움찔
+                    chestRt2.localScale = new Vector3(p, p, 1f);
+                    yield return null;
+                }
+                chestRt2.localScale = Vector3.one;
+                yield return new WaitForSeconds(turn == 0 ? 0.35f : 0.25f);
+            }
+
+            t = 0f; // 열쇠 퇴장
+            while (t < 0.18f)
+            {
+                t += Time.deltaTime;
+                key.color = new Color(1f, 1f, 1f, 1f - Mathf.Clamp01(t / 0.18f));
+                yield return null;
+            }
+            Destroy(key.gameObject);
         }
 
         /// <summary>'똭' — 남은 뚜껑 프레임(3~4)이 순간에 열린다.</summary>
