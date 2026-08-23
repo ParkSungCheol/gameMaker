@@ -80,7 +80,8 @@ namespace GameMaker.Screens
             Ui.Place((RectTransform)pageText.transform, new Vector2(0.5f, 0f), new Vector2(0, 55), new Vector2(640, 42));
 
             grid = Ui.Panel(canvas.transform, new Color(0, 0, 0, 0), "Grid");
-            Ui.Place(grid, new Vector2(0.5f, 0f), new Vector2(0, 120), new Vector2(1760, 780));
+            // 유닛 뷰어와 같은 크기의 칸 — 제목과 겹치지 않게 가운데 기준으로 내려 배치
+            Ui.Place(grid, new Vector2(0.5f, 0.5f), new Vector2(0, -40), new Vector2(1760, 700));
 
             SetMode(false);
         }
@@ -101,7 +102,7 @@ namespace GameMaker.Screens
             var all = DataHub.I.GetMonsters();
             if (!enemyMode)
             {
-                var allies = all.Where(m => m.IsOur).ToList();
+                var allies = all.Where(m => m.IsOur && !m.IsCastle).ToList(); // 성 제외
                 for (int t = 0; t <= 5; t++)
                 {
                     var units = allies.Where(m => m.tier == t).ToList();
@@ -112,12 +113,12 @@ namespace GameMaker.Screens
             }
             else
             {
-                var enemies = all.Where(m => !m.IsOur).ToList();
+                var enemies = all.Where(m => !m.IsOur && !m.IsCastle).ToList(); // 성 제외
                 var themes = enemies.Select(m => m.stage / 10).Distinct().OrderBy(x => x).ToList();
                 foreach (int theme in themes)
                 {
                     var units = enemies.Where(m => m.stage / 10 == theme)
-                        .OrderBy(m => m.stage).ThenBy(m => m.IsCastle ? 1 : 0).ToList();
+                        .OrderBy(m => m.stage).ToList();
                     string label = theme == 0 ? "공통" : theme + ". " + DataHub.I.GetStage(theme).label;
                     AddChunked(label, new Color(1f, 0.75f, 0.55f), units);
                 }
@@ -162,7 +163,7 @@ namespace GameMaker.Screens
             pageText.text = p.title + "   (" + (page + 1) + "/" + pages.Count + ")";
             pageText.color = p.color;
 
-            float cw = 1760f / Cols, ch = 780f / Rows;
+            float cw = 1760f / Cols, ch = 700f / Rows;
             for (int i = 0; i < p.units.Count; i++)
             {
                 var m = p.units[i];
@@ -261,7 +262,7 @@ namespace GameMaker.Screens
                 "이동속도  " + (revealed ? m.moveSpeed.ToString("0") : "?"),
                 "공격주기  " + (revealed ? m.attackInterval.ToString("0.0") + "초" : "?"),
             };
-            if (!enemyMode && !m.IsCastle)
+            if (!enemyMode)
                 lines.Add("소환      " + m.cost + "원 · 쿨타임 " + m.cooldown.ToString("0.0") + "초");
             y -= 64f;
             foreach (var line in lines)

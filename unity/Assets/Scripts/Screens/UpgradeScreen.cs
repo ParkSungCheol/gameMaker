@@ -224,19 +224,6 @@ namespace GameMaker.Screens
             nameRt.anchoredPosition = new Vector2(x, 455f);
             nameRt.sizeDelta = new Vector2(320f, 50f);
 
-            // 도감 병맛 설명 — 가격 버튼 아래 섹션
-            if (!string.IsNullOrEmpty(m.desc))
-            {
-                var desc = Ui.OutlinedLabel(content, m.desc, 22, new Color(1f, 0.95f, 0.8f), "Desc_" + m.name);
-                desc.horizontalOverflow = HorizontalWrapMode.Wrap;
-                desc.alignment = TextAnchor.UpperCenter;
-                var descRt = (RectTransform)desc.transform;
-                descRt.anchorMin = descRt.anchorMax = new Vector2(0f, 0f);
-                descRt.pivot = new Vector2(0.5f, 1f);
-                descRt.anchoredPosition = new Vector2(x, 760f);
-                descRt.sizeDelta = new Vector2(310f, 60f);
-            }
-
             if (!owned)
             {
                 // 미보유: 자물쇠는 캐릭터를 가리지 않게 '뽑기로 획득' 텍스트 바로 위에
