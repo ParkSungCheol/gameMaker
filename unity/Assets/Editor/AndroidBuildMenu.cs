@@ -42,6 +42,9 @@ namespace GameMaker.Dev
             PlayerSettings.SetScriptingBackend(NamedBuildTarget.Android, ScriptingImplementation.IL2CPP);
             PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64 | AndroidArchitecture.ARMv7;
             PlayerSettings.Android.minSdkVersion = AndroidSdkVersions.AndroidApiLevel26;
+            // 버전 — 올릴 때마다 versionCode 를 +1 (같은 코드로는 기기/스토어에서 갱신 설치가 안 된다)
+            PlayerSettings.bundleVersion = "1.1";
+            PlayerSettings.Android.bundleVersionCode = 2;
 
             // 3) 빌드 (디버그 키 자동 서명)
             System.IO.Directory.CreateDirectory("c:/GameMaker_app/build");
