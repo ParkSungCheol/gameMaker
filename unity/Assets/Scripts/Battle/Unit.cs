@@ -325,6 +325,64 @@ namespace GameMaker.Battle
                     yield return Phase(0.09f, k => Pose(-0.06f + 0.26f * k, 0, -16f + 42f * k, 1, 1));
                     yield return Phase(0.15f, k => Pose(0.2f * (1f - k), 0, 26f * (1f - k), 1, 1));
                     break;
+                // ── 아군 전용 스타일 ──
+                case "dash": // 잔상 돌진 베기 (닌자)
+                    yield return Phase(0.08f, k => Pose(-0.06f * k, 0, -8f * k, 1, 1));
+                    FxSlash(0.2f, 0.05f, -8f, 0.8f, new Color(0.7f, 0.95f, 1f, 0.8f), 60f);
+                    FxSlash(0.05f, 0.02f, -8f, 0.6f, new Color(0.7f, 0.95f, 1f, 0.45f), 60f);
+                    yield return Phase(0.07f, k => Pose(-0.06f + 0.46f * k, 0, -8f + 12f * k, 1, 1));
+                    yield return Phase(0.12f, k => Pose(0.4f * (1f - k), 0, 4f * (1f - k), 1, 1));
+                    break;
+                case "combo": // 좌우 2연속 교차 베기 (검사)
+                    yield return Phase(0.09f, k => Pose(-0.05f * k, 0, -14f * k, 1, 1));
+                    FxSlash(0.26f, 0.1f, -30f, 0.7f, new Color(1f, 0.95f, 0.7f, 0.85f), 260f);
+                    yield return Phase(0.08f, k => Pose(-0.05f + 0.24f * k, 0, -14f + 34f * k, 1, 1));
+                    FxSlash(0.26f, 0f, 30f, 0.7f, new Color(1f, 0.95f, 0.7f, 0.85f), -260f);
+                    yield return Phase(0.08f, k => Pose(0.19f - 0.06f * k, 0, 20f - 34f * k, 1, 1));
+                    yield return Phase(0.12f, k => Pose(0.13f * (1f - k), 0, -14f * (1f - k), 1, 1));
+                    break;
+                case "uppercut": // 웅크렸다 위로 쳐올리기 (격투가)
+                    yield return Phase(0.1f, k => Pose(-0.03f * k, -0.06f * k, 8f * k, 1, 1f - 0.08f * k));
+                    FxSlash(0.2f, 0.15f, 80f, 0.6f, new Color(1f, 0.9f, 0.6f, 0.85f), -200f);
+                    yield return Phase(0.09f, k => Pose(-0.03f + 0.15f * k, -0.06f + 0.24f * k, 8f - 26f * k, 1, 0.92f + 0.12f * k));
+                    yield return Phase(0.13f, k => Pose(0.12f * (1f - k), 0.18f * (1f - k), -18f * (1f - k), 1, 1));
+                    break;
+                case "chi": // 장풍 손바닥 파동 (몽크)
+                    yield return Phase(0.12f, k => Pose(-0.04f * k, 0, -6f * k, 1f - 0.05f * k, 1));
+                    FxRing(0.3f, 0.05f, 0.7f, new Color(0.55f, 0.8f, 1f, 0.6f));
+                    FxPop(0.3f, 0.05f, 0.3f, new Color(0.7f, 0.9f, 1f, 0.7f));
+                    yield return Phase(0.08f, k => Pose(-0.04f + 0.22f * k, 0, -6f + 10f * k, Mathf.Lerp(0.95f, 1.04f, k), 1));
+                    yield return Phase(0.12f, k => Pose(0.18f * (1f - k), 0, 4f * (1f - k), Mathf.Lerp(1.04f, 1f, k), 1));
+                    break;
+                case "rocket": // 피스톤 펀치 (로봇)
+                    yield return Phase(0.1f, k => Pose(-0.08f * k, 0, 0, 1f + 0.04f * k, 1));
+                    FxPop(0.38f, 0.04f, 0.34f, new Color(1f, 0.75f, 0.4f, 0.85f));
+                    FxSlash(0.3f, 0.04f, 0f, 0.5f, new Color(1f, 0.85f, 0.5f, 0.6f), 0f);
+                    yield return Phase(0.06f, k => Pose(-0.08f + 0.34f * k, 0, 0, 1.04f - 0.04f * k, 1));
+                    yield return Phase(0.14f, k => Pose(0.26f * (1f - k), 0, 0, 1, 1));
+                    break;
+                case "smash": // 머리 위로 들었다 내려찍기 (곤봉/석상)
+                    yield return Phase(0.14f, k => Pose(-0.05f * k, 0.08f * k, -22f * k, 1, 1));
+                    FxPop(0.28f, -0.3f, 0.3f, new Color(1f, 0.9f, 0.7f, 0.8f));
+                    FxRing(0.28f, -0.42f, 0.6f, new Color(0.8f, 0.72f, 0.58f, 0.6f), true);
+                    yield return Phase(0.08f, k => Pose(-0.05f + 0.25f * k, 0.08f - 0.1f * k, -22f + 50f * k, 1, 1));
+                    yield return Phase(0.14f, k => Pose(0.2f * (1f - k), -0.02f * (1f - k), 28f * (1f - k), 1, 1));
+                    break;
+                case "punch": // 원투 펀치 (마을사람)
+                    yield return Phase(0.09f, k => Pose(0.12f * k, 0, 3f * k, 1, 1));
+                    FxPop(0.24f, 0.04f, 0.15f, new Color(1f, 1f, 0.8f, 0.75f));
+                    yield return Phase(0.09f, k => Pose(0.12f - 0.04f * k, 0, 3f - 5f * k, 1, 1));
+                    FxPop(0.26f, -0.02f, 0.17f, new Color(1f, 1f, 0.8f, 0.85f));
+                    yield return Phase(0.08f, k => Pose(0.08f + 0.08f * k, 0, -2f + 4f * k, 1, 1));
+                    yield return Phase(0.1f, k => Pose(0.16f * (1f - k), 0, 2f * (1f - k), 1, 1));
+                    break;
+                case "bash": // 방패 밀치기 (방패병)
+                    yield return Phase(0.1f, k => Pose(-0.07f * k, 0, -5f * k, 1, 1));
+                    FxRing(0.3f, 0.02f, 0.55f, new Color(0.8f, 0.9f, 1f, 0.6f), true);
+                    FxPop(0.3f, 0.02f, 0.24f, new Color(0.9f, 0.95f, 1f, 0.7f));
+                    yield return Phase(0.07f, k => Pose(-0.07f + 0.3f * k, 0, -5f + 5f * k, 1.02f, 0.98f));
+                    yield return Phase(0.13f, k => Pose(0.23f * (1f - k), 0, 0, 1, 1));
+                    break;
                 default: // 기본 런지 — 접촉 지점 소형 팝
                     FxPop(0.24f, 0.03f, 0.18f, new Color(1f, 1f, 1f, 0.55f));
                     yield return Lunge();
