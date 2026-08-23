@@ -670,14 +670,33 @@ namespace GameMaker.Battle
                 : Color.Lerp(new Color(0.95f, 0.25f, 0.2f), new Color(1f, 0.85f, 0.2f), ratio * 2f);
         }
 
-        /// <summary>죽는 애니메이션 1회 재생 후 오브젝트 제거.</summary>
+        /// <summary>죽는 애니메이션 1회 재생 후 오브젝트 제거. 영혼이 위로 빠져나가는 연출 동반.</summary>
         public void PlayDeathAndDestroy()
         {
             body.localRotation = Quaternion.identity;
             foreach (Transform child in transform)
                 if (child != body) child.gameObject.SetActive(false); // 체력바 숨김
+            SpawnSoul();
             anim.Play(SpriteBank.GetFrames(data.SpriteName, "defeat"), false, () => Destroy(gameObject));
             Destroy(gameObject, 1.5f); // 안전장치
+        }
+
+        /// <summary>같은 모습의 반투명 "영혼"이 몸에서 떠올라 사라지는 연출 —
+        /// 사망 포즈가 유닛마다 달라도 죽음이 직관적으로 읽힌다.</summary>
+        void SpawnSoul()
+        {
+            var mv = SpriteBank.GetFrames(data.SpriteName, "move");
+            if (mv.Length == 0) return;
+            var go = new GameObject("Soul");
+            go.transform.position = body.position;
+            var ssr = go.AddComponent<SpriteRenderer>();
+            ssr.sprite = mv[0];
+            ssr.flipX = sr.flipX;
+            ssr.sortingOrder = 32;
+            ssr.color = new Color(0.85f, 0.95f, 1f, 0.55f); // 푸르스름한 반투명
+            float s = bodyScale * 0.55f;
+            go.transform.localScale = new Vector3(s, s, 1f);
+            go.AddComponent<SoulRise>(); // 유닛이 파괴돼도 혼자 떠올라 사라진다
         }
 
         /// <summary>충격 링이 퍼지며 사라지는 연출.</summary>
@@ -719,6 +738,25 @@ namespace GameMaker.Battle
             sr.color = new Color(1f, 0.45f, 0.45f);
             yield return new WaitForSeconds(0.12f);
             if (sr != null) sr.color = baseColor;
+        }
+    }
+
+    /// <summary>사망 영혼 연출 — 좌우로 하늘거리며 떠올라 서서히 사라진다. 스스로 소멸.</summary>
+    public class SoulRise : MonoBehaviour
+    {
+        const float Life = 0.9f;
+        float t;
+        SpriteRenderer sr;
+
+        void Awake() { sr = GetComponent<SpriteRenderer>(); }
+
+        void Update()
+        {
+            t += Time.deltaTime;
+            float k = t / Life;
+            transform.position += new Vector3(Mathf.Sin(t * 7f) * 16f * Time.deltaTime, 170f * Time.deltaTime, 0);
+            if (sr != null) sr.color = new Color(0.85f, 0.95f, 1f, 0.55f * (1f - k));
+            if (k >= 1f) Destroy(gameObject);
         }
     }
 }

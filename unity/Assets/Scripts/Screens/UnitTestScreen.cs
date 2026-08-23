@@ -266,6 +266,7 @@ namespace GameMaker.Screens
             holdUntil = 0;
             if (frames.Length > 0) SetSprite(frames[0]);
             if (a == "attack") StartCoroutine(AttackLoop());
+            if (a == "defeat") StartCoroutine(Soul()); // 전투와 동일: 죽는 순간 영혼이 떠오른다
         }
 
         void ResetBody()
@@ -312,6 +313,7 @@ namespace GameMaker.Screens
                 if (timer < 0.1f) return; // 10fps — 전투(SimpleSpriteAnimator 기본값)와 동일
                 timer = 0;
                 frame++;
+                if (frame == 0) StartCoroutine(Soul()); // 반복 재생 시작마다 영혼 연출
                 if (frame >= frames.Length)
                 {
                     // 전투에선 여기서 유닛이 소멸 — 뷰어는 쓰러진 모습 유지 후 반복
@@ -612,6 +614,28 @@ namespace GameMaker.Screens
                 yield return new WaitForSecondsRealtime(1f / fps);
             }
             if (i != null) Destroy(i.gameObject);
+        }
+
+        /// <summary>사망 영혼 연출 — 같은 모습의 반투명 유령이 떠올라 사라진다 (전투 SoulRise 와 동일 수치).</summary>
+        IEnumerator Soul()
+        {
+            var mv = SpriteBank.GetFrames(data.SpriteName, "move");
+            if (mv.Length == 0) yield break;
+            var soul = Fx(mv[0], new Color(0.85f, 0.95f, 1f, 0.55f),
+                (Vector2)mv[0].bounds.size * unitScale * 0.55f, "Soul");
+            soul.rectTransform.localScale = new Vector3(sign, 1f, 1f);
+            float t = 0f;
+            while (t < 0.9f)
+            {
+                t += Time.unscaledDeltaTime;
+                if (soul == null) yield break;
+                float p = t / 0.9f;
+                soul.rectTransform.anchoredPosition = basePos +
+                    new Vector2(Mathf.Sin(t * 7f) * 10f * k, 170f * k * p);
+                soul.color = new Color(0.85f, 0.95f, 1f, 0.55f * (1f - p));
+                yield return null;
+            }
+            Destroy(soul.gameObject);
         }
 
         Image Fx(Sprite s, Color c, Vector2 size, string n)
