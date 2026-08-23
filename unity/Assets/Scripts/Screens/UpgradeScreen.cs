@@ -180,13 +180,13 @@ namespace GameMaker.Screens
 
             if (!owned)
             {
-                // 미보유: 자물쇠 + 안내
+                // 미보유: 자물쇠는 캐릭터를 가리지 않게 '뽑기로 획득' 텍스트 바로 위에
                 var lockImg = Ui.Image(content, SpriteBank.GetEnv("icon_lock"), "Lock_" + m.name);
                 lockImg.preserveAspect = true;
                 var lockRt = (RectTransform)lockImg.transform;
                 lockRt.anchorMin = lockRt.anchorMax = new Vector2(0f, 0f);
                 lockRt.pivot = new Vector2(0.5f, 0.5f);
-                lockRt.anchoredPosition = new Vector2(x, 330f);
+                lockRt.anchoredPosition = new Vector2(x, 692f);
                 lockRt.sizeDelta = new Vector2(64, 64);
 
                 var hint = Ui.OutlinedLabel(content, "뽑기로 획득", 30, new Color(1f, 1f, 1f, 0.7f), "Hint_" + m.name);
