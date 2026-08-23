@@ -72,25 +72,6 @@ namespace GameMaker.Screens
                 24, new Color(1f, 1f, 1f, 0.8f), "BotHeader");
             Ui.Place((RectTransform)botHeader.transform, new Vector2(0.5f, 1f), new Vector2(0, -24), new Vector2(1300, 34));
 
-            // 역할 색상 범례 — 카드의 색 배지가 무슨 뜻인지 한 줄로
-            string[] roles = { "탱커", "전사", "암살자", "궁수", "마법사" };
-            Color[] roleCols = {
-                new Color(0.3f, 0.5f, 0.85f), new Color(0.8f, 0.45f, 0.18f), new Color(0.55f, 0.38f, 0.8f),
-                new Color(0.3f, 0.65f, 0.32f), new Color(0.8f, 0.32f, 0.55f),
-            };
-            for (int r = 0; r < roles.Length; r++)
-            {
-                float lx = (r - 2f) * 190f;
-                var dot = Ui.Image(botBand, SpriteBank.Circle, "LegendDot" + r);
-                dot.raycastTarget = false;
-                dot.color = roleCols[r];
-                Ui.Place((RectTransform)dot.transform, new Vector2(0.5f, 0f), new Vector2(lx - 44f, 26f), new Vector2(18, 18));
-                string desc = roles[r] == "궁수" ? "궁수(원거리)" : roles[r] == "마법사" ? "마법사(범위)" : roles[r];
-                var lab = Ui.OutlinedLabel(botBand, desc, 22, new Color(1f, 1f, 1f, 0.9f), "LegendLab" + r);
-                var labRt = (RectTransform)lab.transform;
-                Ui.Place(labRt, new Vector2(0.5f, 0f), new Vector2(lx + 22f, 26f), new Vector2(150, 30));
-                lab.raycastTarget = false;
-            }
 
             // 보유 목록 (등급별 페이지)
             var prev = Ui.CircleIconButton(canvas.transform, "icon_return", 64,

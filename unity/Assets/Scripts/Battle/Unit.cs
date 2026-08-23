@@ -178,7 +178,8 @@ namespace GameMaker.Battle
             r.sprite = SpriteBank.Circle;
             r.color = c;
             r.sortingOrder = 31;
-            go.transform.localScale = new Vector3(size.x * targetHeight / 64f, size.y * targetHeight / 64f, 1f);
+            float ft = 1f + 0.12f * Mathf.Clamp(data.tier, 0, 5); // 등급이 높을수록 큰 이펙트
+            go.transform.localScale = new Vector3(size.x * ft * targetHeight / 64f, size.y * ft * targetHeight / 64f, 1f);
             Destroy(go, 1f); // 안전장치
             return r;
         }
@@ -390,6 +391,9 @@ namespace GameMaker.Battle
                     yield return Lunge();
                     yield break;
             }
+            // 등급 연출 격차 — 희귀+ 금빛 여운 팝, 전설은 금빛 링 추가
+            if (data.tier >= 3) FxPop(0.26f, 0.06f, 0.2f, new Color(1f, 0.9f, 0.5f, 0.5f));
+            if (data.tier == 5) FxRing(0.24f, 0.04f, 0.55f, new Color(1f, 0.85f, 0.35f, 0.45f));
             Pose(0, 0, 0, 1, 1);
 
             IEnumerator FlurryPops()

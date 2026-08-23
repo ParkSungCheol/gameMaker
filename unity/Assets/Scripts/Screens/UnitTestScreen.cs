@@ -377,7 +377,8 @@ namespace GameMaker.Screens
 
         Image AtkFx(float fx, float fy, Vector2 size, Color c, float ang = 0f)
         {
-            var i = Fx(SpriteBank.Circle, c, size * th, "AtkFx");
+            float ft = 1f + 0.12f * Mathf.Clamp(data.tier, 0, 5); // 등급이 높을수록 큰 이펙트
+            var i = Fx(SpriteBank.Circle, c, size * ft * th, "AtkFx");
             i.rectTransform.anchoredPosition = basePos + new Vector2(fx * th * Dir, fy * th);
             i.rectTransform.localRotation = Quaternion.Euler(0, 0, ang * -Dir);
             return i;
@@ -578,6 +579,9 @@ namespace GameMaker.Screens
                     yield return Lunge();
                     yield break;
             }
+            // 등급 연출 격차 — 희귀+ 금빛 여운 팝, 전설은 금빛 링 추가
+            if (data.tier >= 3) FxPop(0.26f, 0.06f, 0.2f, new Color(1f, 0.9f, 0.5f, 0.5f));
+            if (data.tier == 5) FxRing(0.24f, 0.04f, 0.55f, new Color(1f, 0.85f, 0.35f, 0.45f));
             Pose(0, 0, 0, 1, 1);
 
             IEnumerator FlurryPops()
