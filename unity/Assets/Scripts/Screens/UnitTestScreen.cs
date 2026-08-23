@@ -196,6 +196,7 @@ namespace GameMaker.Screens
 
         float k;              // 전투 픽셀 → 칸 픽셀 배율
         float th;             // 전투 targetHeight 의 칸 스케일 값 (= 표시 높이)
+        float unitScale;      // 스프라이트 월드 크기 → 칸 픽셀 (걷기 첫 프레임 기준 고정)
         Vector2 basePos;
         float sign;           // 좌우 반전 부호 (-1 = 왼쪽 보기)
         float walkPhase;
@@ -217,11 +218,14 @@ namespace GameMaker.Screens
 
             img = Ui.Image(card, null, "Sprite");
             img.raycastTarget = false;
-            img.preserveAspect = true;
             // 유닛 크기 비례 표시 (셀 안에서 상대 크기 유지, 너무 작지 않게)
             float h = Mathf.Clamp(m.height * 0.42f, 55f, cellH - 70f);
             body = (RectTransform)img.transform;
-            Ui.Place(body, new Vector2(0.5f, 0.5f), new Vector2(0, 12), new Vector2(cellW - 30, h));
+            Ui.Place(body, new Vector2(0.5f, 0.5f), new Vector2(0, 12), new Vector2(h, h));
+            // 전투와 동일하게 "걷기 첫 프레임 기준 고정 배율"로 모든 프레임 표시 —
+            // 프레임마다 사각형에 맞춰 늘리면 사망(눕기) 프레임이 갑자기 커진다
+            var mv0 = SpriteBank.GetFrames(m.SpriteName, "move");
+            unitScale = mv0.Length > 0 ? h / Mathf.Max(mv0[0].bounds.size.y, 0.01f) : h;
             basePos = body.anchoredPosition;
             k = h / Mathf.Max(m.height, 1f);
             th = h;
@@ -260,7 +264,7 @@ namespace GameMaker.Screens
             frame = 0;
             timer = 0;
             holdUntil = 0;
-            if (frames.Length > 0) img.sprite = frames[0];
+            if (frames.Length > 0) SetSprite(frames[0]);
             if (a == "attack") StartCoroutine(AttackLoop());
         }
 
@@ -315,7 +319,7 @@ namespace GameMaker.Screens
                     holdUntil = Time.unscaledTime + 1.2f;
                     return;
                 }
-                img.sprite = frames[frame];
+                SetSprite(frames[frame]);
             }
             // idle: 정지 / attack: 코루틴이 스프라이트·모션을 전담
         }
@@ -326,7 +330,14 @@ namespace GameMaker.Screens
             if (timer < 0.1f) return;
             timer = 0;
             frame = loop ? (frame + 1) % frames.Length : Mathf.Min(frame + 1, frames.Length - 1);
-            img.sprite = frames[frame];
+            SetSprite(frames[frame]);
+        }
+
+        /// <summary>스프라이트 교체 — 크기는 항상 고정 배율(unitScale)로, 전투의 bodyScale 과 동일 규칙.</summary>
+        void SetSprite(Sprite s)
+        {
+            img.sprite = s;
+            body.sizeDelta = (Vector2)s.bounds.size * unitScale;
         }
 
         // ─────────── 공격 재현 (Unit.cs Strike 계열과 동일 수치) ───────────
@@ -364,12 +375,12 @@ namespace GameMaker.Screens
             var af = SpriteBank.GetFrames(data.SpriteName, "attack");
             for (int i = 0; i < af.Length; i++)
             {
-                img.sprite = af[i];
+                SetSprite(af[i]);
                 yield return new WaitForSecondsRealtime(0.1f);
             }
             // 전투 AttackTick 과 동일: 다음 공격까지 대기 자세(걷기 첫 프레임)
             var mv = SpriteBank.GetFrames(data.SpriteName, "move");
-            if (mv.Length > 0) img.sprite = mv[0];
+            if (mv.Length > 0) SetSprite(mv[0]);
         }
 
         float Dir => data.IsOur ? 1f : -1f;
