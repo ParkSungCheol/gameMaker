@@ -550,7 +550,7 @@ namespace GameMaker.Battle
                 if (!bossSpawned && enemyCount == 45 && !string.IsNullOrEmpty(bossName))
                 {
                     bossSpawned = true;
-                    SpawnUnit(bossName);
+                    SpawnUnit(bossName, 1.5f); // 보스 위압감: 표준 크기의 1.5배로 등장
                 }
 
                 timeText.text = enemyCount / 60 + ":" + (enemyCount % 60).ToString("00");
@@ -678,10 +678,11 @@ namespace GameMaker.Battle
             SpawnUnit(name);
         }
 
-        Unit SpawnUnit(string name)
+        Unit SpawnUnit(string name, float sizeScale = 1f)
         {
             var data = DataHub.I.FindMonster(name)?.Clone();
             if (data == null) return null;
+            if (sizeScale != 1f) data.height = Mathf.RoundToInt(data.height * sizeScale);
 
             // 업그레이드 적용: 레벨당 HP/공격 +20%
             if (data.IsOur)
