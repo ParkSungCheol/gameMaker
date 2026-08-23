@@ -33,6 +33,8 @@ namespace GameMaker.Data
         public int stage;            // 적군 소속 스테이지 ID (테마*10+서브, 아군은 0)
         public string atkStyle;      // 공격 모션 스타일 — 스프라이트(베이크)와 몸 움직임(전투/뷰어) 공용:
                                      // swing/spin/flurry/bite/peck/horn/buck/trample/squash/flap/cast/빈 값(기본 런지)
+        public string role;          // 아군 포지션: 탱커/전사/암살자/궁수/마법사 (적군은 빈 값)
+                                     // 궁수 = 원거리 단일, 마법사 = 원거리 범위(aoe 스플래시), 나머지 근접
 
         public string SpriteName => string.IsNullOrEmpty(sprite) ? name : sprite;
         public string DisplayName => string.IsNullOrEmpty(label) ? name : label;

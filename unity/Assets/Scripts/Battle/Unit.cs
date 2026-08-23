@@ -134,9 +134,11 @@ namespace GameMaker.Battle
                 // 마법사: 하늘에서 화염이 내리꽂히고, "떨어진 순간" 광역 데미지
                 StartCoroutine(MeteorStrike(target.X));
             }
-            else if (!IsCastle && data.aoe > 0 && strikeCount % 3 == 0)
+            else if (!IsCastle && data.aoe > 0 && strikeCount % 3 == 0
+                     && data.range < 200 && string.IsNullOrEmpty(data.projectile))
             {
-                // 보스: 3회마다 점프 내리찍기 — 착지 순간 반경 내 광역 데미지
+                // 근접 보스: 3회마다 점프 내리찍기 — 착지 순간 반경 내 광역 데미지
+                // (원거리 + aoe = 마법사 스플래시 — FireProjectile 에서 처리)
                 StartCoroutine(BossSlam(target));
             }
             else if (!IsCastle && (data.range >= 200 || !string.IsNullOrEmpty(data.projectile)))
@@ -663,7 +665,13 @@ namespace GameMaker.Battle
             if (target != null && !target.Dead)
             {
                 if (kind == "orb") SpawnBurst(to); // 마법구: 착탄 이펙트
-                target.TakeDamage(data.attack);
+                if (data.aoe > 0 && ctrl != null && !ctrl.BattleOver)
+                {
+                    // 마법사 포지션: 착탄 지점 스플래시 — 반경 내 광역 데미지 (범위 공격)
+                    StartCoroutine(ShockRing(new Vector3(to.x, GroundY + 20f, 0), data.aoe));
+                    ctrl.DamageArea(this, to.x, data.aoe, data.attack);
+                }
+                else target.TakeDamage(data.attack);
             }
         }
 

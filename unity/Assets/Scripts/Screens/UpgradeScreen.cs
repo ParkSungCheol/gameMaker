@@ -122,6 +122,13 @@ namespace GameMaker.Screens
             toastUntil = Time.time + 1.6f;
         }
 
+        static Color RoleColor(string role) =>
+            role == "탱커" ? new Color(0.3f, 0.5f, 0.85f)
+            : role == "암살자" ? new Color(0.55f, 0.38f, 0.8f)
+            : role == "궁수" ? new Color(0.3f, 0.65f, 0.32f)
+            : role == "마법사" ? new Color(0.8f, 0.32f, 0.55f)
+            : new Color(0.8f, 0.45f, 0.18f); // 전사
+
         int PriceOf(MonsterData m) =>
             Core.Dev.FreeUpgrade ? 0 : (m.IsCastle ? 50 : m.cost) * (DataHub.I.GetUpgradeCount(m.name) + 1);
 
@@ -198,6 +205,35 @@ namespace GameMaker.Screens
                 return;
             }
 
+            // 역할(포지션) 배지 + 핵심 스탯 한 줄 — 한눈에 원/근·단일/범위·역할이 읽힌다
+            if (!m.IsCastle && !string.IsNullOrEmpty(m.role))
+            {
+                string tag = m.role == "궁수" ? "궁수 · 원거리"
+                           : m.role == "마법사" ? "마법사 · 범위"
+                           : m.role + " · 근접";
+                var rc = RoleColor(m.role);
+                var pill = Ui.RoundedPanel(content, new Color(rc.r, rc.g, rc.b, 0.92f), "Role_" + m.name);
+                var pillRt = (RectTransform)pill.transform;
+                pillRt.anchorMin = pillRt.anchorMax = new Vector2(0f, 0f);
+                pillRt.pivot = new Vector2(0.5f, 0.5f);
+                pillRt.anchoredPosition = new Vector2(x, 504f);
+                pillRt.sizeDelta = new Vector2(196f, 38f);
+                var pillText = Ui.Label(pill.transform, tag, 22, Color.white, "RoleText");
+                pillText.alignment = TextAnchor.MiddleCenter;
+                Ui.Stretch(pillText.rectTransform);
+
+                int lvl = goldLv + dupes;
+                float mult = 1f + 0.2f * lvl;
+                var statLabel = Ui.OutlinedLabel(content,
+                    "HP " + Mathf.RoundToInt(m.hp * mult) + "  ·  공격 " + Mathf.RoundToInt(m.attack * mult),
+                    24, new Color(1f, 1f, 1f, 0.9f), "Stat_" + m.name);
+                var statRt = (RectTransform)statLabel.transform;
+                statRt.anchorMin = statRt.anchorMax = new Vector2(0f, 0f);
+                statRt.pivot = new Vector2(0.5f, 0.5f);
+                statRt.anchoredPosition = new Vector2(x, 544f);
+                statRt.sizeDelta = new Vector2(320f, 30f);
+            }
+
             // 레벨 뱃지: 초록 ↑N (MAX = 주황), 중복은 옆에 노란 +N
             var lvBadge = Ui.RoundedPanel(content, maxed
                 ? new Color(0.85f, 0.5f, 0.15f, 0.95f)
@@ -205,7 +241,7 @@ namespace GameMaker.Screens
             var lvRt = (RectTransform)lvBadge.transform;
             lvRt.anchorMin = lvRt.anchorMax = new Vector2(0f, 0f);
             lvRt.pivot = new Vector2(0.5f, 0.5f);
-            lvRt.anchoredPosition = new Vector2(dupes > 0 ? x - 40f : x, 535f);
+            lvRt.anchoredPosition = new Vector2(dupes > 0 ? x - 40f : x, 588f);
             lvRt.sizeDelta = new Vector2(120, 52);
             var lvText = Ui.CenteredIconValue(lvBadge.transform, SpriteBank.GetEnv("icon_arrowup"),
                 maxed ? "MAX" : goldLv.ToString(), 32, Color.white, "Lv_" + m.name);
@@ -217,7 +253,7 @@ namespace GameMaker.Screens
                 var dupRt = (RectTransform)dupBadge.transform;
                 dupRt.anchorMin = dupRt.anchorMax = new Vector2(0f, 0f);
                 dupRt.pivot = new Vector2(0.5f, 0.5f);
-                dupRt.anchoredPosition = new Vector2(x + 55f, 535f);
+                dupRt.anchoredPosition = new Vector2(x + 55f, 588f);
                 dupRt.sizeDelta = new Vector2(76, 52);
                 var dupText = Ui.Label(dupBadge.transform, "+" + dupes, 30, new Color(0.25f, 0.15f, 0f), "Dup");
                 dupText.alignment = TextAnchor.MiddleCenter;
@@ -230,7 +266,7 @@ namespace GameMaker.Screens
             var btnRt = (RectTransform)btn.transform;
             btnRt.anchorMin = btnRt.anchorMax = new Vector2(0f, 0f);
             btnRt.pivot = new Vector2(0.5f, 0.5f);
-            btnRt.anchoredPosition = new Vector2(x, 640f);
+            btnRt.anchoredPosition = new Vector2(x, 668f);
             Ui.PressedSwap(btn, SpriteBank.GetEnv("btn_wood_pressed"));
 
             if (maxed)

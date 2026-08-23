@@ -215,6 +215,21 @@ namespace GameMaker.Screens
             Ui.Place((RectTransform)img.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 18),
                 new Vector2(size.x - 36, size.y - 96));
 
+            // 역할 미니 배지 (좌상단) — 색으로 포지션이 읽힌다
+            if (!string.IsNullOrEmpty(m.role))
+            {
+                var rc = m.role == "탱커" ? new Color(0.3f, 0.5f, 0.85f)
+                       : m.role == "암살자" ? new Color(0.55f, 0.38f, 0.8f)
+                       : m.role == "궁수" ? new Color(0.3f, 0.65f, 0.32f)
+                       : m.role == "마법사" ? new Color(0.8f, 0.32f, 0.55f)
+                       : new Color(0.8f, 0.45f, 0.18f);
+                var pill = Ui.RoundedPanel(parent, new Color(rc.r, rc.g, rc.b, 0.92f), "RolePill");
+                Ui.Place((RectTransform)pill.transform, new Vector2(0f, 1f), new Vector2(40, -17), new Vector2(64, 24));
+                var pt = Ui.Label(pill.transform, m.role, 14, Color.white, "RoleText");
+                pt.alignment = TextAnchor.MiddleCenter;
+                Ui.Stretch(pt.rectTransform);
+            }
+
             int tier = Mathf.Clamp(m.tier, 0, 5);
             var nameLabel = Ui.Label(parent, m.DisplayName, 18, TierColors[tier], "Name");
             nameLabel.alignment = TextAnchor.MiddleCenter;

@@ -758,6 +758,8 @@ namespace GameMaker.Screens
             }
             if (p != null) Destroy(p.gameObject);
             if (kind == "orb") SpawnBurst(to); // 마법구: 착탄 이펙트
+            if (data.aoe > 0 && data.range >= 200)
+                StartCoroutine(ShockRing(new Vector2(to.x, footY + 16f * k), data.aoe * k)); // 마법사 스플래시
         }
 
         IEnumerator Meteor()

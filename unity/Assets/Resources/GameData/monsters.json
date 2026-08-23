@@ -17,7 +17,8 @@
    "label": "아군 성",
    "tier": 0,
    "stage": 0,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "ourbasic",
@@ -36,7 +37,8 @@
    "label": "검병",
    "tier": 0,
    "stage": 0,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": "전사"
   },
   {
    "name": "ourtank",
@@ -55,7 +57,8 @@
    "label": "궁수",
    "tier": 0,
    "stage": 0,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": "궁수"
   },
   {
    "name": "ourbattle",
@@ -74,7 +77,8 @@
    "label": "방패병",
    "tier": 0,
    "stage": 0,
-   "atkStyle": "bash"
+   "atkStyle": "bash",
+   "role": "탱커"
   },
   {
    "name": "ourmass",
@@ -93,7 +97,8 @@
    "label": "마법사",
    "tier": 0,
    "stage": 0,
-   "atkStyle": "cast"
+   "atkStyle": "cast",
+   "role": "마법사"
   },
   {
    "name": "yourcastle",
@@ -112,7 +117,8 @@
    "label": "적군 성",
    "tier": 0,
    "stage": 0,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "alwbsu",
@@ -120,6 +126,7 @@
    "label": "강철 검병",
    "tier": 1,
    "stage": 0,
+   "role": "전사",
    "hp": 260,
    "attack": 16,
    "range": 105,
@@ -144,7 +151,8 @@
    "label": "강철 궁수",
    "tier": 1,
    "stage": 0,
-   "hp": 260,
+   "role": "궁수",
+   "hp": 145,
    "attack": 14,
    "range": 330,
    "moveSpeed": 185,
@@ -168,11 +176,12 @@
    "label": "강철 방패병",
    "tier": 1,
    "stage": 0,
-   "hp": 260,
-   "attack": 16,
+   "role": "탱커",
+   "hp": 470,
+   "attack": 10,
    "range": 90,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 170,
+   "attackInterval": 2,
    "cost": 60,
    "cooldown": 3,
    "height": 175,
@@ -192,11 +201,12 @@
    "label": "강철 마법사",
    "tier": 1,
    "stage": 0,
-   "hp": 260,
-   "attack": 14,
+   "role": "마법사",
+   "hp": 130,
+   "attack": 18,
    "range": 350,
-   "moveSpeed": 185,
-   "attackInterval": 2,
+   "moveSpeed": 175,
+   "attackInterval": 2.6,
    "cost": 60,
    "cooldown": 3,
    "height": 175,
@@ -207,7 +217,7 @@
    "sink": 0,
    "projectile": "orb",
    "melee": "",
-   "aoe": 0,
+   "aoe": 120,
    "atkStyle": "cast"
   },
   {
@@ -216,6 +226,7 @@
    "label": "붉은 검병",
    "tier": 1,
    "stage": 0,
+   "role": "전사",
    "hp": 260,
    "attack": 16,
    "range": 105,
@@ -240,7 +251,8 @@
    "label": "붉은 궁수",
    "tier": 1,
    "stage": 0,
-   "hp": 260,
+   "role": "궁수",
+   "hp": 145,
    "attack": 14,
    "range": 320,
    "moveSpeed": 185,
@@ -264,11 +276,12 @@
    "label": "붉은 방패병",
    "tier": 1,
    "stage": 0,
-   "hp": 260,
-   "attack": 16,
+   "role": "탱커",
+   "hp": 470,
+   "attack": 10,
    "range": 90,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 170,
+   "attackInterval": 2,
    "cost": 60,
    "cooldown": 3,
    "height": 175,
@@ -288,11 +301,12 @@
    "label": "붉은 마법사",
    "tier": 1,
    "stage": 0,
-   "hp": 260,
-   "attack": 14,
+   "role": "마법사",
+   "hp": 130,
+   "attack": 18,
    "range": 340,
-   "moveSpeed": 185,
-   "attackInterval": 2,
+   "moveSpeed": 175,
+   "attackInterval": 2.6,
    "cost": 60,
    "cooldown": 3,
    "height": 175,
@@ -303,7 +317,7 @@
    "sink": 0,
    "projectile": "orb",
    "melee": "",
-   "aoe": 0,
+   "aoe": 120,
    "atkStyle": "cast"
   },
   {
@@ -312,6 +326,7 @@
    "label": "진홍 검병",
    "tier": 1,
    "stage": 0,
+   "role": "전사",
    "hp": 260,
    "attack": 16,
    "range": 105,
@@ -336,7 +351,8 @@
    "label": "진홍 궁수",
    "tier": 1,
    "stage": 0,
-   "hp": 260,
+   "role": "궁수",
+   "hp": 145,
    "attack": 14,
    "range": 330,
    "moveSpeed": 185,
@@ -360,11 +376,12 @@
    "label": "진홍 방패병",
    "tier": 1,
    "stage": 0,
-   "hp": 260,
-   "attack": 16,
+   "role": "탱커",
+   "hp": 470,
+   "attack": 10,
    "range": 90,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 170,
+   "attackInterval": 2,
    "cost": 60,
    "cooldown": 3,
    "height": 175,
@@ -384,11 +401,12 @@
    "label": "진홍 마법사",
    "tier": 1,
    "stage": 0,
-   "hp": 260,
-   "attack": 14,
+   "role": "마법사",
+   "hp": 130,
+   "attack": 18,
    "range": 350,
-   "moveSpeed": 185,
-   "attackInterval": 2,
+   "moveSpeed": 175,
+   "attackInterval": 2.6,
    "cost": 60,
    "cooldown": 3,
    "height": 175,
@@ -399,7 +417,7 @@
    "sink": 0,
    "projectile": "orb",
    "melee": "",
-   "aoe": 0,
+   "aoe": 120,
    "atkStyle": "cast"
   },
   {
@@ -408,6 +426,7 @@
    "label": "촌민",
    "tier": 2,
    "stage": 0,
+   "role": "전사",
    "hp": 340,
    "attack": 20,
    "range": 75,
@@ -432,6 +451,7 @@
    "label": "촌민 2",
    "tier": 2,
    "stage": 0,
+   "role": "전사",
    "hp": 340,
    "attack": 20,
    "range": 75,
@@ -456,6 +476,7 @@
    "label": "촌민 3",
    "tier": 2,
    "stage": 0,
+   "role": "전사",
    "hp": 340,
    "attack": 20,
    "range": 75,
@@ -480,6 +501,7 @@
    "label": "촌민 4",
    "tier": 2,
    "stage": 0,
+   "role": "전사",
    "hp": 340,
    "attack": 20,
    "range": 75,
@@ -504,6 +526,7 @@
    "label": "촌민 5",
    "tier": 2,
    "stage": 0,
+   "role": "전사",
    "hp": 340,
    "attack": 20,
    "range": 75,
@@ -528,6 +551,7 @@
    "label": "촌민 6",
    "tier": 2,
    "stage": 0,
+   "role": "전사",
    "hp": 340,
    "attack": 20,
    "range": 75,
@@ -552,6 +576,7 @@
    "label": "이장님",
    "tier": 2,
    "stage": 0,
+   "role": "전사",
    "hp": 340,
    "attack": 20,
    "range": 75,
@@ -576,6 +601,7 @@
    "label": "아낙네",
    "tier": 2,
    "stage": 0,
+   "role": "전사",
    "hp": 340,
    "attack": 20,
    "range": 75,
@@ -600,6 +626,7 @@
    "label": "촌장 할아범",
    "tier": 2,
    "stage": 0,
+   "role": "전사",
    "hp": 340,
    "attack": 20,
    "range": 75,
@@ -624,6 +651,7 @@
    "label": "소년",
    "tier": 2,
    "stage": 0,
+   "role": "전사",
    "hp": 340,
    "attack": 20,
    "range": 75,
@@ -648,6 +676,7 @@
    "label": "꼬마",
    "tier": 2,
    "stage": 0,
+   "role": "전사",
    "hp": 340,
    "attack": 20,
    "range": 75,
@@ -672,6 +701,7 @@
    "label": "알소년",
    "tier": 2,
    "stage": 0,
+   "role": "전사",
    "hp": 340,
    "attack": 20,
    "range": 75,
@@ -696,6 +726,7 @@
    "label": "알소녀",
    "tier": 2,
    "stage": 0,
+   "role": "전사",
    "hp": 340,
    "attack": 20,
    "range": 75,
@@ -720,11 +751,12 @@
    "label": "파랑 닌자",
    "tier": 3,
    "stage": 0,
-   "hp": 460,
-   "attack": 27,
+   "role": "암살자",
+   "hp": 300,
+   "attack": 39,
    "range": 120,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 140,
    "cooldown": 6,
    "height": 175,
@@ -744,11 +776,12 @@
    "label": "남색 닌자",
    "tier": 3,
    "stage": 0,
-   "hp": 460,
-   "attack": 27,
+   "role": "암살자",
+   "hp": 300,
+   "attack": 39,
    "range": 120,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 140,
    "cooldown": 6,
    "height": 175,
@@ -768,11 +801,12 @@
    "label": "흑색 닌자",
    "tier": 3,
    "stage": 0,
-   "hp": 460,
-   "attack": 27,
+   "role": "암살자",
+   "hp": 300,
+   "attack": 39,
    "range": 120,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 140,
    "cooldown": 6,
    "height": 175,
@@ -792,11 +826,12 @@
    "label": "회색 닌자",
    "tier": 3,
    "stage": 0,
-   "hp": 460,
-   "attack": 27,
+   "role": "암살자",
+   "hp": 300,
+   "attack": 39,
    "range": 120,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 140,
    "cooldown": 6,
    "height": 175,
@@ -816,11 +851,12 @@
    "label": "초록 닌자",
    "tier": 3,
    "stage": 0,
-   "hp": 460,
-   "attack": 27,
+   "role": "암살자",
+   "hp": 300,
+   "attack": 39,
    "range": 120,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 140,
    "cooldown": 6,
    "height": 175,
@@ -840,11 +876,12 @@
    "label": "빨강 닌자",
    "tier": 3,
    "stage": 0,
-   "hp": 460,
-   "attack": 27,
+   "role": "암살자",
+   "hp": 300,
+   "attack": 39,
    "range": 120,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 140,
    "cooldown": 6,
    "height": 175,
@@ -864,11 +901,12 @@
    "label": "주홍 닌자",
    "tier": 3,
    "stage": 0,
-   "hp": 460,
-   "attack": 27,
+   "role": "암살자",
+   "hp": 300,
+   "attack": 39,
    "range": 120,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 140,
    "cooldown": 6,
    "height": 175,
@@ -888,11 +926,12 @@
    "label": "노랑 닌자",
    "tier": 3,
    "stage": 0,
-   "hp": 460,
-   "attack": 27,
+   "role": "암살자",
+   "hp": 300,
+   "attack": 39,
    "range": 120,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 140,
    "cooldown": 6,
    "height": 175,
@@ -912,11 +951,12 @@
    "label": "복면 닌자",
    "tier": 3,
    "stage": 0,
-   "hp": 460,
-   "attack": 27,
+   "role": "암살자",
+   "hp": 300,
+   "attack": 39,
    "range": 120,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 140,
    "cooldown": 6,
    "height": 175,
@@ -936,11 +976,12 @@
    "label": "적귀 닌자",
    "tier": 3,
    "stage": 0,
-   "hp": 460,
-   "attack": 27,
+   "role": "암살자",
+   "hp": 300,
+   "attack": 39,
    "range": 120,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 140,
    "cooldown": 6,
    "height": 175,
@@ -960,6 +1001,7 @@
    "label": "사무라이",
    "tier": 3,
    "stage": 0,
+   "role": "전사",
    "hp": 460,
    "attack": 27,
    "range": 105,
@@ -984,6 +1026,7 @@
    "label": "청의 사무라이",
    "tier": 3,
    "stage": 0,
+   "role": "전사",
    "hp": 460,
    "attack": 27,
    "range": 105,
@@ -1008,6 +1051,7 @@
    "label": "홍의 사무라이",
    "tier": 3,
    "stage": 0,
+   "role": "전사",
    "hp": 460,
    "attack": 27,
    "range": 105,
@@ -1032,11 +1076,12 @@
    "label": "기사",
    "tier": 3,
    "stage": 0,
-   "hp": 460,
-   "attack": 27,
+   "role": "탱커",
+   "hp": 830,
+   "attack": 16,
    "range": 105,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 170,
+   "attackInterval": 2,
    "cost": 140,
    "cooldown": 6,
    "height": 175,
@@ -1056,6 +1101,7 @@
    "label": "파랑 검투사",
    "tier": 3,
    "stage": 0,
+   "role": "전사",
    "hp": 460,
    "attack": 27,
    "range": 105,
@@ -1080,6 +1126,7 @@
    "label": "빨강 검투사",
    "tier": 3,
    "stage": 0,
+   "role": "전사",
    "hp": 460,
    "attack": 27,
    "range": 105,
@@ -1104,6 +1151,7 @@
    "label": "몽크",
    "tier": 3,
    "stage": 0,
+   "role": "전사",
    "hp": 460,
    "attack": 27,
    "range": 130,
@@ -1128,6 +1176,7 @@
    "label": "노몽크",
    "tier": 3,
    "stage": 0,
+   "role": "전사",
    "hp": 460,
    "attack": 27,
    "range": 130,
@@ -1152,7 +1201,8 @@
    "label": "사냥꾼",
    "tier": 3,
    "stage": 0,
-   "hp": 460,
+   "role": "궁수",
+   "hp": 255,
    "attack": 23,
    "range": 330,
    "moveSpeed": 185,
@@ -1176,6 +1226,7 @@
    "label": "빨강 격투가",
    "tier": 3,
    "stage": 0,
+   "role": "전사",
    "hp": 460,
    "attack": 27,
    "range": 95,
@@ -1200,6 +1251,7 @@
    "label": "흰 격투가",
    "tier": 3,
    "stage": 0,
+   "role": "전사",
    "hp": 460,
    "attack": 27,
    "range": 95,
@@ -1224,6 +1276,7 @@
    "label": "원시전사",
    "tier": 3,
    "stage": 0,
+   "role": "전사",
    "hp": 460,
    "attack": 27,
    "range": 100,
@@ -1248,6 +1301,7 @@
    "label": "사자소년",
    "tier": 3,
    "stage": 0,
+   "role": "전사",
    "hp": 460,
    "attack": 27,
    "range": 95,
@@ -1272,11 +1326,12 @@
    "label": "화염 닌자",
    "tier": 4,
    "stage": 0,
-   "hp": 620,
-   "attack": 36,
+   "role": "암살자",
+   "hp": 405,
+   "attack": 52,
    "range": 120,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 210,
    "cooldown": 8,
    "height": 175,
@@ -1296,11 +1351,12 @@
    "label": "물의 닌자",
    "tier": 4,
    "stage": 0,
-   "hp": 620,
-   "attack": 36,
+   "role": "암살자",
+   "hp": 405,
+   "attack": 52,
    "range": 120,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 210,
    "cooldown": 8,
    "height": 175,
@@ -1320,11 +1376,12 @@
    "label": "번개 닌자",
    "tier": 4,
    "stage": 0,
-   "hp": 620,
-   "attack": 36,
+   "role": "암살자",
+   "hp": 405,
+   "attack": 52,
    "range": 120,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 210,
    "cooldown": 8,
    "height": 175,
@@ -1344,11 +1401,12 @@
    "label": "바람잎 닌자",
    "tier": 4,
    "stage": 0,
-   "hp": 620,
-   "attack": 36,
+   "role": "암살자",
+   "hp": 405,
+   "attack": 52,
    "range": 120,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 210,
    "cooldown": 8,
    "height": 175,
@@ -1368,11 +1426,12 @@
    "label": "폭탄 닌자",
    "tier": 4,
    "stage": 0,
-   "hp": 620,
-   "attack": 36,
+   "role": "암살자",
+   "hp": 405,
+   "attack": 52,
    "range": 120,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 210,
    "cooldown": 8,
    "height": 175,
@@ -1392,11 +1451,12 @@
    "label": "설한 닌자",
    "tier": 4,
    "stage": 0,
-   "hp": 620,
-   "attack": 36,
+   "role": "암살자",
+   "hp": 405,
+   "attack": 52,
    "range": 120,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 210,
    "cooldown": 8,
    "height": 175,
@@ -1416,11 +1476,12 @@
    "label": "흑주술 닌자",
    "tier": 4,
    "stage": 0,
-   "hp": 620,
-   "attack": 31,
+   "role": "마법사",
+   "hp": 310,
+   "attack": 40,
    "range": 350,
-   "moveSpeed": 185,
-   "attackInterval": 2,
+   "moveSpeed": 175,
+   "attackInterval": 2.6,
    "cost": 210,
    "cooldown": 8,
    "height": 175,
@@ -1431,7 +1492,7 @@
    "sink": 0,
    "projectile": "orb",
    "melee": "",
-   "aoe": 0,
+   "aoe": 120,
    "atkStyle": "cast"
   },
   {
@@ -1440,11 +1501,12 @@
    "label": "주황 주술 닌자",
    "tier": 4,
    "stage": 0,
-   "hp": 620,
-   "attack": 31,
+   "role": "마법사",
+   "hp": 310,
+   "attack": 40,
    "range": 350,
-   "moveSpeed": 185,
-   "attackInterval": 2,
+   "moveSpeed": 175,
+   "attackInterval": 2.6,
    "cost": 210,
    "cooldown": 8,
    "height": 175,
@@ -1455,7 +1517,7 @@
    "sink": 0,
    "projectile": "orb",
    "melee": "",
-   "aoe": 0,
+   "aoe": 120,
    "atkStyle": "cast"
   },
   {
@@ -1464,11 +1526,12 @@
    "label": "흑마도사",
    "tier": 4,
    "stage": 0,
-   "hp": 620,
-   "attack": 31,
+   "role": "마법사",
+   "hp": 310,
+   "attack": 40,
    "range": 360,
-   "moveSpeed": 185,
-   "attackInterval": 2,
+   "moveSpeed": 175,
+   "attackInterval": 2.6,
    "cost": 210,
    "cooldown": 8,
    "height": 175,
@@ -1479,7 +1542,7 @@
    "sink": 0,
    "projectile": "orb",
    "melee": "",
-   "aoe": 0,
+   "aoe": 120,
    "atkStyle": "cast"
   },
   {
@@ -1488,11 +1551,12 @@
    "label": "화염 마도사",
    "tier": 4,
    "stage": 0,
-   "hp": 620,
-   "attack": 31,
+   "role": "마법사",
+   "hp": 310,
+   "attack": 40,
    "range": 360,
-   "moveSpeed": 185,
-   "attackInterval": 2,
+   "moveSpeed": 175,
+   "attackInterval": 2.6,
    "cost": 210,
    "cooldown": 8,
    "height": 175,
@@ -1503,7 +1567,7 @@
    "sink": 0,
    "projectile": "orb",
    "melee": "",
-   "aoe": 0,
+   "aoe": 120,
    "atkStyle": "cast"
   },
   {
@@ -1512,11 +1576,12 @@
    "label": "위장 로봇",
    "tier": 4,
    "stage": 0,
-   "hp": 620,
-   "attack": 36,
+   "role": "탱커",
+   "hp": 1115,
+   "attack": 22,
    "range": 140,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 170,
+   "attackInterval": 2,
    "cost": 210,
    "cooldown": 8,
    "height": 175,
@@ -1536,11 +1601,12 @@
    "label": "초록 로봇",
    "tier": 4,
    "stage": 0,
-   "hp": 620,
-   "attack": 36,
+   "role": "탱커",
+   "hp": 1115,
+   "attack": 22,
    "range": 140,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 170,
+   "attackInterval": 2,
    "cost": 210,
    "cooldown": 8,
    "height": 175,
@@ -1560,11 +1626,12 @@
    "label": "강철 로봇",
    "tier": 4,
    "stage": 0,
-   "hp": 620,
-   "attack": 36,
+   "role": "탱커",
+   "hp": 1115,
+   "attack": 22,
    "range": 140,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 170,
+   "attackInterval": 2,
    "cost": 210,
    "cooldown": 8,
    "height": 175,
@@ -1584,11 +1651,12 @@
    "label": "텐구",
    "tier": 4,
    "stage": 0,
-   "hp": 620,
-   "attack": 36,
+   "role": "암살자",
+   "hp": 405,
+   "attack": 52,
    "range": 130,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 210,
    "cooldown": 8,
    "height": 175,
@@ -1608,11 +1676,12 @@
    "label": "노사부",
    "tier": 5,
    "stage": 0,
-   "hp": 850,
-   "attack": 50,
+   "role": "암살자",
+   "hp": 555,
+   "attack": 73,
    "range": 130,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 320,
    "cooldown": 12,
    "height": 175,
@@ -1632,11 +1701,12 @@
    "label": "황금 기사",
    "tier": 5,
    "stage": 0,
-   "hp": 850,
-   "attack": 50,
+   "role": "탱커",
+   "hp": 1530,
+   "attack": 30,
    "range": 105,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 170,
+   "attackInterval": 2,
    "cost": 320,
    "cooldown": 12,
    "height": 175,
@@ -1656,11 +1726,12 @@
    "label": "황금 석상",
    "tier": 5,
    "stage": 0,
-   "hp": 850,
-   "attack": 50,
+   "role": "탱커",
+   "hp": 1530,
+   "attack": 30,
    "range": 100,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 170,
+   "attackInterval": 2,
    "cost": 320,
    "cooldown": 12,
    "height": 175,
@@ -1680,11 +1751,12 @@
    "label": "사자 주술사",
    "tier": 5,
    "stage": 0,
-   "hp": 850,
-   "attack": 43,
+   "role": "마법사",
+   "hp": 425,
+   "attack": 55,
    "range": 360,
-   "moveSpeed": 185,
-   "attackInterval": 2,
+   "moveSpeed": 175,
+   "attackInterval": 2.6,
    "cost": 320,
    "cooldown": 12,
    "height": 175,
@@ -1695,7 +1767,7 @@
    "sink": 0,
    "projectile": "orb",
    "melee": "",
-   "aoe": 0,
+   "aoe": 120,
    "atkStyle": "cast"
   },
   {
@@ -1704,11 +1776,12 @@
    "label": "뱀파이어",
    "tier": 5,
    "stage": 0,
-   "hp": 850,
-   "attack": 50,
+   "role": "암살자",
+   "hp": 555,
+   "attack": 73,
    "range": 120,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
+   "moveSpeed": 260,
+   "attackInterval": 1.1,
    "cost": 320,
    "cooldown": 12,
    "height": 175,
@@ -1728,35 +1801,12 @@
    "label": "수호 정령",
    "tier": 5,
    "stage": 0,
-   "hp": 850,
-   "attack": 50,
-   "range": 130,
-   "moveSpeed": 200,
-   "attackInterval": 1.7,
-   "cost": 320,
-   "cooldown": 12,
-   "height": 175,
-   "facing": "",
-   "sprite": "",
-   "tint": "",
-   "fly": 0,
-   "sink": 0,
-   "projectile": "",
-   "melee": "",
-   "aoe": 0,
-   "atkStyle": "chi"
-  },
-  {
-   "name": "a118princess",
-   "team": "ally",
-   "label": "공주",
-   "tier": 5,
-   "stage": 0,
-   "hp": 850,
-   "attack": 43,
-   "range": 340,
-   "moveSpeed": 185,
-   "attackInterval": 2,
+   "role": "마법사",
+   "hp": 425,
+   "attack": 55,
+   "range": 350,
+   "moveSpeed": 175,
+   "attackInterval": 2.6,
    "cost": 320,
    "cooldown": 12,
    "height": 175,
@@ -1767,7 +1817,32 @@
    "sink": 0,
    "projectile": "orb",
    "melee": "",
-   "aoe": 0,
+   "aoe": 120,
+   "atkStyle": "chi"
+  },
+  {
+   "name": "a118princess",
+   "team": "ally",
+   "label": "공주",
+   "tier": 5,
+   "stage": 0,
+   "role": "마법사",
+   "hp": 425,
+   "attack": 55,
+   "range": 340,
+   "moveSpeed": 175,
+   "attackInterval": 2.6,
+   "cost": 320,
+   "cooldown": 12,
+   "height": 175,
+   "facing": "",
+   "sprite": "",
+   "tint": "",
+   "fly": 0,
+   "sink": 0,
+   "projectile": "orb",
+   "melee": "",
+   "aoe": 120,
    "atkStyle": "cast"
   },
   {
@@ -1792,7 +1867,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "flurry",
+   "role": ""
   },
   {
    "name": "e147gobarcher",
@@ -1816,7 +1892,8 @@
    "projectile": "arrow",
    "melee": "",
    "aoe": 0,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "e147gobwar",
@@ -1840,7 +1917,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": ""
   },
   {
    "name": "e147ggoblin",
@@ -1864,7 +1942,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "flurry",
+   "role": ""
   },
   {
    "name": "e147ggobarcher",
@@ -1888,7 +1967,8 @@
    "projectile": "arrow",
    "melee": "",
    "aoe": 0,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "e147ggobwar",
@@ -1912,7 +1992,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": ""
   },
   {
    "name": "e118bamboo",
@@ -1936,7 +2017,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": ""
   },
   {
    "name": "e118bambooy",
@@ -1960,7 +2042,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": ""
   },
   {
    "name": "e118kappag",
@@ -1984,7 +2067,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e118octog",
@@ -2008,7 +2092,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "e118cat",
@@ -2032,7 +2117,8 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "flurry",
+   "role": ""
   },
   {
    "name": "e118cato",
@@ -2056,7 +2142,8 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "flurry",
+   "role": ""
   },
   {
    "name": "e118dog",
@@ -2080,7 +2167,8 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e118dog2",
@@ -2104,7 +2192,8 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e118dogo",
@@ -2128,7 +2217,8 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e118dogy",
@@ -2152,7 +2242,8 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e118lioncub",
@@ -2176,7 +2267,8 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 230,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e147slime",
@@ -2200,7 +2292,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "squash"
+   "atkStyle": "squash",
+   "role": ""
   },
   {
    "name": "e147stoneslime",
@@ -2224,7 +2317,8 @@
    "projectile": "rock",
    "melee": "stomp",
    "aoe": 0,
-   "atkStyle": "trample"
+   "atkStyle": "trample",
+   "role": ""
   },
   {
    "name": "e147slimeking",
@@ -2248,7 +2342,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": "squash"
+   "atkStyle": "squash",
+   "role": ""
   },
   {
    "name": "e117slime",
@@ -2272,7 +2367,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "squash"
+   "atkStyle": "squash",
+   "role": ""
   },
   {
    "name": "e118heartg",
@@ -2296,7 +2392,8 @@
    "projectile": "orb",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "cast"
+   "atkStyle": "cast",
+   "role": ""
   },
   {
    "name": "e118heartr",
@@ -2320,7 +2417,8 @@
    "projectile": "orb",
    "melee": "",
    "aoe": 230,
-   "atkStyle": "cast"
+   "atkStyle": "cast",
+   "role": ""
   },
   {
    "name": "e118axolot",
@@ -2344,7 +2442,8 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e118axolotb",
@@ -2368,7 +2467,8 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e118frog",
@@ -2392,7 +2492,8 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "flurry",
+   "role": ""
   },
   {
    "name": "e81frogmon",
@@ -2416,7 +2517,8 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "trample"
+   "atkStyle": "trample",
+   "role": ""
   },
   {
    "name": "e81ghost",
@@ -2440,7 +2542,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "squash"
+   "atkStyle": "squash",
+   "role": ""
   },
   {
    "name": "e118kappar",
@@ -2464,7 +2567,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e147skull",
@@ -2488,7 +2592,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "flurry",
+   "role": ""
   },
   {
    "name": "e147skullarcher",
@@ -2512,7 +2617,8 @@
    "projectile": "arrow",
    "melee": "",
    "aoe": 0,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "e147skullwar",
@@ -2536,7 +2642,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": ""
   },
   {
    "name": "e147pskull",
@@ -2560,7 +2667,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "flurry",
+   "role": ""
   },
   {
    "name": "e147pskullarcher",
@@ -2584,7 +2692,8 @@
    "projectile": "arrow",
    "melee": "",
    "aoe": 0,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "e147pskullwar",
@@ -2608,7 +2717,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": ""
   },
   {
    "name": "e118spiderr",
@@ -2632,7 +2742,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "flurry",
+   "role": ""
   },
   {
    "name": "e118spidery",
@@ -2656,7 +2767,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "flurry",
+   "role": ""
   },
   {
    "name": "e118mskull",
@@ -2680,7 +2792,8 @@
    "projectile": "orb",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "cast"
+   "atkStyle": "cast",
+   "role": ""
   },
   {
    "name": "e118mskullb",
@@ -2704,7 +2817,8 @@
    "projectile": "orb",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "cast"
+   "atkStyle": "cast",
+   "role": ""
   },
   {
    "name": "e118trexgrey",
@@ -2728,7 +2842,8 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 230,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e118panda",
@@ -2752,7 +2867,8 @@
    "projectile": "",
    "melee": "stomp",
    "aoe": 0,
-   "atkStyle": "trample"
+   "atkStyle": "trample",
+   "role": ""
   },
   {
    "name": "e118catw",
@@ -2776,7 +2892,8 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "flurry",
+   "role": ""
   },
   {
    "name": "e118hamster",
@@ -2800,7 +2917,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "squash"
+   "atkStyle": "squash",
+   "role": ""
   },
   {
    "name": "e118bear",
@@ -2824,7 +2942,8 @@
    "projectile": "",
    "melee": "stomp",
    "aoe": 230,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e118mouse",
@@ -2848,7 +2967,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "squash"
+   "atkStyle": "squash",
+   "role": ""
   },
   {
    "name": "e118mouseb",
@@ -2872,7 +2992,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "squash"
+   "atkStyle": "squash",
+   "role": ""
   },
   {
    "name": "e118hyena",
@@ -2896,7 +3017,8 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e118goldracoon",
@@ -2920,7 +3042,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "e147oslime",
@@ -2944,7 +3067,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "squash"
+   "atkStyle": "squash",
+   "role": ""
   },
   {
    "name": "e147ostoneslime",
@@ -2968,7 +3092,8 @@
    "projectile": "rock",
    "melee": "stomp",
    "aoe": 0,
-   "atkStyle": "trample"
+   "atkStyle": "trample",
+   "role": ""
   },
   {
    "name": "e147oslimeking",
@@ -2992,7 +3117,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": "squash"
+   "atkStyle": "squash",
+   "role": ""
   },
   {
    "name": "e210pigpink",
@@ -3016,7 +3142,8 @@
    "projectile": "",
    "melee": "stomp",
    "aoe": 0,
-   "atkStyle": "trample"
+   "atkStyle": "trample",
+   "role": ""
   },
   {
    "name": "e210piggreen1",
@@ -3040,7 +3167,8 @@
    "projectile": "",
    "melee": "stomp",
    "aoe": 0,
-   "atkStyle": "trample"
+   "atkStyle": "trample",
+   "role": ""
   },
   {
    "name": "e210piggreen2",
@@ -3064,7 +3192,8 @@
    "projectile": "",
    "melee": "stomp",
    "aoe": 0,
-   "atkStyle": "trample"
+   "atkStyle": "trample",
+   "role": ""
   },
   {
    "name": "e210sheepw1",
@@ -3088,7 +3217,8 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 0,
-   "atkStyle": "horn"
+   "atkStyle": "horn",
+   "role": ""
   },
   {
    "name": "e210sheepw2",
@@ -3112,7 +3242,8 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 230,
-   "atkStyle": "horn"
+   "atkStyle": "horn",
+   "role": ""
   },
   {
    "name": "e118fish",
@@ -3136,7 +3267,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e118fishr",
@@ -3160,7 +3292,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e118octor",
@@ -3184,7 +3317,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "e121ninja",
@@ -3208,7 +3342,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "flurry",
+   "role": ""
   },
   {
    "name": "e121soldier",
@@ -3232,7 +3367,8 @@
    "projectile": "bullet",
    "melee": "",
    "aoe": 0,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "e121pirate",
@@ -3256,7 +3392,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "spin"
+   "atkStyle": "spin",
+   "role": ""
   },
   {
    "name": "e121warrior",
@@ -3280,7 +3417,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": ""
   },
   {
    "name": "e118bluebat",
@@ -3304,7 +3442,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flap"
+   "atkStyle": "flap",
+   "role": ""
   },
   {
    "name": "e118yellowbat",
@@ -3328,7 +3467,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flap"
+   "atkStyle": "flap",
+   "role": ""
   },
   {
    "name": "e118lanterng",
@@ -3352,7 +3492,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "squash"
+   "atkStyle": "squash",
+   "role": ""
   },
   {
    "name": "e118lanternr",
@@ -3376,7 +3517,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "squash"
+   "atkStyle": "squash",
+   "role": ""
   },
   {
    "name": "e118cyclope",
@@ -3400,7 +3542,8 @@
    "projectile": "",
    "melee": "stomp",
    "aoe": 230,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "e210chickm1",
@@ -3424,7 +3567,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "peck"
+   "atkStyle": "peck",
+   "role": ""
   },
   {
    "name": "e210chickm2",
@@ -3448,7 +3592,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "peck"
+   "atkStyle": "peck",
+   "role": ""
   },
   {
    "name": "e210sheepm1",
@@ -3472,7 +3617,8 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 0,
-   "atkStyle": "horn"
+   "atkStyle": "horn",
+   "role": ""
   },
   {
    "name": "e210sheepm2",
@@ -3496,7 +3642,8 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 0,
-   "atkStyle": "horn"
+   "atkStyle": "horn",
+   "role": ""
   },
   {
    "name": "e210cowm",
@@ -3520,7 +3667,8 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 230,
-   "atkStyle": "buck"
+   "atkStyle": "buck",
+   "role": ""
   },
   {
    "name": "e118trex",
@@ -3544,7 +3692,8 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 0,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e118racoonm",
@@ -3568,7 +3717,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "spin"
+   "atkStyle": "spin",
+   "role": ""
   },
   {
    "name": "e118racoona",
@@ -3592,7 +3742,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "spin"
+   "atkStyle": "spin",
+   "role": ""
   },
   {
    "name": "e118boar",
@@ -3616,7 +3767,8 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 0,
-   "atkStyle": "horn"
+   "atkStyle": "horn",
+   "role": ""
   },
   {
    "name": "e118cyclope2",
@@ -3640,7 +3792,8 @@
    "projectile": "",
    "melee": "stomp",
    "aoe": 230,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "e46addergul",
@@ -3664,7 +3817,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flap"
+   "atkStyle": "flap",
+   "role": ""
   },
   {
    "name": "e46deton",
@@ -3688,7 +3842,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "squash"
+   "atkStyle": "squash",
+   "role": ""
   },
   {
    "name": "e46koboiled",
@@ -3712,7 +3867,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": ""
   },
   {
    "name": "e46rattles",
@@ -3736,7 +3892,8 @@
    "projectile": "orb",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "cast"
+   "atkStyle": "cast",
+   "role": ""
   },
   {
    "name": "e46speckle",
@@ -3760,7 +3917,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "spin"
+   "atkStyle": "spin",
+   "role": ""
   },
   {
    "name": "e46puppeteer",
@@ -3784,7 +3942,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "e118butterfly",
@@ -3808,7 +3967,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flap"
+   "atkStyle": "flap",
+   "role": ""
   },
   {
    "name": "e118butterflyb",
@@ -3832,7 +3992,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flap"
+   "atkStyle": "flap",
+   "role": ""
   },
   {
    "name": "e118spirit",
@@ -3856,7 +4017,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "squash"
+   "atkStyle": "squash",
+   "role": ""
   },
   {
    "name": "e46phantom",
@@ -3880,7 +4042,8 @@
    "projectile": "orb",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "cast"
+   "atkStyle": "cast",
+   "role": ""
   },
   {
    "name": "e46valkyrie",
@@ -3904,7 +4067,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": ""
   },
   {
    "name": "e118spirit2",
@@ -3928,7 +4092,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": "squash"
+   "atkStyle": "squash",
+   "role": ""
   },
   {
    "name": "e210chickd",
@@ -3952,7 +4117,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "peck"
+   "atkStyle": "peck",
+   "role": ""
   },
   {
    "name": "e210chickg1",
@@ -3976,7 +4142,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "peck"
+   "atkStyle": "peck",
+   "role": ""
   },
   {
    "name": "e210chickw1",
@@ -4000,7 +4167,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "peck"
+   "atkStyle": "peck",
+   "role": ""
   },
   {
    "name": "e210chickg2",
@@ -4024,7 +4192,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "peck"
+   "atkStyle": "peck",
+   "role": ""
   },
   {
    "name": "e210chickw2",
@@ -4048,7 +4217,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": "peck"
+   "atkStyle": "peck",
+   "role": ""
   },
   {
    "name": "e210sheepg1",
@@ -4072,7 +4242,8 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 0,
-   "atkStyle": "horn"
+   "atkStyle": "horn",
+   "role": ""
   },
   {
    "name": "e210sheepg2",
@@ -4096,7 +4267,8 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 0,
-   "atkStyle": "horn"
+   "atkStyle": "horn",
+   "role": ""
   },
   {
    "name": "e210sheepd1",
@@ -4120,7 +4292,8 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 0,
-   "atkStyle": "horn"
+   "atkStyle": "horn",
+   "role": ""
   },
   {
    "name": "e210sheepd2",
@@ -4144,7 +4317,8 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 230,
-   "atkStyle": "horn"
+   "atkStyle": "horn",
+   "role": ""
   },
   {
    "name": "e210cowg",
@@ -4168,7 +4342,8 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 0,
-   "atkStyle": "buck"
+   "atkStyle": "buck",
+   "role": ""
   },
   {
    "name": "e210coww",
@@ -4192,7 +4367,8 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 0,
-   "atkStyle": "buck"
+   "atkStyle": "buck",
+   "role": ""
   },
   {
    "name": "e210cowd",
@@ -4216,7 +4392,8 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 0,
-   "atkStyle": "buck"
+   "atkStyle": "buck",
+   "role": ""
   },
   {
    "name": "e210bull",
@@ -4240,7 +4417,8 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 230,
-   "atkStyle": "buck"
+   "atkStyle": "buck",
+   "role": ""
   },
   {
    "name": "e117chicken",
@@ -4264,7 +4442,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "peck"
+   "atkStyle": "peck",
+   "role": ""
   },
   {
    "name": "e117cow",
@@ -4288,7 +4467,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "buck"
+   "atkStyle": "buck",
+   "role": ""
   },
   {
    "name": "e117pig",
@@ -4312,7 +4492,8 @@
    "projectile": "",
    "melee": "stomp",
    "aoe": 0,
-   "atkStyle": "trample"
+   "atkStyle": "trample",
+   "role": ""
   },
   {
    "name": "e117sheep",
@@ -4336,7 +4517,8 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 0,
-   "atkStyle": "horn"
+   "atkStyle": "horn",
+   "role": ""
   },
   {
    "name": "e116chick",
@@ -4360,7 +4542,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "peck"
+   "atkStyle": "peck",
+   "role": ""
   },
   {
    "name": "e116cow",
@@ -4384,7 +4567,8 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 230,
-   "atkStyle": "buck"
+   "atkStyle": "buck",
+   "role": ""
   },
   {
    "name": "e92farmer0",
@@ -4408,7 +4592,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": ""
   },
   {
    "name": "e92farmer1",
@@ -4432,7 +4617,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": ""
   },
   {
    "name": "e92farmer2",
@@ -4456,7 +4642,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": ""
   },
   {
    "name": "e92farmer3",
@@ -4480,7 +4667,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": ""
   },
   {
    "name": "e117boy2",
@@ -4504,7 +4692,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "e117skeleton",
@@ -4528,7 +4717,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "e121archer",
@@ -4552,7 +4742,8 @@
    "projectile": "arrow",
    "melee": "",
    "aoe": 0,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "e121caveman",
@@ -4576,7 +4767,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": ""
   },
   {
    "name": "e121clown",
@@ -4600,7 +4792,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "spin"
+   "atkStyle": "spin",
+   "role": ""
   },
   {
    "name": "e121monk",
@@ -4624,7 +4817,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "flurry",
+   "role": ""
   },
   {
    "name": "e121wizard",
@@ -4648,7 +4842,8 @@
    "projectile": "orb",
    "melee": "",
    "aoe": 230,
-   "atkStyle": "cast"
+   "atkStyle": "cast",
+   "role": ""
   },
   {
    "name": "e148man1",
@@ -4672,7 +4867,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": ""
   },
   {
    "name": "e148man2",
@@ -4696,7 +4892,8 @@
    "projectile": "rock",
    "melee": "",
    "aoe": 0,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "e148man3",
@@ -4720,7 +4917,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "spin"
+   "atkStyle": "spin",
+   "role": ""
   },
   {
    "name": "e148man4",
@@ -4744,7 +4942,8 @@
    "projectile": "orb",
    "melee": "",
    "aoe": 230,
-   "atkStyle": "cast"
+   "atkStyle": "cast",
+   "role": ""
   },
   {
    "name": "e148man7",
@@ -4768,7 +4967,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "flurry",
+   "role": ""
   },
   {
    "name": "e148man8",
@@ -4792,7 +4992,8 @@
    "projectile": "arrow",
    "melee": "",
    "aoe": 0,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "e154swordman",
@@ -4816,7 +5017,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": ""
   },
   {
    "name": "e115hood",
@@ -4840,7 +5042,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": ""
   },
   {
    "name": "e207rogue",
@@ -4864,7 +5067,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": "swing"
+   "atkStyle": "swing",
+   "role": ""
   },
   {
    "name": "e92zombie0",
@@ -4888,7 +5092,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e92zombie1",
@@ -4912,7 +5117,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e92zombie2",
@@ -4936,7 +5142,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e92zombie3",
@@ -4960,7 +5167,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e92zombie4",
@@ -4984,7 +5192,8 @@
    "projectile": "",
    "melee": "stomp",
    "aoe": 230,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   },
   {
    "name": "e118catblack",
@@ -5008,7 +5217,8 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "flurry",
+   "role": ""
   },
   {
    "name": "e118catcyclop",
@@ -5032,7 +5242,8 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "flurry",
+   "role": ""
   },
   {
    "name": "e118dogblack",
@@ -5056,7 +5267,8 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "bite"
+   "atkStyle": "bite",
+   "role": ""
   },
   {
    "name": "e18dino",
@@ -5080,7 +5292,8 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": ""
+   "atkStyle": "",
+   "role": ""
   }
  ]
 }
