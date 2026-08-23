@@ -430,7 +430,13 @@ namespace GameMaker.Battle
             {
                 string unitName = SpawnableUnits[i];
                 var m = DataHub.I.FindMonster(unitName);
+                // 기본 4종은 전용 초상화, 뽑기 유닛은 걷기 첫 프레임 (없으면 흰 네모가 떴었다)
                 var portrait = SpriteBank.GetEnv(unitName.Replace("our", "portrait_"));
+                if (portrait == null)
+                {
+                    var mv = SpriteBank.GetFrames(m.SpriteName, "move");
+                    if (mv.Length > 0) portrait = mv[0];
+                }
 
                 var btn = Ui.ImageButton(hud.transform, SpriteBank.GetEnv("btn_wood"), new Vector2(150, 140),
                     () => TrySpawnOur(unitName), "Spawn_" + unitName);
