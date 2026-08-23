@@ -40,6 +40,7 @@ namespace GameMaker.Screens
         Image chest, whiteFlash, dimmer;
         Button drawBtn;
         Image drawBtnImg;
+        ToastBar toast;
         RectTransform resultRoot; // 결과 연출 (매 뽑기마다 갈아엎음 — 자식 코루틴은 null 가드로 종료)
         bool drawing;
         static Sprite[] burstFrames;
@@ -98,6 +99,8 @@ namespace GameMaker.Screens
             var priceText = Ui.CenteredIconValue(drawBtn.transform, SpriteBank.GetEnv("icon_coin"),
                 Cost + "  뽑기", 38, new Color(1f, 0.9f, 0.3f), "Price");
             Ui.Place((RectTransform)priceText.transform.parent, new Vector2(0.5f, 0.5f), new Vector2(0, 4));
+
+            toast = Ui.CreateToast(canvas.transform, 150); // 뽑기/되돌아가기 버튼 줄 바로 위
 
             whiteFlash = Ui.Image(canvas.transform, null, "Flash");
             whiteFlash.color = new Color(1f, 1f, 1f, 0f);
@@ -169,9 +172,10 @@ namespace GameMaker.Screens
             if (drawing) return;
             GachaResult result;
             try { result = DataHub.I.DrawGacha(Cost); }
-            catch (GameException)
+            catch (GameException e)
             {
                 Ui.Flash(this, drawBtnImg, new Color(0.9f, 0.2f, 0.2f));
+                toast.Show(e.Message);
                 return;
             }
             RefreshMoney();

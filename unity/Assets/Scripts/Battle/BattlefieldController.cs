@@ -51,6 +51,7 @@ namespace GameMaker.Battle
         const string SpeedPrefKey = "gameSpeed"; // 배속은 스테이지가 바뀌어도 유지
         Image walletImg;
         readonly List<Image> spawnBtnImages = new List<Image>();
+        ToastBar toast;
         readonly List<CanvasGroup> spawnBtnGroups = new List<CanvasGroup>(); // 불가 상태 반투명 처리
         readonly List<float> spawnFlashUntil = new List<float>();            // 빨간 플래시 유지 시각
         CanvasGroup walletGroup;
@@ -392,6 +393,7 @@ namespace GameMaker.Battle
         void SetupHud()
         {
             hud = Ui.CreateCanvas(transform, "BattleHud");
+            toast = Ui.CreateToast(hud.transform, 195); // 소환 버튼 줄(85±70) 바로 위
 
             // 여행지 이름: 상단 중앙 — 기존 스타일 (외곽선 흰 글씨)
             var placeText = Ui.OutlinedLabel(hud.transform,
@@ -685,6 +687,9 @@ namespace GameMaker.Battle
                     spawnFlashUntil[idx] = Time.time + 0.25f; // Update 가 플래시를 덮지 않도록
                     Ui.Flash(this, spawnBtnImages[idx], new Color(1f, 0.25f, 0.25f));
                 }
+                toast.Show(idx >= 0 && spawnTimers[idx] > 0f ? "아직 쿨타임입니다."
+                    : ourParty.Count - 1 >= 10 ? "출전 인원이 가득 찼습니다. (최대 10)"
+                    : "돈이 부족합니다. [ " + m.cost + " ] 필요", 1.2f);
                 return;
             }
 

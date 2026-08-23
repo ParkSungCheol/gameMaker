@@ -32,8 +32,8 @@ namespace GameMaker.Screens
 
         Canvas canvas;
         RectTransform grid;
-        Text pageText, toastText, slotHeader;
-        float toastUntil;
+        Text pageText, slotHeader;
+        ToastBar toast;
         List<List<MonsterData>> pages; // 등급별 보유 유닛
         static readonly string[] SortKeys = { "이름", "공격력", "체력", "사거리", "비용", "등급" };
         int sortKey;          // SortKeys 인덱스
@@ -99,9 +99,7 @@ namespace GameMaker.Screens
                 new Color(0.3f, 0.26f, 0.18f, 0.95f), "DirBtn");
             Ui.Place((RectTransform)dirBtn.transform, new Vector2(0f, 0f), new Vector2(258, 40));
 
-            toastText = Ui.OutlinedLabel(canvas.transform, "", 28, new Color(1f, 0.6f, 0.5f), "Toast");
-            toastText.raycastTarget = false;
-            Ui.Place((RectTransform)toastText.transform, new Vector2(0.5f, 0f), new Vector2(0, 12), new Vector2(900, 40));
+            toast = Ui.CreateToast(canvas.transform, 110); // 페이지 화살표(55) 위, 목록 아래
 
             grid = Ui.Panel(canvas.transform, new Color(0, 0, 0, 0), "Grid");
             Ui.Place(grid, new Vector2(0.5f, 0f), new Vector2(0, 105), new Vector2(1760, 400));
@@ -120,16 +118,7 @@ namespace GameMaker.Screens
             RebuildList();
         }
 
-        void Update()
-        {
-            if (toastText.text.Length > 0 && Time.time > toastUntil) toastText.text = "";
-        }
-
-        void Toast(string msg)
-        {
-            toastText.text = msg;
-            toastUntil = Time.time + 1.6f;
-        }
+        void Toast(string msg) => toast.Show(msg);
 
         void Save()
         {

@@ -196,12 +196,30 @@ namespace GameMaker.UI
             if (size.HasValue) rt.sizeDelta = size.Value;
         }
 
-        /// <summary>레거시 alert() 대응 — 나타났다 사라지는 안내문구.</summary>
+        /// <summary>화면 공용 알림 — 항상 '아래쪽'에, 어두운 알약 배경 + 주황 글씨로 강조해서 잠깐 떴다 사라진다.
+        /// (돈 부족 / 최대 강화 / 최소 배치 / 잠긴 스테이지 등). bottomY = 화면 바닥에서의 중심 높이.</summary>
+        public static ToastBar CreateToast(Transform canvas, float bottomY)
+        {
+            var bg = RoundedPanel(canvas, new Color(0.08f, 0.05f, 0.02f, 0.92f), "Toast");
+            bg.raycastTarget = false;
+            Place(bg.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, bottomY), new Vector2(10, 56));
+            bg.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            Frame(bg.rectTransform, new Color(1f, 0.72f, 0.25f, 0.95f), 2f);
+            var text = OutlinedLabel(bg.transform, "", 30, new Color(1f, 0.78f, 0.35f), "Text");
+            text.raycastTarget = false;
+            Stretch(text.rectTransform);
+            var toast = bg.gameObject.AddComponent<ToastBar>();
+            toast.Init(bg, text);
+            bg.gameObject.SetActive(false);
+            return toast;
+        }
+
+        /// <summary>레거시 alert() 대응 — 나타났다 사라지는 안내문구 (하단).</summary>
         public static void Alert(MonoBehaviour host, Transform canvas, string message)
         {
-            var text = Label(canvas, message, 44, new Color(1f, 0.95f, 0.4f), "FadeAlert");
+            var text = OutlinedLabel(canvas, message, 44, new Color(1f, 0.95f, 0.4f), "FadeAlert");
             var rt = (RectTransform)text.transform;
-            Place(rt, new Vector2(0.5f, 0.5f), new Vector2(0, 200));
+            Place(rt, new Vector2(0.5f, 0f), new Vector2(0, 120));
             text.transform.SetAsLastSibling();
             host.StartCoroutine(FadeAndDie(text));
         }
@@ -433,6 +451,31 @@ namespace GameMaker.UI
             g.color = color;
             yield return new WaitForSeconds(0.18f);
             if (g != null) g.color = orig;
+        }
+    }
+
+    /// <summary>하단 알림 — Show(msg) 로 띄우면 글 길이에 맞춰 알약이 늘어나고, 시간이 지나면 사라진다.
+    /// 같은 화면에서 여러 번 불러도 마지막 메시지로 갱신되며 타이머가 연장된다.</summary>
+    public class ToastBar : MonoBehaviour
+    {
+        Image bg;
+        Text text;
+        float until;
+
+        public void Init(Image bg, Text text) { this.bg = bg; this.text = text; }
+
+        public void Show(string msg, float seconds = 1.8f)
+        {
+            gameObject.SetActive(true);
+            text.text = msg;
+            bg.rectTransform.sizeDelta = new Vector2(text.preferredWidth + 64f, 56f);
+            until = Time.unscaledTime + seconds;
+            transform.SetAsLastSibling();
+        }
+
+        void Update()
+        {
+            if (Time.unscaledTime > until) gameObject.SetActive(false);
         }
     }
 

@@ -21,6 +21,8 @@ namespace GameMaker.Screens
 
         bool Cleared(int stageId) => stageId >= 0 && stageId < player.mapClear.Length && player.mapClear[stageId] > 0;
 
+        ToastBar toast;
+
         bool Unlocked(int theme, int sub)
         {
             if (Core.Dev.UnlockAllStages) return true; // [DEV] 전체 해금 — Core/Dev.cs 에서 끄면 아래 순차 해금 복원
@@ -34,6 +36,7 @@ namespace GameMaker.Screens
         {
             var canvas = Ui.CreateCanvas(transform, "MapCanvas");
             MenuBackdrop.Build(this, canvas, dim: 0.5f, withGround: false);
+            toast = Ui.CreateToast(canvas.transform, 60);
 
             var title = Ui.OutlinedLabel(canvas.transform, "보물찾기 여정", 52, Color.white, "Title");
             Ui.Place((RectTransform)title.transform, new Vector2(0.5f, 1f), new Vector2(0, -55));
@@ -97,7 +100,11 @@ namespace GameMaker.Screens
                 var lockImg = Ui.Image(btn.transform, SpriteBank.GetEnv("icon_lock"), "Lock");
                 Ui.Place((RectTransform)lockImg.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 16), new Vector2(56, 56));
                 lockImg.preserveAspect = true;
-                btn.onClick.AddListener(() => Ui.Flash(this, btnImg, new Color(0.55f, 0.15f, 0.15f)));
+                btn.onClick.AddListener(() =>
+                {
+                    Ui.Flash(this, btnImg, new Color(0.55f, 0.15f, 0.15f));
+                    toast.Show("이전 여행지를 먼저 클리어해야 합니다.");
+                });
                 // 잠긴 테마도 서브 표시줄 자리는 유지 (레이아웃 정렬)
                 var lockedLbl = Ui.OutlinedLabel(canvas.transform, "???", 28, new Color(0.85f, 0.85f, 0.85f), "Sub" + theme);
                 Ui.Place((RectTransform)lockedLbl.transform, new Vector2(0.5f, 0.5f), pos + new Vector2(0, -85));
@@ -150,7 +157,10 @@ namespace GameMaker.Screens
                 if (Unlocked(theme, selected))
                     ScreenRouter.I.Show(ScreenId.Battlefield, theme * 10 + selected);
                 else
+                {
                     Ui.Flash(this, btnImg, new Color(0.55f, 0.15f, 0.15f));
+                    toast.Show("이전 스테이지를 먼저 클리어해야 합니다.");
+                }
             });
 
             refresh();

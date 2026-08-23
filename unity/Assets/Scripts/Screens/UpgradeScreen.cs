@@ -26,8 +26,8 @@ namespace GameMaker.Screens
         Canvas canvas;
         RectTransform content;
         ScrollRect scroll;
-        Text moneyText, tierText, toastText;
-        float toastUntil;
+        Text moneyText, tierText;
+        ToastBar toast;
         List<Group> groups;
         int page;
         readonly Dictionary<string, Image> upBtnImages = new Dictionary<string, Image>();
@@ -63,9 +63,7 @@ namespace GameMaker.Screens
             tierText.raycastTarget = false;
             Ui.Place((RectTransform)tierText.transform, new Vector2(0.5f, 1f), new Vector2(0, -135), new Vector2(460, 52));
 
-            toastText = Ui.OutlinedLabel(canvas.transform, "", 28, new Color(1f, 0.6f, 0.5f), "Toast");
-            toastText.raycastTarget = false;
-            Ui.Place((RectTransform)toastText.transform, new Vector2(0.5f, 1f), new Vector2(0, -190), new Vector2(900, 40));
+            toast = Ui.CreateToast(canvas.transform, 74); // 하단 스크롤바(26) 바로 위
 
             // 가로 스크롤 영역 — 화면 전체 높이, 좌우 드래그/휠로 유닛들을 넘긴다
             var viewport = Ui.Panel(canvas.transform, new Color(0, 0, 0, 0), "Viewport");
@@ -122,14 +120,9 @@ namespace GameMaker.Screens
                 bool ok = money >= upBtnPrice[kv.Key];
                 kv.Value.color = ok ? Color.white : new Color(0.45f, 0.45f, 0.45f);
             }
-            if (toastText.text.Length > 0 && Time.time > toastUntil) toastText.text = "";
         }
 
-        void Toast(string msg)
-        {
-            toastText.text = msg;
-            toastUntil = Time.time + 1.6f;
-        }
+        void Toast(string msg) => toast.Show(msg);
 
         /// <summary>직업(포지션) 안내 팝업 — 승/패 팝업과 같은 보드.</summary>
         void ShowRoleGuide()
