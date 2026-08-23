@@ -403,7 +403,7 @@ namespace GameMaker.Screens
                 seg.color = new Color(1f, 0.97f, 0.85f, Mathf.Lerp(0.3f, 0.06f, k));
                 var rt = (RectTransform)seg.transform;
                 rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-                rt.anchoredPosition = new Vector2(0, Mathf.Lerp(340f, -520f, k));
+                rt.anchoredPosition = new Vector2(0, Mathf.Lerp(220f, -520f, k)); // 제목 아래에서 시작
                 rt.sizeDelta = new Vector2(Mathf.Lerp(130f, 1240f, k), Mathf.Lerp(200f, 300f, k)); // 아래로 갈수록 계속 확장
             }
         }
