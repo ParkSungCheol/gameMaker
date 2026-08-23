@@ -29,6 +29,8 @@ namespace GameMaker.Data
         public string projectile;    // 발사체 종류: "arrow"/"bullet"/"rock"/"orb" (빈 값 = 근접 타격)
         public float aoe;            // 범위공격 반경(px) — 보스 전용, 3회 공격마다 내리찍기
         public string melee;         // 근접 타입: "pounce"(점프덮치기)/"ram"(들이받기)/"stomp"(내려찍기)/빈 값(기본 런지)
+        public int tier;             // 아군 뽑기 등급: 0 기본 / 1 일반 ~ 5 전설 (적군은 0)
+        public int stage;            // 적군 소속 스테이지 ID (테마*10+서브, 아군은 0)
 
         public string SpriteName => string.IsNullOrEmpty(sprite) ? name : sprite;
         public string DisplayName => string.IsNullOrEmpty(label) ? name : label;

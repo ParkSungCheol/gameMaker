@@ -19,7 +19,15 @@ namespace GameMaker.Screens
     public class UnitTestScreen : MonoBehaviour
     {
         const int Cols = 8, Rows = 3;
-        const int PerPage = Cols * Rows;
+
+        /// <summary>한 페이지 = 한 그룹 (아군: 등급, 적군: 테마)</summary>
+        class Group
+        {
+            public string title;
+            public List<MonsterData> units;
+        }
+
+        static readonly string[] TierNames = { "기본", "일반", "고급", "희귀", "영웅", "전설" };
 
         Canvas canvas;
         RectTransform grid;
@@ -27,7 +35,7 @@ namespace GameMaker.Screens
         readonly List<Button> actionButtons = new List<Button>();
         readonly List<Button> tabButtons = new List<Button>();
 
-        List<MonsterData> allies, enemies;
+        List<Group> allyGroups, enemyGroups;
         bool showingEnemies = true;
         int page;
         string globalAction = "idle"; // 기본: 가만히 서 있기
@@ -35,8 +43,27 @@ namespace GameMaker.Screens
         void Start()
         {
             var all = DataHub.I.GetMonsters().Where(m => !m.IsCastle).ToList();
-            allies = all.Where(m => m.IsOur).ToList();
-            enemies = all.Where(m => !m.IsOur).ToList(); // JSON 순서 = 스테이지 순서
+
+            // 아군: 뽑기 등급별 그룹 (0 기본 ~ 5 전설)
+            allyGroups = new List<Group>();
+            for (int t = 0; t < TierNames.Length; t++)
+            {
+                var units = all.Where(m => m.IsOur && m.tier == t).ToList();
+                if (units.Count > 0)
+                    allyGroups.Add(new Group { title = TierNames[t], units = units });
+            }
+
+            // 적군: 테마별 그룹, 테마 안에서는 서브스테이지 순
+            enemyGroups = new List<Group>();
+            foreach (var g in all.Where(m => !m.IsOur).GroupBy(m => m.stage / 10).OrderBy(x => x.Key))
+            {
+                var stage = DataHub.I.GetStage(g.Key);
+                enemyGroups.Add(new Group
+                {
+                    title = "테마 " + g.Key + " · " + (stage != null ? stage.label : ""),
+                    units = g.OrderBy(m => m.stage).ToList(),
+                });
+            }
 
             canvas = Ui.CreateCanvas(transform, "UnitTestCanvas");
             MenuBackdrop.Build(this, canvas, dim: 0.55f, withGround: false);
@@ -67,7 +94,7 @@ namespace GameMaker.Screens
             ((RectTransform)next.transform).localScale = new Vector3(-1f, 1f, 1f);
             Ui.Place((RectTransform)next.transform, new Vector2(0.5f, 0f), new Vector2(140, 55));
             pageText = Ui.OutlinedLabel(canvas.transform, "", 34, Color.white, "Page");
-            Ui.Place((RectTransform)pageText.transform, new Vector2(0.5f, 0f), new Vector2(0, 55), new Vector2(200, 44));
+            Ui.Place((RectTransform)pageText.transform, new Vector2(0.5f, 0f), new Vector2(0, 55), new Vector2(640, 44));
 
             grid = Ui.Panel(canvas.transform, new Color(0, 0, 0, 0), "Grid");
             Ui.Place(grid, new Vector2(0.5f, 0.5f), new Vector2(0, -20), new Vector2(1760, 760));
@@ -75,8 +102,8 @@ namespace GameMaker.Screens
             Rebuild();
         }
 
-        List<MonsterData> Current => showingEnemies ? enemies : allies;
-        int PageCount => Mathf.Max(1, Mathf.CeilToInt(Current.Count / (float)PerPage));
+        List<Group> Current => showingEnemies ? enemyGroups : allyGroups;
+        int PageCount => Mathf.Max(1, Current.Count);
 
         void MakeTab(string label, Vector2 pos, System.Action onClick)
         {
@@ -124,21 +151,20 @@ namespace GameMaker.Screens
             RefreshActionColors();
             RefreshTabColors();
 
-            var list = Current;
-            pageText.text = (page + 1) + " / " + PageCount + "  (" + list.Count + "종)";
+            var group = Current[Mathf.Clamp(page, 0, Current.Count - 1)];
+            var list = group.units;
+            pageText.text = group.title + "  " + (page + 1) + "/" + PageCount + "  (" + list.Count + "종)";
 
             float cellW = 1760f / Cols, cellH = 760f / Rows;
-            int start = page * PerPage;
-            for (int i = start; i < Mathf.Min(start + PerPage, list.Count); i++)
+            for (int i = 0; i < Mathf.Min(Cols * Rows, list.Count); i++)
             {
-                int idx = i - start;
                 var m = list[i];
                 var slot = new GameObject("Cell_" + m.name);
                 slot.transform.SetParent(grid, false);
                 var rt = slot.AddComponent<RectTransform>();
                 rt.anchorMin = rt.anchorMax = new Vector2(0f, 1f);
                 rt.pivot = new Vector2(0f, 1f);
-                rt.anchoredPosition = new Vector2((idx % Cols) * cellW, -(idx / Cols) * cellH);
+                rt.anchoredPosition = new Vector2((i % Cols) * cellW, -(i / Cols) * cellH);
                 rt.sizeDelta = new Vector2(cellW, cellH);
 
                 var cell = slot.AddComponent<UnitMotionCell>();
@@ -187,7 +213,9 @@ namespace GameMaker.Screens
             label = Ui.Label(card.transform, m.DisplayName, 22, new Color(1f, 1f, 1f, 0.95f), "Name");
             label.alignment = TextAnchor.MiddleCenter;
             Ui.Place(label.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 30), new Vector2(cellW - 12, 28));
-            var idText = Ui.Label(card.transform, m.name, 14, new Color(1f, 1f, 1f, 0.45f), "Id");
+            // 적군은 소속 스테이지(테마-서브)도 함께 — 수정 요청 시 특정용
+            string idStr = m.stage > 0 ? (m.stage / 10) + "-" + (m.stage % 10) + " · " + m.name : m.name;
+            var idText = Ui.Label(card.transform, idStr, 14, new Color(1f, 1f, 1f, 0.45f), "Id");
             idText.alignment = TextAnchor.MiddleCenter;
             Ui.Place(idText.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 10), new Vector2(cellW - 12, 20));
 
@@ -218,7 +246,7 @@ namespace GameMaker.Screens
             if (Time.unscaledTime < holdUntil) return;
 
             timer += Time.unscaledDeltaTime;
-            if (timer < 1f / 8f) return; // 8fps
+            if (timer < 1f / 10f) return; // 10fps — 전투(SimpleSpriteAnimator 기본값)와 동일
             timer = 0;
             frame++;
             if (frame >= frames.Length)
