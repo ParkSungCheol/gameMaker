@@ -116,9 +116,9 @@ namespace GameMaker.Screens
         void ShowRates()
         {
             if (drawing) return;
-            var board = Ui.Popup(canvas.transform, "뽑기 확률", new Vector2(1180, 920));
-            var viewport = Ui.Panel(board, new Color(0, 0, 0, 0.18f), "RateViewport");
-            Ui.Place(viewport, new Vector2(0.5f, 1f), new Vector2(0, -150), new Vector2(1040, 620));
+            var board = Ui.Popup(canvas.transform, "뽑기 확률", new Vector2(1180, 900));
+            var viewport = Ui.Panel(board, new Color(0, 0, 0, 0), "RateViewport");
+            Ui.Place(viewport, new Vector2(0.5f, 1f), new Vector2(-20, -120), new Vector2(1020, 740));
             viewport.gameObject.AddComponent<RectMask2D>();
             var content = Ui.Panel(viewport, new Color(0, 0, 0, 0), "Content");
             content.anchorMin = new Vector2(0f, 1f); content.anchorMax = new Vector2(1f, 1f);
@@ -127,10 +127,13 @@ namespace GameMaker.Screens
             var sr = viewport.gameObject.AddComponent<ScrollRect>();
             sr.viewport = viewport; sr.content = content; sr.horizontal = false; sr.vertical = true;
             sr.movementType = ScrollRect.MovementType.Clamped; sr.scrollSensitivity = 40f;
+            var vbar = Ui.CleanScrollbar(board, false, new Vector2(1f, 1f), new Vector2(-44, -120), new Vector2(16, 740));
+            sr.verticalScrollbar = vbar;
+            sr.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.Permanent;
 
             var all = DataHub.I.GetMonsters().Where(m => m.IsOur && !m.IsCastle && m.tier > 0).ToList();
             float y = -8f;
-            for (int t = 1; t <= 5; t++)
+            for (int t = 5; t >= 1; t--) // 희귀한 등급부터
             {
                 var units = all.Where(m => m.tier == t).ToList();
                 if (units.Count == 0) continue;
@@ -139,7 +142,9 @@ namespace GameMaker.Screens
                     units.Count + "종 · 1종당 " + each.ToString("0.00") + "%)", 28, TierColors[t], "Head" + t);
                 head.alignment = TextAnchor.MiddleLeft;
                 Ui.Place((RectTransform)head.transform, new Vector2(0f, 1f), new Vector2(24, y), new Vector2(980, 44));
-                y -= 50f;
+                var rule = Ui.Panel(content, new Color(TierColors[t].r, TierColors[t].g, TierColors[t].b, 0.45f), "Rule" + t);
+                Ui.Place(rule, new Vector2(0f, 1f), new Vector2(24, y - 46), new Vector2(960, 1));
+                y -= 58f;
                 foreach (var u in units)
                 {
                     var fr = SpriteBank.GetFrames(u.SpriteName, "move");
@@ -157,7 +162,7 @@ namespace GameMaker.Screens
                     Ui.Place((RectTransform)pr.transform, new Vector2(1f, 1f), new Vector2(-30, y - 8), new Vector2(160, 32));
                     y -= 50f;
                 }
-                y -= 12f;
+                y -= 26f;
             }
             content.sizeDelta = new Vector2(0, -y + 20f);
         }

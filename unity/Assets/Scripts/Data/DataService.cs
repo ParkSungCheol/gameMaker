@@ -102,13 +102,19 @@ namespace GameMaker.Data
         public int Clear(int mapNumber)
         {
             player.mapClear[mapNumber]++;
-            int clearTime = player.mapClear[mapNumber];
-            int baseVal = mapNumber >= 10 ? (mapNumber / 10) * 3 + (mapNumber % 10) : mapNumber;
-            int money = baseVal * (11 - clearTime) <= 0 ? 1 : baseVal * (11 - clearTime);
-            money = Mathf.Max(10, Mathf.RoundToInt(money / 10f) * 10); // 10단위 반올림 (최소 10)
+            int money = ClearReward(mapNumber, player.mapClear[mapNumber]);
             player.money += money;
             SavePlayer(player);
             return money;
+        }
+
+        /// <summary>클리어 보상액 — clearTime 은 '이번 클리어까지 포함한' 횟수. 맵 화면 미리보기와 같은 식.
+        /// 난이도기준 * (11 - 횟수) 를 10단위 반올림, 최소 10.</summary>
+        public static int ClearReward(int mapNumber, int clearTime)
+        {
+            int baseVal = mapNumber >= 10 ? (mapNumber / 10) * 3 + (mapNumber % 10) : mapNumber;
+            int money = baseVal * (11 - clearTime) <= 0 ? 1 : baseVal * (11 - clearTime);
+            return Mathf.Max(10, Mathf.RoundToInt(money / 10f) * 10);
         }
 
         public int GetUpgradeCount(string monsterName) => upgrades.Get(monsterName);

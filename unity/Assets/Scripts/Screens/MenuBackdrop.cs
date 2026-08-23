@@ -161,12 +161,21 @@ namespace GameMaker.Screens
             }
         }
 
+        /// <summary>걷기 프레임 순환. 프레임마다 원본 크기가 달라도(발 벌림 등) 배율을 하나로 고정해
+        /// 몸 전체가 커졌다 작아졌다 하는 '꿀렁임'을 막는다 — 박스는 가장 큰 프레임 기준으로 맞춘다.</summary>
         public static System.Collections.IEnumerator CycleFrames(Image img, Sprite[] frames, float interval)
         {
+            var rt = img.rectTransform;
+            var box = rt.sizeDelta;
+            float maxW = 1f, maxH = 1f;
+            foreach (var fr in frames) { maxW = Mathf.Max(maxW, fr.rect.width); maxH = Mathf.Max(maxH, fr.rect.height); }
+            float scale = Mathf.Min(box.x / maxW, box.y / maxH);
             int i = 0;
             while (img != null)
             {
-                img.sprite = frames[i % frames.Length];
+                var fr = frames[i % frames.Length];
+                img.sprite = fr;
+                rt.sizeDelta = new Vector2(fr.rect.width * scale, fr.rect.height * scale);
                 i++;
                 yield return new WaitForSeconds(interval);
             }

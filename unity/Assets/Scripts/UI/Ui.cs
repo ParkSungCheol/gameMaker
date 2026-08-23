@@ -298,27 +298,89 @@ namespace GameMaker.UI
             Place((RectTransform)txt.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 2));
         }
 
-        /// <summary>범용 팝업 보드 — 승/패 팝업과 같은 금테 프레임을 크기만 바꿔 재사용.
-        /// 제목 + [닫기] 버튼을 갖추고, 내용을 붙일 보드 RectTransform 을 돌려준다.
-        /// 바깥(어두운 영역) 클릭으로도 닫힌다.</summary>
+        /// <summary>범용 팝업 보드 — 어두운 반투명 판 + 가는 금테. 제목만 두고 [닫기] 버튼은 없다:
+        /// 바깥(어두운 영역) 클릭으로 닫히며, 보드 아래에 깜빡이는 안내 문구가 그걸 알려준다.
+        /// 내용을 붙일 보드 RectTransform 을 돌려준다 (제목 아래 약 -110 부터 자유 영역).</summary>
         public static RectTransform Popup(Transform canvas, string title, Vector2 size, Action onClose = null)
         {
-            var overlay = Panel(canvas, new Color(0, 0, 0, 0.65f), "PopupOverlay");
+            var overlay = Panel(canvas, new Color(0, 0, 0, 0.8f), "PopupOverlay");
             Stretch(overlay);
             overlay.SetAsLastSibling();
             overlay.gameObject.AddComponent<Button>().onClick.AddListener(() =>
             { UnityEngine.Object.Destroy(overlay.gameObject); onClose?.Invoke(); });
 
-            var board = Image(overlay.transform, Resources.Load<Sprite>("Sprites/env/popup_frame"), "Board");
-            Place((RectTransform)board.transform, new Vector2(0.5f, 0.5f), Vector2.zero, size);
+            var board = Panel(overlay.transform, new Color(0.03f, 0.03f, 0.05f, 0.55f), "Board");
+            Place(board, new Vector2(0.5f, 0.5f), Vector2.zero, size);
             board.gameObject.AddComponent<Button>(); // 보드 클릭은 닫히지 않게 (레이캐스트 흡수)
+            Frame(board, new Color(1f, 0.82f, 0.35f, 0.9f), 3f);
 
-            var titleTxt = OutlinedLabel(board.transform, title, 56, new Color(1f, 0.72f, 0.1f), "Title");
-            Place((RectTransform)titleTxt.transform, new Vector2(0.5f, 1f), new Vector2(0, -92));
+            var titleTxt = OutlinedLabel(board, title, 48, new Color(1f, 0.82f, 0.3f), "Title");
+            Place((RectTransform)titleTxt.transform, new Vector2(0.5f, 1f), new Vector2(0, -44));
+            var rule = Panel(board, new Color(1f, 0.82f, 0.35f, 0.5f), "TitleRule");
+            Place(rule, new Vector2(0.5f, 1f), new Vector2(0, -92), new Vector2(size.x - 120, 2));
 
-            MakeTextButton(board.transform, "닫기", Color.white, new Vector2(0, 58),
-                () => { UnityEngine.Object.Destroy(overlay.gameObject); onClose?.Invoke(); }, koreanFont: true);
-            return (RectTransform)board.transform;
+            var hint = OutlinedLabel(overlay.transform, "바깥쪽을 누르면 닫힙니다", 28, Color.white, "CloseHint");
+            hint.raycastTarget = false;
+            Place((RectTransform)hint.transform, new Vector2(0.5f, 0.5f), new Vector2(0, -size.y * 0.5f - 44), new Vector2(600, 40));
+            hint.gameObject.AddComponent<Blink>();
+            return board;
+        }
+
+        /// <summary>가는 외곽 테두리 — 네 변에 얇은 판을 붙인다 (또렷한 선, 블러 없음).</summary>
+        public static void Frame(RectTransform rt, Color color, float thickness)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                var edge = Panel(rt, color, "Edge" + i);
+                edge.GetComponent<Image>().raycastTarget = false;
+                bool horiz = i < 2;
+                edge.anchorMin = new Vector2(horiz ? 0f : (i == 2 ? 0f : 1f), horiz ? (i == 0 ? 1f : 0f) : 0f);
+                edge.anchorMax = new Vector2(horiz ? 1f : (i == 2 ? 0f : 1f), horiz ? (i == 0 ? 1f : 0f) : 1f);
+                edge.pivot = new Vector2(horiz ? 0.5f : (i == 2 ? 0f : 1f), horiz ? (i == 0 ? 1f : 0f) : 0.5f);
+                edge.anchoredPosition = Vector2.zero;
+                edge.sizeDelta = horiz ? new Vector2(0, thickness) : new Vector2(thickness, 0);
+            }
+        }
+
+        /// <summary>깔끔한 스크롤바 — 각진 트랙 + 금색 손잡이, 항상 표시(페이드 없음).
+        /// horizontal 이면 size.x 가 길이, 아니면 size.y 가 길이.</summary>
+        public static Scrollbar CleanScrollbar(Transform parent, bool horizontal, Vector2 anchor, Vector2 pos, Vector2 size)
+        {
+            var bg = Panel(parent, new Color(1f, 1f, 1f, 0.18f), horizontal ? "HScrollbar" : "VScrollbar");
+            Place(bg, anchor, pos, size);
+            Frame(bg, new Color(1f, 1f, 1f, 0.35f), 1f);
+            var sb = bg.gameObject.AddComponent<Scrollbar>();
+            var handle = Panel(bg, new Color(1f, 0.84f, 0.4f, 1f), "Handle");
+            Stretch(handle);
+            handle.offsetMin = new Vector2(2, 2);
+            handle.offsetMax = new Vector2(-2, -2);
+            sb.handleRect = handle;
+            sb.targetGraphic = handle.GetComponent<Image>();
+            sb.direction = horizontal ? Scrollbar.Direction.LeftToRight : Scrollbar.Direction.BottomToTop;
+            return sb;
+        }
+
+        /// <summary>눈에 띄는 도움말 버튼 — 금색 원 + 진한 ? (단순 글자 버튼보다 존재감 있게).</summary>
+        public static Button HelpButton(Transform parent, float size, Action onClick, string name = "HelpButton")
+        {
+            var btn = ImageButton(parent, Battle.SpriteBank.Circle, new Vector2(size, size), onClick, name);
+            var img = btn.GetComponent<Image>();
+            img.color = new Color(1f, 0.84f, 0.3f);
+            var ring = Image(btn.transform, Battle.SpriteBank.Circle, "Ring");
+            ring.color = new Color(0.3f, 0.2f, 0.05f, 0.9f);
+            ring.raycastTarget = false;
+            Place(ring.rectTransform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(size - 8, size - 8));
+            var core = Image(btn.transform, Battle.SpriteBank.Circle, "Core");
+            core.color = new Color(1f, 0.9f, 0.5f);
+            core.raycastTarget = false;
+            Place(core.rectTransform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(size - 14, size - 14));
+            var q = Label(btn.transform, "?", Mathf.RoundToInt(size * 0.62f), new Color(0.3f, 0.18f, 0.04f), "Q");
+            q.fontStyle = FontStyle.Bold;
+            q.alignment = TextAnchor.MiddleCenter;
+            q.raycastTarget = false;
+            Stretch(q.rectTransform);
+            ((RectTransform)q.transform).anchoredPosition = new Vector2(0, 2);
+            return btn;
         }
 
         /// <summary>확인 팝업 — 결과 모달과 같은 카툰 프레임 재활용. 그림 + 메시지 + [계속]/[확인] 두 버튼.</summary>
@@ -375,6 +437,21 @@ namespace GameMaker.UI
             g.color = color;
             yield return new WaitForSeconds(0.18f);
             if (g != null) g.color = orig;
+        }
+    }
+
+    /// <summary>텍스트/이미지 깜빡임 — 안내 문구용 (알파 0.35~1 사인파).</summary>
+    public class Blink : MonoBehaviour
+    {
+        public float speed = 3.2f;
+        Graphic g;
+        void Awake() => g = GetComponent<Graphic>();
+        void Update()
+        {
+            if (g == null) return;
+            var c = g.color;
+            c.a = 0.675f + 0.325f * Mathf.Sin(Time.unscaledTime * speed);
+            g.color = c;
         }
     }
 }

@@ -122,10 +122,9 @@ namespace GameMaker.Screens
                 {
                     int stageId = theme * 10 + selected;
                     int clears = player.mapClear[stageId];
-                    int baseVal = theme * 3 + selected;
-                    int reward = Mathf.Max(1, baseVal * (11 - clears));
+                    int reward = LocalDataService.ClearReward(stageId, clears + 1); // 다음 클리어 보상 (10단위)
                     rewardLbl.text = "+" + reward;
-                    rewardLbl.color = reward <= baseVal ? new Color(0.6f, 0.6f, 0.6f) : new Color(1f, 0.88f, 0.3f);
+                    rewardLbl.color = clears >= 10 ? new Color(0.6f, 0.6f, 0.6f) : new Color(1f, 0.88f, 0.3f);
                 }
                 else rewardLbl.text = "";
             };

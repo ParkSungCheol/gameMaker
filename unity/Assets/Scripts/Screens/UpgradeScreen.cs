@@ -89,24 +89,13 @@ namespace GameMaker.Screens
             // 뷰포트(투명 전체 패널)가 위 UI 의 클릭을 가로채지 않도록 배경 바로 위 층으로
             viewport.SetSiblingIndex(title.transform.GetSiblingIndex());
 
-            // 하단 가로 스크롤바 — 어디까지 넘겼는지 보이게
-            var sbBg = Ui.RoundedPanel(canvas.transform, new Color(0f, 0f, 0f, 0.35f), "ScrollbarBg");
-            Ui.Place((RectTransform)sbBg.transform, new Vector2(0.5f, 0f), new Vector2(0, 24), new Vector2(1200, 22));
-            var sb = sbBg.gameObject.AddComponent<Scrollbar>();
-            var handle = Ui.RoundedPanel(sbBg.transform, new Color(0.95f, 0.8f, 0.4f, 0.95f), "Handle");
-            var handleRt = (RectTransform)handle.transform;
-            Ui.Stretch(handleRt);
-            handleRt.offsetMin = new Vector2(3, 3);
-            handleRt.offsetMax = new Vector2(-3, -3);
-            sb.handleRect = handleRt;
-            sb.targetGraphic = handle;
-            sb.direction = Scrollbar.Direction.LeftToRight;
+            // 하단 가로 스크롤바 — 각진 트랙 + 금색 손잡이, 항상 표시 (페이드 없음)
+            var sb = Ui.CleanScrollbar(canvas.transform, true, new Vector2(0.5f, 0f), new Vector2(0, 26), new Vector2(1200, 16));
             scroll.horizontalScrollbar = sb;
-            scroll.horizontalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
+            scroll.horizontalScrollbarVisibility = ScrollRect.ScrollbarVisibility.Permanent;
 
             // 직업(포지션) 안내 — 등급명 오른쪽 ? 버튼
-            var helpBtn = Ui.TextButton(canvas.transform, "?", 34, new Vector2(56, 56), ShowRoleGuide,
-                new Color(0.3f, 0.26f, 0.18f, 0.95f), "RoleHelp");
+            var helpBtn = Ui.HelpButton(canvas.transform, 64, ShowRoleGuide, "RoleHelp");
             Ui.Place((RectTransform)helpBtn.transform, new Vector2(0.5f, 1f), new Vector2(345, -135));
 
             // 그룹: 기본(성+기본 4종) + 뽑기 등급 1~5
@@ -145,7 +134,7 @@ namespace GameMaker.Screens
         /// <summary>직업(포지션) 안내 팝업 — 승/패 팝업과 같은 보드.</summary>
         void ShowRoleGuide()
         {
-            var board = Ui.Popup(canvas.transform, "포지션 안내", new Vector2(980, 820));
+            var board = Ui.Popup(canvas.transform, "포지션 안내", new Vector2(1040, 900));
             string[][] rows = {
                 new[] { "탱커",   "근접 · 단일", "체력이 높고 공격은 약하다. 맨 앞에서 적을 막아 뒤를 지킨다." },
                 new[] { "전사",   "근접 · 단일", "체력과 공격이 균형. 어디에 넣어도 무난한 근접 주력." },
@@ -155,20 +144,25 @@ namespace GameMaker.Screens
             };
             for (int i = 0; i < rows.Length; i++)
             {
-                float y = -170f - i * 118f;
+                float y = -130f - i * 150f; // 행 간격 150: 배지 / 타입 / 설명이 서로 안 겹치게
                 var rc = RoleColor(rows[i][0]);
                 var pill = Ui.RoundedPanel(board, new Color(rc.r, rc.g, rc.b, 0.95f), "Pill" + i);
-                Ui.Place((RectTransform)pill.transform, new Vector2(0f, 1f), new Vector2(150, y - 26), new Vector2(120, 44));
+                Ui.Place((RectTransform)pill.transform, new Vector2(0f, 1f), new Vector2(70, y - 4), new Vector2(130, 46));
                 var pt = Ui.Label(pill.transform, rows[i][0], 24, Color.white, "PillText");
                 pt.alignment = TextAnchor.MiddleCenter;
                 Ui.Stretch(pt.rectTransform);
                 var kind = Ui.OutlinedLabel(board, rows[i][1], 22, new Color(1f, 0.85f, 0.45f), "Kind" + i);
                 kind.alignment = TextAnchor.MiddleLeft;
-                Ui.Place((RectTransform)kind.transform, new Vector2(0f, 1f), new Vector2(225, y), new Vector2(200, 30));
+                Ui.Place((RectTransform)kind.transform, new Vector2(0f, 1f), new Vector2(230, y), new Vector2(300, 36));
                 var body = Ui.OutlinedLabel(board, rows[i][2], 24, Color.white, "Body" + i);
                 body.alignment = TextAnchor.UpperLeft;
                 body.horizontalOverflow = HorizontalWrapMode.Wrap;
-                Ui.Place((RectTransform)body.transform, new Vector2(0f, 1f), new Vector2(225, y - 30), new Vector2(640, 64));
+                Ui.Place((RectTransform)body.transform, new Vector2(0f, 1f), new Vector2(230, y - 44), new Vector2(740, 80));
+                if (i < rows.Length - 1)
+                {
+                    var sep = Ui.Panel(board, new Color(1f, 1f, 1f, 0.12f), "Sep" + i);
+                    Ui.Place(sep, new Vector2(0f, 1f), new Vector2(70, y - 128), new Vector2(900, 1));
+                }
             }
         }
 

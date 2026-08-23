@@ -206,21 +206,22 @@ namespace GameMaker.Screens
 
         void ShowDetail(MonsterData m, bool revealed)
         {
-            var board = Ui.Popup(canvas.transform, revealed ? m.DisplayName : "???", new Vector2(1060, 840));
+            var board = Ui.Popup(canvas.transform, revealed ? m.DisplayName : "???", new Vector2(1100, 820));
 
-            // 왼쪽: 걷는 모습 (비공개면 실루엣)
-            var stage = Ui.RoundedPanel(board, new Color(0f, 0f, 0f, 0.3f), "Stage");
-            Ui.Place((RectTransform)stage.transform, new Vector2(0f, 1f), new Vector2(70, -160), new Vector2(380, 440));
+            // 왼쪽: 걷는 모습 (비공개면 실루엣) — 발을 바닥선에 고정
             var frames = SpriteBank.GetFrames(m.SpriteName, "move");
-            var img = Ui.Image(stage.transform, frames.Length > 0 ? frames[0] : null, "Walk");
+            var img = Ui.Image(board, frames.Length > 0 ? frames[0] : null, "Walk");
             img.preserveAspect = true; img.raycastTarget = false;
             if (m.facing == "left") img.rectTransform.localScale = new Vector3(-1, 1, 1);
-            Ui.Place(img.rectTransform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(340, 380));
+            Ui.Place(img.rectTransform, new Vector2(0f, 1f), new Vector2(260, -560), new Vector2(360, 400));
+            img.rectTransform.pivot = new Vector2(0.5f, 0f); // 발 바닥 고정 + 좌우반전 시 제자리
+            var groundLine = Ui.Panel(board, new Color(1f, 1f, 1f, 0.25f), "GroundLine");
+            Ui.Place(groundLine, new Vector2(0f, 1f), new Vector2(60, -562), new Vector2(400, 2));
             if (!revealed) img.color = new Color(0.08f, 0.08f, 0.1f, 0.95f);
             else if (frames.Length > 1) StartCoroutine(MenuBackdrop.CycleFrames(img, frames, 0.16f));
 
             // 오른쪽: 태그 + 스탯
-            float x = 490f, y = -165f;
+            float x = 510f, y = -130f;
             if (!enemyMode)
             {
                 var rc = UpgradeScreen.RoleColor(m.role);
@@ -264,23 +265,23 @@ namespace GameMaker.Screens
             };
             if (!enemyMode && !m.IsCastle)
                 lines.Add("소환      " + m.cost + "원 · 쿨타임 " + m.cooldown.ToString("0.0") + "초");
-            y -= 56f;
+            y -= 64f;
             foreach (var line in lines)
             {
                 var t = Ui.OutlinedLabel(board, line, 26, Color.white, "Stat");
                 t.alignment = TextAnchor.MiddleLeft;
-                Ui.Place((RectTransform)t.transform, new Vector2(0f, 1f), new Vector2(x, y), new Vector2(500, 36));
-                y -= 40f;
+                Ui.Place((RectTransform)t.transform, new Vector2(0f, 1f), new Vector2(x, y), new Vector2(520, 36));
+                y -= 46f;
             }
 
-            // 아래: 병맛 설명
-            var descBg = Ui.RoundedPanel(board, new Color(0f, 0f, 0f, 0.3f), "DescBg");
-            Ui.Place((RectTransform)descBg.transform, new Vector2(0.5f, 1f), new Vector2(0, -620), new Vector2(920, 110));
+            // 아래: 병맛 설명 — 배경 없이 글씨만 또렷하게
+            var sep = Ui.Panel(board, new Color(1f, 0.82f, 0.35f, 0.4f), "DescRule");
+            Ui.Place(sep, new Vector2(0.5f, 1f), new Vector2(0, -600), new Vector2(960, 1));
             var desc = Ui.OutlinedLabel(board, revealed ? (string.IsNullOrEmpty(m.desc) ? "..." : m.desc) : "아직 만나지 못한 상대다.",
-                26, new Color(1f, 0.95f, 0.8f), "Desc");
+                30, new Color(1f, 0.95f, 0.75f), "Desc");
             desc.alignment = TextAnchor.MiddleCenter;
             desc.horizontalOverflow = HorizontalWrapMode.Wrap;
-            Ui.Place((RectTransform)desc.transform, new Vector2(0.5f, 1f), new Vector2(0, -620), new Vector2(880, 110));
+            Ui.Place((RectTransform)desc.transform, new Vector2(0.5f, 1f), new Vector2(0, -620), new Vector2(960, 150));
         }
     }
 }
