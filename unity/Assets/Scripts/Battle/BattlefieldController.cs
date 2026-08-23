@@ -689,7 +689,7 @@ namespace GameMaker.Battle
                 }
                 toast.Show(idx >= 0 && spawnTimers[idx] > 0f ? "아직 쿨타임입니다."
                     : ourParty.Count - 1 >= 10 ? "출전 인원이 가득 찼습니다. (최대 10)"
-                    : "돈이 부족합니다. [ " + m.cost + " ] 필요", 1.2f);
+                    : "돈이 부족합니다. [ " + m.cost + " ] 필요");
                 return;
             }
 
