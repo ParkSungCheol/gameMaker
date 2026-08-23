@@ -11,6 +11,7 @@ namespace GameMaker.Data
     public class MonsterData
     {
         public string name;
+        public string label;         // 한글 표시명 (빈 값이면 name 사용)
         public string team;          // "ally" 또는 "enemy"
         public int hp;               // 최대 체력
         public int attack;           // 1회 공격 데미지
@@ -30,6 +31,7 @@ namespace GameMaker.Data
         public string melee;         // 근접 타입: "pounce"(점프덮치기)/"ram"(들이받기)/"stomp"(내려찍기)/빈 값(기본 런지)
 
         public string SpriteName => string.IsNullOrEmpty(sprite) ? name : sprite;
+        public string DisplayName => string.IsNullOrEmpty(label) ? name : label;
 
         public bool IsCastle => name.Contains("castle");
         public bool IsOur => team != "enemy";

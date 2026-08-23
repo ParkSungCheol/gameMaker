@@ -13,7 +13,8 @@
    "height": 350,
    "facing": "",
    "sprite": "",
-   "tint": ""
+   "tint": "",
+   "label": "아군 성"
   },
   {
    "name": "ourbasic",
@@ -28,7 +29,8 @@
    "height": 180,
    "facing": "",
    "sprite": "",
-   "tint": ""
+   "tint": "",
+   "label": "검병"
   },
   {
    "name": "ourtank",
@@ -43,7 +45,8 @@
    "height": 180,
    "facing": "",
    "sprite": "",
-   "tint": ""
+   "tint": "",
+   "label": "궁수"
   },
   {
    "name": "ourbattle",
@@ -58,7 +61,8 @@
    "height": 180,
    "facing": "",
    "sprite": "",
-   "tint": ""
+   "tint": "",
+   "label": "방패병"
   },
   {
    "name": "ourmass",
@@ -73,7 +77,8 @@
    "height": 180,
    "facing": "",
    "sprite": "",
-   "tint": ""
+   "tint": "",
+   "label": "마법사"
   },
   {
    "name": "yourcastle",
@@ -88,11 +93,13 @@
    "height": 350,
    "facing": "",
    "sprite": "",
-   "tint": ""
+   "tint": "",
+   "label": "적군 성"
   },
   {
    "name": "e147goblin",
    "team": "enemy",
+   "label": "고블린",
    "hp": 135,
    "attack": 12,
    "range": 90,
@@ -113,6 +120,7 @@
   {
    "name": "e147gobarcher",
    "team": "enemy",
+   "label": "고블린 궁수",
    "hp": 95,
    "attack": 10,
    "range": 320,
@@ -133,6 +141,7 @@
   {
    "name": "e147gobwar",
    "team": "enemy",
+   "label": "고블린 전사",
    "hp": 650,
    "attack": 20,
    "range": 120,
@@ -153,6 +162,7 @@
   {
    "name": "e147ggoblin",
    "team": "enemy",
+   "label": "초록 고블린",
    "hp": 150,
    "attack": 14,
    "range": 90,
@@ -173,6 +183,7 @@
   {
    "name": "e147ggobarcher",
    "team": "enemy",
+   "label": "초록 고블린 궁수",
    "hp": 105,
    "attack": 11,
    "range": 320,
@@ -193,6 +204,7 @@
   {
    "name": "e147ggobwar",
    "team": "enemy",
+   "label": "초록 고블린 전사",
    "hp": 720,
    "attack": 22,
    "range": 120,
@@ -213,6 +225,7 @@
   {
    "name": "e118bamboo",
    "team": "enemy",
+   "label": "대나무 정령",
    "hp": 165,
    "attack": 15,
    "range": 90,
@@ -233,6 +246,7 @@
   {
    "name": "e118bambooy",
    "team": "enemy",
+   "label": "노랑 대나무 정령",
    "hp": 165,
    "attack": 15,
    "range": 90,
@@ -253,6 +267,7 @@
   {
    "name": "e118kappag",
    "team": "enemy",
+   "label": "초록 카파",
    "hp": 165,
    "attack": 15,
    "range": 90,
@@ -273,6 +288,7 @@
   {
    "name": "e118octog",
    "team": "enemy",
+   "label": "초록 문어왕",
    "hp": 795,
    "attack": 25,
    "range": 120,
@@ -293,6 +309,7 @@
   {
    "name": "e118cat",
    "team": "enemy",
+   "label": "길고양이",
    "hp": 180,
    "attack": 16,
    "range": 130,
@@ -313,6 +330,7 @@
   {
    "name": "e118cato",
    "team": "enemy",
+   "label": "주황 고양이",
    "hp": 180,
    "attack": 16,
    "range": 130,
@@ -333,6 +351,7 @@
   {
    "name": "e118dog",
    "team": "enemy",
+   "label": "들개",
    "hp": 180,
    "attack": 16,
    "range": 130,
@@ -353,6 +372,7 @@
   {
    "name": "e118dog2",
    "team": "enemy",
+   "label": "흰 들개",
    "hp": 180,
    "attack": 16,
    "range": 130,
@@ -373,6 +393,7 @@
   {
    "name": "e118dogo",
    "team": "enemy",
+   "label": "주황 들개",
    "hp": 180,
    "attack": 16,
    "range": 130,
@@ -393,6 +414,7 @@
   {
    "name": "e118dogy",
    "team": "enemy",
+   "label": "노랑 들개",
    "hp": 180,
    "attack": 16,
    "range": 130,
@@ -413,6 +435,7 @@
   {
    "name": "e118lioncub",
    "team": "enemy",
+   "label": "아기사자",
    "hp": 865,
    "attack": 27,
    "range": 120,
@@ -433,6 +456,7 @@
   {
    "name": "e147slime",
    "team": "enemy",
+   "label": "슬라임",
    "hp": 195,
    "attack": 18,
    "range": 90,
@@ -453,6 +477,7 @@
   {
    "name": "e147stoneslime",
    "team": "enemy",
+   "label": "돌 슬라임",
    "hp": 135,
    "attack": 15,
    "range": 160,
@@ -473,6 +498,7 @@
   {
    "name": "e147slimeking",
    "team": "enemy",
+   "label": "슬라임 킹",
    "hp": 935,
    "attack": 29,
    "range": 120,
@@ -493,6 +519,7 @@
   {
    "name": "e117slime",
    "team": "enemy",
+   "label": "젤리 슬라임",
    "hp": 210,
    "attack": 19,
    "range": 90,
@@ -513,6 +540,7 @@
   {
    "name": "e118heartg",
    "team": "enemy",
+   "label": "초록 하트몬",
    "hp": 210,
    "attack": 19,
    "range": 90,
@@ -533,6 +561,7 @@
   {
    "name": "e118heartr",
    "team": "enemy",
+   "label": "빨강 하트몬",
    "hp": 1010,
    "attack": 31,
    "range": 120,
@@ -553,6 +582,7 @@
   {
    "name": "e118axolot",
    "team": "enemy",
+   "label": "아홀로틀",
    "hp": 225,
    "attack": 20,
    "range": 130,
@@ -573,6 +603,7 @@
   {
    "name": "e118axolotb",
    "team": "enemy",
+   "label": "파랑 아홀로틀",
    "hp": 225,
    "attack": 20,
    "range": 130,
@@ -593,6 +624,7 @@
   {
    "name": "e118frog",
    "team": "enemy",
+   "label": "개구리",
    "hp": 225,
    "attack": 20,
    "range": 130,
@@ -613,6 +645,7 @@
   {
    "name": "e81frogmon",
    "team": "enemy",
+   "label": "개구리몬",
    "hp": 225,
    "attack": 20,
    "range": 130,
@@ -633,6 +666,7 @@
   {
    "name": "e81ghost",
    "team": "enemy",
+   "label": "유령몬",
    "hp": 225,
    "attack": 20,
    "range": 90,
@@ -653,6 +687,7 @@
   {
    "name": "e118kappar",
    "team": "enemy",
+   "label": "빨강 카파",
    "hp": 1080,
    "attack": 33,
    "range": 120,
@@ -673,6 +708,7 @@
   {
    "name": "e147skull",
    "team": "enemy",
+   "label": "해골",
    "hp": 240,
    "attack": 21,
    "range": 90,
@@ -693,6 +729,7 @@
   {
    "name": "e147skullarcher",
    "team": "enemy",
+   "label": "해골 궁수",
    "hp": 170,
    "attack": 18,
    "range": 340,
@@ -713,6 +750,7 @@
   {
    "name": "e147skullwar",
    "team": "enemy",
+   "label": "해골 전사",
    "hp": 1150,
    "attack": 36,
    "range": 120,
@@ -733,6 +771,7 @@
   {
    "name": "e147pskull",
    "team": "enemy",
+   "label": "독 해골",
    "hp": 255,
    "attack": 23,
    "range": 90,
@@ -753,6 +792,7 @@
   {
    "name": "e147pskullarcher",
    "team": "enemy",
+   "label": "독 해골 궁수",
    "hp": 180,
    "attack": 19,
    "range": 340,
@@ -773,6 +813,7 @@
   {
    "name": "e147pskullwar",
    "team": "enemy",
+   "label": "독 해골 전사",
    "hp": 1220,
    "attack": 38,
    "range": 120,
@@ -793,6 +834,7 @@
   {
    "name": "e118spiderr",
    "team": "enemy",
+   "label": "빨강 거미",
    "hp": 270,
    "attack": 24,
    "range": 90,
@@ -813,6 +855,7 @@
   {
    "name": "e118spidery",
    "team": "enemy",
+   "label": "노랑 거미",
    "hp": 270,
    "attack": 24,
    "range": 90,
@@ -833,6 +876,7 @@
   {
    "name": "e118mskull",
    "team": "enemy",
+   "label": "유령 해골",
    "hp": 270,
    "attack": 24,
    "range": 90,
@@ -853,6 +897,7 @@
   {
    "name": "e118mskullb",
    "team": "enemy",
+   "label": "파랑 유령 해골",
    "hp": 270,
    "attack": 24,
    "range": 90,
@@ -873,6 +918,7 @@
   {
    "name": "e118trexgrey",
    "team": "enemy",
+   "label": "화석 티렉스",
    "hp": 1295,
    "attack": 40,
    "range": 120,
@@ -893,6 +939,7 @@
   {
    "name": "e118panda",
    "team": "enemy",
+   "label": "판다 전사",
    "hp": 370,
    "attack": 38,
    "range": 100,
@@ -913,6 +960,7 @@
   {
    "name": "e118catw",
    "team": "enemy",
+   "label": "흰 고양이",
    "hp": 285,
    "attack": 25,
    "range": 130,
@@ -933,6 +981,7 @@
   {
    "name": "e118hamster",
    "team": "enemy",
+   "label": "햄스터",
    "hp": 240,
    "attack": 15,
    "range": 70,
@@ -953,6 +1002,7 @@
   {
    "name": "e118bear",
    "team": "enemy",
+   "label": "큰곰",
    "hp": 1365,
    "attack": 42,
    "range": 120,
@@ -973,6 +1023,7 @@
   {
    "name": "e118mouse",
    "team": "enemy",
+   "label": "생쥐",
    "hp": 255,
    "attack": 16,
    "range": 70,
@@ -993,6 +1044,7 @@
   {
    "name": "e118mouseb",
    "team": "enemy",
+   "label": "검은 생쥐",
    "hp": 255,
    "attack": 16,
    "range": 70,
@@ -1013,6 +1065,7 @@
   {
    "name": "e118hyena",
    "team": "enemy",
+   "label": "하이에나",
    "hp": 300,
    "attack": 27,
    "range": 130,
@@ -1033,6 +1086,7 @@
   {
    "name": "e118goldracoon",
    "team": "enemy",
+   "label": "황금 너구리",
    "hp": 1435,
    "attack": 44,
    "range": 120,
@@ -1053,6 +1107,7 @@
   {
    "name": "e147oslime",
    "team": "enemy",
+   "label": "주황 슬라임",
    "hp": 315,
    "attack": 28,
    "range": 90,
@@ -1073,6 +1128,7 @@
   {
    "name": "e147ostoneslime",
    "team": "enemy",
+   "label": "주황 돌 슬라임",
    "hp": 220,
    "attack": 23,
    "range": 160,
@@ -1093,6 +1149,7 @@
   {
    "name": "e147oslimeking",
    "team": "enemy",
+   "label": "주황 슬라임 킹",
    "hp": 1510,
    "attack": 47,
    "range": 120,
@@ -1113,6 +1170,7 @@
   {
    "name": "e210pigpink",
    "team": "enemy",
+   "label": "핑크 돼지",
    "hp": 330,
    "attack": 36,
    "range": 115,
@@ -1133,6 +1191,7 @@
   {
    "name": "e210piggreen1",
    "team": "enemy",
+   "label": "초록 돼지",
    "hp": 330,
    "attack": 36,
    "range": 115,
@@ -1153,6 +1212,7 @@
   {
    "name": "e210piggreen2",
    "team": "enemy",
+   "label": "뿔 초록 돼지",
    "hp": 330,
    "attack": 36,
    "range": 115,
@@ -1173,6 +1233,7 @@
   {
    "name": "e210sheepw1",
    "team": "enemy",
+   "label": "흰 양",
    "hp": 330,
    "attack": 36,
    "range": 115,
@@ -1193,6 +1254,7 @@
   {
    "name": "e210sheepw2",
    "team": "enemy",
+   "label": "왕관 양",
    "hp": 1580,
    "attack": 49,
    "range": 120,
@@ -1213,6 +1275,7 @@
   {
    "name": "e118fish",
    "team": "enemy",
+   "label": "물고기",
    "hp": 345,
    "attack": 31,
    "range": 90,
@@ -1233,6 +1296,7 @@
   {
    "name": "e118fishr",
    "team": "enemy",
+   "label": "빨강 물고기",
    "hp": 345,
    "attack": 31,
    "range": 90,
@@ -1253,6 +1317,7 @@
   {
    "name": "e118octor",
    "team": "enemy",
+   "label": "빨강 문어왕",
    "hp": 1650,
    "attack": 51,
    "range": 120,
@@ -1273,6 +1338,7 @@
   {
    "name": "e121ninja",
    "team": "enemy",
+   "label": "닌자",
    "hp": 360,
    "attack": 32,
    "range": 90,
@@ -1293,6 +1359,7 @@
   {
    "name": "e121soldier",
    "team": "enemy",
+   "label": "해적 총잡이",
    "hp": 250,
    "attack": 27,
    "range": 350,
@@ -1313,6 +1380,7 @@
   {
    "name": "e121pirate",
    "team": "enemy",
+   "label": "해적 선장",
    "hp": 360,
    "attack": 32,
    "range": 90,
@@ -1333,6 +1401,7 @@
   {
    "name": "e121warrior",
    "team": "enemy",
+   "label": "해적 전사",
    "hp": 1725,
    "attack": 53,
    "range": 120,
@@ -1353,6 +1422,7 @@
   {
    "name": "e118bluebat",
    "team": "enemy",
+   "label": "파랑 박쥐",
    "hp": 375,
    "attack": 33,
    "range": 90,
@@ -1373,6 +1443,7 @@
   {
    "name": "e118yellowbat",
    "team": "enemy",
+   "label": "주황 박쥐",
    "hp": 375,
    "attack": 33,
    "range": 90,
@@ -1393,6 +1464,7 @@
   {
    "name": "e118lanterng",
    "team": "enemy",
+   "label": "초록 랜턴귀신",
    "hp": 375,
    "attack": 33,
    "range": 90,
@@ -1413,6 +1485,7 @@
   {
    "name": "e118lanternr",
    "team": "enemy",
+   "label": "빨강 랜턴귀신",
    "hp": 375,
    "attack": 33,
    "range": 90,
@@ -1433,6 +1506,7 @@
   {
    "name": "e118cyclope",
    "team": "enemy",
+   "label": "사이클롭스",
    "hp": 1795,
    "attack": 55,
    "range": 120,
@@ -1453,6 +1527,7 @@
   {
    "name": "e210chickm1",
    "team": "enemy",
+   "label": "광부 닭",
    "hp": 325,
    "attack": 20,
    "range": 70,
@@ -1473,6 +1548,7 @@
   {
    "name": "e210chickm2",
    "team": "enemy",
+   "label": "광부 닭 2",
    "hp": 325,
    "attack": 20,
    "range": 70,
@@ -1493,6 +1569,7 @@
   {
    "name": "e210sheepm1",
    "team": "enemy",
+   "label": "광부 양",
    "hp": 385,
    "attack": 43,
    "range": 115,
@@ -1513,6 +1590,7 @@
   {
    "name": "e210sheepm2",
    "team": "enemy",
+   "label": "광부 양 2",
    "hp": 385,
    "attack": 43,
    "range": 115,
@@ -1533,6 +1611,7 @@
   {
    "name": "e210cowm",
    "team": "enemy",
+   "label": "광부 소",
    "hp": 1865,
    "attack": 58,
    "range": 120,
@@ -1553,6 +1632,7 @@
   {
    "name": "e118trex",
    "team": "enemy",
+   "label": "티렉스",
    "hp": 400,
    "attack": 45,
    "range": 115,
@@ -1573,6 +1653,7 @@
   {
    "name": "e118racoonm",
    "team": "enemy",
+   "label": "너구리 요괴",
    "hp": 400,
    "attack": 36,
    "range": 90,
@@ -1593,6 +1674,7 @@
   {
    "name": "e118racoona",
    "team": "enemy",
+   "label": "너구리",
    "hp": 400,
    "attack": 36,
    "range": 90,
@@ -1613,6 +1695,7 @@
   {
    "name": "e118boar",
    "team": "enemy",
+   "label": "멧돼지",
    "hp": 400,
    "attack": 45,
    "range": 115,
@@ -1633,6 +1716,7 @@
   {
    "name": "e118cyclope2",
    "team": "enemy",
+   "label": "외눈 거인",
    "hp": 1935,
    "attack": 60,
    "range": 120,
@@ -1653,6 +1737,7 @@
   {
    "name": "e46addergul",
    "team": "enemy",
+   "label": "폭탄 도도새",
    "hp": 415,
    "attack": 37,
    "range": 90,
@@ -1673,6 +1758,7 @@
   {
    "name": "e46deton",
    "team": "enemy",
+   "label": "폭탄돌이",
    "hp": 415,
    "attack": 37,
    "range": 90,
@@ -1693,6 +1779,7 @@
   {
    "name": "e46koboiled",
    "team": "enemy",
+   "label": "장군 유령",
    "hp": 415,
    "attack": 37,
    "range": 90,
@@ -1713,6 +1800,7 @@
   {
    "name": "e46rattles",
    "team": "enemy",
+   "label": "늪지 정령",
    "hp": 415,
    "attack": 37,
    "range": 90,
@@ -1733,6 +1821,7 @@
   {
    "name": "e46speckle",
    "team": "enemy",
+   "label": "두건 정령",
    "hp": 415,
    "attack": 37,
    "range": 90,
@@ -1753,6 +1842,7 @@
   {
    "name": "e46puppeteer",
    "team": "enemy",
+   "label": "인형술사",
    "hp": 2010,
    "attack": 62,
    "range": 120,
@@ -1773,6 +1863,7 @@
   {
    "name": "e118butterfly",
    "team": "enemy",
+   "label": "빨강 나비",
    "hp": 430,
    "attack": 38,
    "range": 90,
@@ -1793,6 +1884,7 @@
   {
    "name": "e118butterflyb",
    "team": "enemy",
+   "label": "파랑 나비",
    "hp": 430,
    "attack": 38,
    "range": 90,
@@ -1813,6 +1905,7 @@
   {
    "name": "e118spirit",
    "team": "enemy",
+   "label": "물방울 정령",
    "hp": 430,
    "attack": 38,
    "range": 90,
@@ -1833,6 +1926,7 @@
   {
    "name": "e46phantom",
    "team": "enemy",
+   "label": "팬텀",
    "hp": 430,
    "attack": 38,
    "range": 90,
@@ -1853,6 +1947,7 @@
   {
    "name": "e46valkyrie",
    "team": "enemy",
+   "label": "발키리",
    "hp": 430,
    "attack": 38,
    "range": 90,
@@ -1873,6 +1968,7 @@
   {
    "name": "e118spirit2",
    "team": "enemy",
+   "label": "화염 정령",
    "hp": 2080,
    "attack": 64,
    "range": 120,
@@ -1893,6 +1989,7 @@
   {
    "name": "e210chickd",
    "team": "enemy",
+   "label": "검은 좀비닭",
    "hp": 380,
    "attack": 24,
    "range": 70,
@@ -1913,6 +2010,7 @@
   {
    "name": "e210chickg1",
    "team": "enemy",
+   "label": "초록 좀비닭",
    "hp": 380,
    "attack": 24,
    "range": 70,
@@ -1933,6 +2031,7 @@
   {
    "name": "e210chickw1",
    "team": "enemy",
+   "label": "흰 좀비닭",
    "hp": 380,
    "attack": 24,
    "range": 70,
@@ -1953,6 +2052,7 @@
   {
    "name": "e210chickg2",
    "team": "enemy",
+   "label": "초록 좀비닭 2",
    "hp": 380,
    "attack": 24,
    "range": 70,
@@ -1973,6 +2073,7 @@
   {
    "name": "e210chickw2",
    "team": "enemy",
+   "label": "왕관 좀비닭",
    "hp": 2150,
    "attack": 66,
    "range": 120,
@@ -1993,6 +2094,7 @@
   {
    "name": "e210sheepg1",
    "team": "enemy",
+   "label": "초록 좀비양",
    "hp": 460,
    "attack": 51,
    "range": 115,
@@ -2013,6 +2115,7 @@
   {
    "name": "e210sheepg2",
    "team": "enemy",
+   "label": "초록 좀비양 2",
    "hp": 460,
    "attack": 51,
    "range": 115,
@@ -2033,6 +2136,7 @@
   {
    "name": "e210sheepd1",
    "team": "enemy",
+   "label": "검은 좀비양",
    "hp": 460,
    "attack": 51,
    "range": 115,
@@ -2053,6 +2157,7 @@
   {
    "name": "e210sheepd2",
    "team": "enemy",
+   "label": "검은 좀비양 대장",
    "hp": 2225,
    "attack": 69,
    "range": 120,
@@ -2073,6 +2178,7 @@
   {
    "name": "e210cowg",
    "team": "enemy",
+   "label": "초록 좀비소",
    "hp": 475,
    "attack": 53,
    "range": 115,
@@ -2093,6 +2199,7 @@
   {
    "name": "e210coww",
    "team": "enemy",
+   "label": "흰 좀비소",
    "hp": 475,
    "attack": 53,
    "range": 115,
@@ -2113,6 +2220,7 @@
   {
    "name": "e210cowd",
    "team": "enemy",
+   "label": "검은 좀비소",
    "hp": 475,
    "attack": 53,
    "range": 115,
@@ -2133,6 +2241,7 @@
   {
    "name": "e210bull",
    "team": "enemy",
+   "label": "검은 황소",
    "hp": 2295,
    "attack": 71,
    "range": 120,
@@ -2153,6 +2262,7 @@
   {
    "name": "e117chicken",
    "team": "enemy",
+   "label": "닭",
    "hp": 415,
    "attack": 26,
    "range": 70,
@@ -2173,6 +2283,7 @@
   {
    "name": "e117cow",
    "team": "enemy",
+   "label": "송아지",
    "hp": 490,
    "attack": 44,
    "range": 90,
@@ -2193,6 +2304,7 @@
   {
    "name": "e117pig",
    "team": "enemy",
+   "label": "돼지",
    "hp": 490,
    "attack": 44,
    "range": 90,
@@ -2213,6 +2325,7 @@
   {
    "name": "e117sheep",
    "team": "enemy",
+   "label": "양",
    "hp": 490,
    "attack": 44,
    "range": 90,
@@ -2233,6 +2346,7 @@
   {
    "name": "e116chick",
    "team": "enemy",
+   "label": "병아리",
    "hp": 415,
    "attack": 26,
    "range": 70,
@@ -2253,6 +2367,7 @@
   {
    "name": "e116cow",
    "team": "enemy",
+   "label": "젖소",
    "hp": 2365,
    "attack": 73,
    "range": 120,
@@ -2273,6 +2388,7 @@
   {
    "name": "e92farmer0",
    "team": "enemy",
+   "label": "농부",
    "hp": 505,
    "attack": 45,
    "range": 90,
@@ -2293,6 +2409,7 @@
   {
    "name": "e92farmer1",
    "team": "enemy",
+   "label": "농부 2",
    "hp": 505,
    "attack": 45,
    "range": 90,
@@ -2313,6 +2430,7 @@
   {
    "name": "e92farmer2",
    "team": "enemy",
+   "label": "농부 3",
    "hp": 505,
    "attack": 45,
    "range": 90,
@@ -2333,6 +2451,7 @@
   {
    "name": "e92farmer3",
    "team": "enemy",
+   "label": "농부 4",
    "hp": 505,
    "attack": 45,
    "range": 90,
@@ -2353,6 +2472,7 @@
   {
    "name": "e117boy2",
    "team": "enemy",
+   "label": "곡괭이 소년",
    "hp": 505,
    "attack": 45,
    "range": 90,
@@ -2373,6 +2493,7 @@
   {
    "name": "e117skeleton",
    "team": "enemy",
+   "label": "해골 농부",
    "hp": 2440,
    "attack": 75,
    "range": 120,
@@ -2393,6 +2514,7 @@
   {
    "name": "e121archer",
    "team": "enemy",
+   "label": "로빈훗",
    "hp": 365,
    "attack": 39,
    "range": 350,
@@ -2413,6 +2535,7 @@
   {
    "name": "e121caveman",
    "team": "enemy",
+   "label": "원시인",
    "hp": 520,
    "attack": 46,
    "range": 90,
@@ -2433,6 +2556,7 @@
   {
    "name": "e121clown",
    "team": "enemy",
+   "label": "광대",
    "hp": 520,
    "attack": 46,
    "range": 90,
@@ -2453,6 +2577,7 @@
   {
    "name": "e121monk",
    "team": "enemy",
+   "label": "수도승",
    "hp": 520,
    "attack": 46,
    "range": 90,
@@ -2473,6 +2598,7 @@
   {
    "name": "e121wizard",
    "team": "enemy",
+   "label": "대마법사",
    "hp": 2510,
    "attack": 77,
    "range": 300,
@@ -2493,6 +2619,7 @@
   {
    "name": "e148man1",
    "team": "enemy",
+   "label": "도끼 용병",
    "hp": 535,
    "attack": 47,
    "range": 90,
@@ -2513,6 +2640,7 @@
   {
    "name": "e148man2",
    "team": "enemy",
+   "label": "투석 용병",
    "hp": 375,
    "attack": 40,
    "range": 320,
@@ -2533,6 +2661,7 @@
   {
    "name": "e148man3",
    "team": "enemy",
+   "label": "대검 용병",
    "hp": 535,
    "attack": 47,
    "range": 90,
@@ -2553,6 +2682,7 @@
   {
    "name": "e148man4",
    "team": "enemy",
+   "label": "보라 마법사",
    "hp": 2580,
    "attack": 80,
    "range": 300,
@@ -2573,6 +2703,7 @@
   {
    "name": "e148man7",
    "team": "enemy",
+   "label": "쌍검 용병",
    "hp": 550,
    "attack": 49,
    "range": 90,
@@ -2593,6 +2724,7 @@
   {
    "name": "e148man8",
    "team": "enemy",
+   "label": "저격 용병",
    "hp": 390,
    "attack": 41,
    "range": 360,
@@ -2613,6 +2745,7 @@
   {
    "name": "e154swordman",
    "team": "enemy",
+   "label": "흰 기사",
    "hp": 550,
    "attack": 49,
    "range": 90,
@@ -2633,6 +2766,7 @@
   {
    "name": "e115hood",
    "team": "enemy",
+   "label": "빨간 후드",
    "hp": 550,
    "attack": 49,
    "range": 90,
@@ -2653,6 +2787,7 @@
   {
    "name": "e207rogue",
    "team": "enemy",
+   "label": "로그 두목",
    "hp": 2650,
    "attack": 82,
    "range": 120,
@@ -2673,6 +2808,7 @@
   {
    "name": "e92zombie0",
    "team": "enemy",
+   "label": "좀비",
    "hp": 565,
    "attack": 50,
    "range": 90,
@@ -2693,6 +2829,7 @@
   {
    "name": "e92zombie1",
    "team": "enemy",
+   "label": "좀비 2",
    "hp": 565,
    "attack": 50,
    "range": 90,
@@ -2713,6 +2850,7 @@
   {
    "name": "e92zombie2",
    "team": "enemy",
+   "label": "창백한 좀비",
    "hp": 565,
    "attack": 50,
    "range": 90,
@@ -2733,6 +2871,7 @@
   {
    "name": "e92zombie3",
    "team": "enemy",
+   "label": "창백한 좀비 2",
    "hp": 565,
    "attack": 50,
    "range": 90,
@@ -2753,6 +2892,7 @@
   {
    "name": "e92zombie4",
    "team": "enemy",
+   "label": "거대 좀비",
    "hp": 2725,
    "attack": 84,
    "range": 120,
@@ -2773,6 +2913,7 @@
   {
    "name": "e118catblack",
    "team": "enemy",
+   "label": "검은 고양이",
    "hp": 580,
    "attack": 51,
    "range": 130,
@@ -2793,6 +2934,7 @@
   {
    "name": "e118catcyclop",
    "team": "enemy",
+   "label": "외눈 고양이",
    "hp": 580,
    "attack": 51,
    "range": 130,
@@ -2813,6 +2955,7 @@
   {
    "name": "e118dogblack",
    "team": "enemy",
+   "label": "검은 들개",
    "hp": 580,
    "attack": 51,
    "range": 130,
@@ -2833,6 +2976,7 @@
   {
    "name": "e18dino",
    "team": "enemy",
+   "label": "심연의 공룡",
    "hp": 2795,
    "attack": 86,
    "range": 120,

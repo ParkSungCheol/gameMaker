@@ -183,9 +183,13 @@ namespace GameMaker.Screens
             bool flip = m.facing == "left" ? m.IsOur : !m.IsOur;
             img.transform.localScale = new Vector3(flip ? -1f : 1f, 1f, 1f);
 
-            label = Ui.Label(card.transform, m.name, 18, new Color(1f, 1f, 1f, 0.85f), "Name");
+            // 한글명 (크게) + 내부 id (작게 — 수정 요청 시 함께 확인용)
+            label = Ui.Label(card.transform, m.DisplayName, 22, new Color(1f, 1f, 1f, 0.95f), "Name");
             label.alignment = TextAnchor.MiddleCenter;
-            Ui.Place(label.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 18), new Vector2(cellW - 12, 26));
+            Ui.Place(label.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 30), new Vector2(cellW - 12, 28));
+            var idText = Ui.Label(card.transform, m.name, 14, new Color(1f, 1f, 1f, 0.45f), "Id");
+            idText.alignment = TextAnchor.MiddleCenter;
+            Ui.Place(idText.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 10), new Vector2(cellW - 12, 20));
 
             SetAction(startAction);
         }
