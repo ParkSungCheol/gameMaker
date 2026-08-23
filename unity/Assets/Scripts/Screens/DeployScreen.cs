@@ -58,16 +58,16 @@ namespace GameMaker.Screens
 
             // ── 상단 섹션: 출전 배치 (전용 배경 밴드로 아래와 확실히 구분) ──
             var topBand = Ui.RoundedPanel(canvas.transform, new Color(0.07f, 0.09f, 0.14f, 0.88f), "TopBand");
-            Ui.Place((RectTransform)topBand.transform, new Vector2(0.5f, 1f), new Vector2(0, -290), new Vector2(1320, 340));
+            Ui.Place((RectTransform)topBand.transform, new Vector2(0.5f, 1f), new Vector2(0, -120), new Vector2(1320, 330));
             slotHeader = Ui.OutlinedLabel(topBand.transform, "", 30, new Color(1f, 0.9f, 0.5f), "SlotHeader");
             Ui.Place((RectTransform)slotHeader.transform, new Vector2(0.5f, 1f), new Vector2(0, -26), new Vector2(600, 38));
 
             slotRow = Ui.Panel(topBand.transform, new Color(0, 0, 0, 0), "SlotRow");
-            Ui.Place(slotRow, new Vector2(0.5f, 0.5f), new Vector2(0, -20), new Vector2(1200, 260));
+            Ui.Place(slotRow, new Vector2(0.5f, 0.5f), new Vector2(0, -18), new Vector2(1200, 250));
 
             // ── 하단 섹션: 보유 유닛 (별도 배경 밴드) ──
             var botBand = Ui.RoundedPanel(canvas.transform, new Color(0.07f, 0.09f, 0.14f, 0.88f), "BotBand");
-            Ui.Place((RectTransform)botBand.transform, new Vector2(0.5f, 0f), new Vector2(0, 330), new Vector2(1820, 500));
+            Ui.Place((RectTransform)botBand.transform, new Vector2(0.5f, 0f), new Vector2(0, 90), new Vector2(1820, 480));
             var botHeader = Ui.OutlinedLabel(botBand.transform, "보유 유닛 — 위 칸으로 드래그해 배치, 배치된 유닛은 클릭으로 해제",
                 24, new Color(1f, 1f, 1f, 0.8f), "BotHeader");
             Ui.Place((RectTransform)botHeader.transform, new Vector2(0.5f, 1f), new Vector2(0, -24), new Vector2(1300, 34));
@@ -86,10 +86,10 @@ namespace GameMaker.Screens
 
             toastText = Ui.OutlinedLabel(canvas.transform, "", 28, new Color(1f, 0.6f, 0.5f), "Toast");
             toastText.raycastTarget = false;
-            Ui.Place((RectTransform)toastText.transform, new Vector2(0.5f, 0f), new Vector2(0, 104), new Vector2(900, 40));
+            Ui.Place((RectTransform)toastText.transform, new Vector2(0.5f, 0f), new Vector2(0, 12), new Vector2(900, 40));
 
             grid = Ui.Panel(canvas.transform, new Color(0, 0, 0, 0), "Grid");
-            Ui.Place(grid, new Vector2(0.5f, 0f), new Vector2(0, 295), new Vector2(1760, 410));
+            Ui.Place(grid, new Vector2(0.5f, 0f), new Vector2(0, 105), new Vector2(1760, 400));
 
             // 보유 유닛만 (성 제외 — 성은 항상 출전)
             var owned = DataHub.I.GetMonsters()
@@ -180,7 +180,7 @@ namespace GameMaker.Screens
             int tier = units[0].tier;
             pageText.text = TierNames[tier] + "  " + (page + 1) + "/" + pages.Count + "  (" + units.Count + "종)";
 
-            float cellW = 1760f / Cols, cellH = 410f / Rows;
+            float cellW = 1760f / Cols, cellH = 400f / Rows;
             for (int i = 0; i < Mathf.Min(Cols * Rows, units.Count); i++)
             {
                 var m = units[i];

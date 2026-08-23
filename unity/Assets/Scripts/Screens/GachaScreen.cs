@@ -157,12 +157,7 @@ namespace GameMaker.Screens
                     charge.color = new Color(glowCol.r, glowCol.g, glowCol.b, 0.18f + 0.1f * pulse);
                     yield return null;
                 }
-                // 펄스 마침표: 링 팝 + 반짝이 별 (전부 노란빛)
-                PopRing(new Vector2(0, -190), 220f + pulse * 90f, glowCol, 0.5f);
-                for (int s = 0; s < 3 + pulse * 2; s++)
-                    Sparkle(new Vector2(Random.Range(-170f, 170f), -190 + Random.Range(-90f, 120f)),
-                        new Color(1f, 0.95f, 0.6f));
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(0.1f); // 상자를 가리지 않게 — 링/반짝이 없이 요동만
             }
             chestRt.localRotation = Quaternion.identity;
             chestRt.anchoredPosition = new Vector2(0, -190);
@@ -173,8 +168,6 @@ namespace GameMaker.Screens
             StartCoroutine(FlashOnce(0.95f, 0.06f, 0.35f));
             StartCoroutine(ChestOpenAnim());
             SpawnBurst(new Vector2(0, -170), 460f);
-            PopRing(new Vector2(0, -170), 520f, Color.white, 0.8f);
-            PopRing(new Vector2(0, -170), 760f, gold, 0.6f);
             SpawnRays(root, new Vector2(0, -170), gold, 12, 560f);
             if (tier >= 4) StartCoroutine(ShakeRoot(0.4f, tier == 5 ? 24f : 13f));
             yield return new WaitForSeconds(0.2f);
