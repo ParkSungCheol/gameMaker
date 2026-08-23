@@ -124,13 +124,12 @@ namespace GameMaker.UI
         public static Text OutlinedLabel(Transform parent, string text, int size, Color color, string name = "Text")
         {
             var t = Label(parent, text, size, color, name);
+            // Outline 은 네 대각선 방향으로 복제하므로 한 겹이면 사방 테두리가 생긴다.
+            // 두께는 글씨 크기에 비례 — 작은 글씨에 두꺼운 테두리를 두르면 '-' 가 '=' 처럼 보인다.
             var o = t.gameObject.AddComponent<Outline>();
             o.effectColor = new Color(0f, 0f, 0f, 1f);
-            o.effectDistance = new Vector2(2.5f, -2.5f);
-            // 반대 방향 외곽선 한 겹 더 — 네 방향 모두 테두리가 생겨 어떤 배경에서도 또렷
-            var o2 = t.gameObject.AddComponent<Outline>();
-            o2.effectColor = new Color(0f, 0f, 0f, 1f);
-            o2.effectDistance = new Vector2(-2f, 2f);
+            float d = size >= 40 ? 2.5f : size >= 28 ? 2f : 1.5f;
+            o.effectDistance = new Vector2(d, -d);
             return t;
         }
 
@@ -332,7 +331,7 @@ namespace GameMaker.UI
             overlay.gameObject.AddComponent<Button>().onClick.AddListener(() =>
             { UnityEngine.Object.Destroy(overlay.gameObject); onClose?.Invoke(); });
 
-            var board = Panel(overlay.transform, new Color(0.03f, 0.03f, 0.05f, 0.55f), "Board");
+            var board = Panel(overlay.transform, new Color(0.03f, 0.03f, 0.05f, 0.78f), "Board");
             Place(board, new Vector2(0.5f, 0.5f), Vector2.zero, size);
             board.gameObject.AddComponent<Button>(); // 보드 클릭은 닫히지 않게 (레이캐스트 흡수)
             Frame(board, new Color(1f, 0.82f, 0.35f, 0.9f), 3f);

@@ -126,11 +126,11 @@ namespace GameMaker.Dev
                 var ctrl = FindFirstObjectByType<Battle.BattlefieldController>();
                 SetSpeed(ctrl, 3); // 컨트롤러가 매 프레임 Time.timeScale 을 자기 배속으로 덮어쓰므로 배속 필드를 직접 바꾼다
 
-                // 1) 적 전선이 화면 오른쪽 1/4 지점(약 78%)까지 들어올 때까지 대기 (최대 30초)
-                for (float t = 0; t < 30f; t += 0.5f)
+                // 1) 첫 적이 나타날 때까지 대기 (최대 30초) — 적은 빠르므로 보이자마자 아군을 내보내야 중앙에서 만난다
+                for (float t = 0; t < 30f; t += 0.25f)
                 {
-                    if (EnemyFront(ctrl) < Battle.BattlefieldController.WorldWidth * 0.78f) break;
-                    yield return new WaitForSecondsRealtime(0.5f);
+                    if (EnemyFront(ctrl) < Battle.BattlefieldController.WorldWidth * 0.98f) break;
+                    yield return new WaitForSecondsRealtime(0.25f);
                 }
 
                 // 2) 지갑을 채워 아군을 내보내고(아군은 오른쪽으로 행군) 전선이 맞붙는 순간을 감지 (최대 18초)
@@ -139,7 +139,7 @@ namespace GameMaker.Dev
                 for (float t = 0; t < 18f; t += 0.4f)
                 {
                     FillWallet(ctrl);
-                    ClickSpawnButtons(2); // 한 번에 두 종만 — 인원 초과 안내가 뜨지 않게
+                    ClickSpawnButtons(3); // 한 번에 세 종 — 인원 초과 안내가 뜨지 않는 선에서
                     if (AllyFront(ctrl) >= EnemyFront(ctrl) - 190f) { engaged = true; break; }
                     yield return new WaitForSecondsRealtime(0.4f);
                 }
