@@ -32,3 +32,7 @@ build/
 # 에셋 원본 아카이브 — 게임은 베이킹된 PNG만 사용, zip은 로컬 보관
 *.zip
 *.zip.meta
+
+# Unity Performance Testing 패키지가 빌드 때 자동 생성
+unity/Assets/Resources/PerformanceTestRun*.json
+unity/Assets/Resources/PerformanceTestRun*.json.meta
