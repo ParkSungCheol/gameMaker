@@ -53,15 +53,15 @@ namespace GameMaker.Screens
             Ui.Place((RectTransform)title.transform, new Vector2(0.5f, 1f), new Vector2(0, -50));
             var hintLabel = Ui.OutlinedLabel(canvas.transform, "보유 유닛을 위 칸으로 끌어다 배치하세요 (슬롯 밖으로 끌면 해제)",
                 24, new Color(1f, 1f, 1f, 0.75f), "Hint");
-            Ui.Place((RectTransform)hintLabel.transform, new Vector2(0.5f, 1f), new Vector2(0, -100), new Vector2(1100, 34));
+            Ui.Place((RectTransform)hintLabel.transform, new Vector2(0.5f, 1f), new Vector2(0, -108), new Vector2(1100, 34));
 
             var back = Ui.CircleIconButton(canvas.transform, "icon_return", 92,
                 () => ScreenRouter.I.Show(ScreenId.Main), "BackButton");
             Ui.Place((RectTransform)back.transform, new Vector2(1f, 0f), new Vector2(-58, 50));
 
-            // 출전 슬롯 5칸
+            // 출전 슬롯 5칸 — 아래 보유 목록과 확실히 분리된 상단 밴드
             slotRow = Ui.Panel(canvas.transform, new Color(0, 0, 0, 0), "SlotRow");
-            Ui.Place(slotRow, new Vector2(0.5f, 1f), new Vector2(0, -270), new Vector2(1150, 260));
+            Ui.Place(slotRow, new Vector2(0.5f, 1f), new Vector2(0, -300), new Vector2(1200, 270));
 
             // 보유 목록 (등급별 페이지)
             var prev = Ui.CircleIconButton(canvas.transform, "icon_return", 64,
@@ -80,7 +80,7 @@ namespace GameMaker.Screens
             Ui.Place((RectTransform)toastText.transform, new Vector2(0.5f, 0f), new Vector2(0, 104), new Vector2(900, 40));
 
             grid = Ui.Panel(canvas.transform, new Color(0, 0, 0, 0), "Grid");
-            Ui.Place(grid, new Vector2(0.5f, 0.5f), new Vector2(0, -140), new Vector2(1760, 480));
+            Ui.Place(grid, new Vector2(0.5f, 0f), new Vector2(0, 300), new Vector2(1760, 430));
 
             // 보유 유닛만 (성 제외 — 성은 항상 출전)
             var owned = DataHub.I.GetMonsters()
@@ -118,29 +118,46 @@ namespace GameMaker.Screens
         void RebuildSlots()
         {
             foreach (Transform c in slotRow) Destroy(c.gameObject);
-            float gap = 1150f / LocalDataService.LoadoutMax;
+            float gap = 1200f / LocalDataService.LoadoutMax;
             for (int i = 0; i < LocalDataService.LoadoutMax; i++)
             {
-                var box = Ui.RoundedPanel(slotRow, slots[i] != null
-                    ? new Color(1f, 0.85f, 0.35f, 0.2f)
-                    : new Color(1f, 1f, 1f, 0.07f), "Slot" + i);
-                var rt = (RectTransform)box.transform;
+                bool filled = slots[i] != null;
+
+                // 금테(테두리) + 진한 속판 — 배경과 확실히 구분되는 출전 슬롯
+                var border = Ui.RoundedPanel(slotRow, filled
+                    ? new Color(0.95f, 0.75f, 0.25f, 0.95f)
+                    : new Color(0.55f, 0.5f, 0.4f, 0.8f), "Slot" + i);
+                var rt = (RectTransform)border.transform;
                 rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
                 rt.anchoredPosition = new Vector2((i - (LocalDataService.LoadoutMax - 1) * 0.5f) * gap, 0);
-                rt.sizeDelta = new Vector2(gap - 16, 244);
+                rt.sizeDelta = new Vector2(gap - 14, 258);
                 slotRects[i] = rt;
 
-                if (slots[i] == null)
+                var inner = Ui.RoundedPanel(border.transform, filled
+                    ? new Color(0.24f, 0.19f, 0.1f, 0.97f)
+                    : new Color(0.14f, 0.13f, 0.11f, 0.95f), "Inner");
+                Ui.Place((RectTransform)inner.transform, new Vector2(0.5f, 0.5f), Vector2.zero,
+                    new Vector2(gap - 26, 246));
+
+                // 슬롯 번호
+                var num = Ui.Label(border.transform, (i + 1).ToString(), 20, new Color(1f, 1f, 1f, 0.5f), "Num");
+                num.alignment = TextAnchor.MiddleCenter;
+                Ui.Place(num.rectTransform, new Vector2(0f, 1f), new Vector2(20, -18), new Vector2(30, 26));
+
+                if (!filled)
                 {
-                    var plus = Ui.Label(box.transform, "+", 64, new Color(1f, 1f, 1f, 0.25f), "Plus");
+                    var plus = Ui.Label(inner.transform, "+", 66, new Color(1f, 1f, 1f, 0.3f), "Plus");
                     plus.alignment = TextAnchor.MiddleCenter;
                     Ui.Stretch(plus.rectTransform);
+                    var hint = Ui.Label(inner.transform, "드래그로 배치", 16, new Color(1f, 1f, 1f, 0.35f), "Hint");
+                    hint.alignment = TextAnchor.MiddleCenter;
+                    Ui.Place(hint.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 20), new Vector2(gap - 30, 22));
                     continue;
                 }
 
                 var m = DataHub.I.FindMonster(slots[i]);
                 if (m == null) { slots[i] = null; continue; }
-                BuildUnitCard(box.transform, m, rt.sizeDelta, i);
+                BuildUnitCard(inner.transform, m, ((RectTransform)inner.transform).sizeDelta, i);
             }
         }
 
@@ -153,7 +170,7 @@ namespace GameMaker.Screens
             int tier = units[0].tier;
             pageText.text = TierNames[tier] + "  " + (page + 1) + "/" + pages.Count + "  (" + units.Count + "종)";
 
-            float cellW = 1760f / Cols, cellH = 480f / Rows;
+            float cellW = 1760f / Cols, cellH = 430f / Rows;
             for (int i = 0; i < Mathf.Min(Cols * Rows, units.Count); i++)
             {
                 var m = units[i];
@@ -167,8 +184,8 @@ namespace GameMaker.Screens
 
                 bool deployed = System.Array.IndexOf(slots, m.name) >= 0;
                 var card = Ui.RoundedPanel(slot.transform, deployed
-                    ? new Color(1f, 0.85f, 0.35f, 0.18f)
-                    : new Color(1f, 1f, 1f, 0.08f), "Card");
+                    ? new Color(1f, 0.85f, 0.35f, 0.22f)
+                    : new Color(0.1f, 0.12f, 0.18f, 0.75f), "Card");
                 Ui.Place((RectTransform)card.transform, new Vector2(0.5f, 0.5f), Vector2.zero,
                     new Vector2(cellW - 10, cellH - 10));
                 BuildUnitCard(card.transform, m, new Vector2(cellW - 10, cellH - 10), -1);

@@ -48,14 +48,37 @@ namespace GameMaker.Screens
             canvas = Ui.CreateCanvas(transform, "GachaCanvas");
             MenuBackdrop.Build(this, canvas, dim: 0.7f, withGround: false);
 
-            root = Ui.Panel(canvas.transform, new Color(0, 0, 0, 0), "Root");
-            Ui.Place(root, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(1920, 1080));
-
-            // 연출용 암전막 (결과/상자 뒤, UI 앞)
-            dimmer = Ui.Image(root, null, "Dimmer");
+            // 연출용 암전막 — 캔버스 전체(좌우 여백 없이)를 덮는다
+            dimmer = Ui.Image(canvas.transform, null, "Dimmer");
             dimmer.color = new Color(0, 0, 0, 0);
             dimmer.raycastTarget = false;
             Ui.Stretch((RectTransform)dimmer.transform);
+
+            root = Ui.Panel(canvas.transform, new Color(0, 0, 0, 0), "Root");
+            Ui.Place(root, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(1920, 1080));
+
+            // ── 상시 무대 배경: 느리게 도는 온기 선버스트 + 바닥 조명 + 피어오르는 금가루 ──
+            var stagePivot = Ui.Panel(root, new Color(0, 0, 0, 0), "StageBurst");
+            Ui.Place(stagePivot, new Vector2(0.5f, 0.5f), new Vector2(0, -190), new Vector2(10, 10));
+            for (int i = 0; i < 14; i++)
+            {
+                var blade = Ui.Image(stagePivot, SpriteBank.Circle, "Blade");
+                blade.raycastTarget = false;
+                blade.color = new Color(1f, 0.85f, 0.45f, 0.05f);
+                var brt = (RectTransform)blade.transform;
+                brt.anchorMin = brt.anchorMax = new Vector2(0.5f, 0.5f);
+                brt.pivot = new Vector2(0f, 0.5f);
+                brt.anchoredPosition = Vector2.zero;
+                brt.sizeDelta = new Vector2(1200f, 90f);
+                brt.localRotation = Quaternion.Euler(0, 0, i * (360f / 14f));
+            }
+            StartCoroutine(Rotate(stagePivot, 7f));
+
+            var floorGlow = Ui.Image(root, SpriteBank.Circle, "FloorGlow");
+            floorGlow.raycastTarget = false;
+            floorGlow.color = new Color(1f, 0.85f, 0.45f, 0.2f);
+            Ui.Place((RectTransform)floorGlow.transform, new Vector2(0.5f, 0.5f), new Vector2(0, -300), new Vector2(560, 130));
+            StartCoroutine(GoldDust());
 
             var title = Ui.OutlinedLabel(root, "뽑기", 52, Color.white, "Title");
             Ui.Place((RectTransform)title.transform, new Vector2(0.5f, 1f), new Vector2(0, -55));
@@ -73,16 +96,11 @@ namespace GameMaker.Screens
             resultRoot = Ui.Panel(root, new Color(0, 0, 0, 0), "Result");
             Ui.Place(resultRoot, new Vector2(0.5f, 0.5f), new Vector2(0, 130), new Vector2(1100, 640));
 
-            // 보물상자 — 가만히 놓여 있다 (요동은 뽑기 연출에서만)
-            var idleGlow = Ui.Image(root, SpriteBank.Circle, "IdleGlow");
-            idleGlow.color = new Color(1f, 0.85f, 0.4f, 0.16f);
-            idleGlow.raycastTarget = false;
-            Ui.Place((RectTransform)idleGlow.transform, new Vector2(0.5f, 0.5f), new Vector2(0, -215), new Vector2(430, 160));
-
-            chest = Ui.Image(root, SpriteBank.GetEnv("icon_chest_closed"), "Chest");
+            // 보물상자 (황금 상자, 열림 애니메이션 보유) — 가만히 놓여 있다
+            chest = Ui.Image(root, SpriteBank.GetEnv("gacha_chest_0"), "Chest");
             chest.preserveAspect = true;
             chest.raycastTarget = false;
-            Ui.Place((RectTransform)chest.transform, new Vector2(0.5f, 0.5f), new Vector2(0, -190), new Vector2(300, 220));
+            Ui.Place((RectTransform)chest.transform, new Vector2(0.5f, 0.5f), new Vector2(0, -190), new Vector2(320, 320));
 
             drawBtn = Ui.ImageButton(root, SpriteBank.GetEnv("btn_wood"), new Vector2(320, 130), TryDraw, "DrawBtn");
             Ui.Place((RectTransform)drawBtn.transform, new Vector2(0.5f, 0f), new Vector2(0, 110));
@@ -127,7 +145,7 @@ namespace GameMaker.Screens
             int tier = Mathf.Clamp(result.unit.tier, 1, 5);
             Color tierCol = TierColors[tier];
             var chestRt = (RectTransform)chest.transform;
-            chest.sprite = SpriteBank.GetEnv("icon_chest_closed");
+            chest.sprite = SpriteBank.GetEnv("gacha_chest_0"); // 닫힌 상자로 리셋
 
             // 0) 암전 — 무대에 집중
             yield return Fade(dimmer, 0f, 0.6f, 0.18f);
@@ -164,9 +182,9 @@ namespace GameMaker.Screens
             chestRt.anchoredPosition = new Vector2(0, -190);
             Destroy(charge.gameObject);
 
-            // 2) 개봉 — 섬광 + 폭발 + 이중 파동 링 + 광선 방사
+            // 2) 개봉 — 뚜껑이 벌컥 열리는 프레임 애니메이션 + 섬광 + 폭발 + 이중 파동 링 + 광선 방사
             StartCoroutine(FlashOnce(0.95f, 0.06f, 0.35f));
-            chest.sprite = SpriteBank.GetEnv("icon_chest");
+            StartCoroutine(ChestOpenAnim());
             SpawnBurst(new Vector2(0, -170), 460f);
             PopRing(new Vector2(0, -170), 520f, Color.white, 0.8f);
             PopRing(new Vector2(0, -170), 760f, tierCol, 0.6f);
@@ -177,12 +195,6 @@ namespace GameMaker.Screens
             // 3) 회전 선버스트 무대 (결과가 살아있는 동안 계속 돈다)
             Sunburst(tierCol, 0.16f, 12, 40f);
             Sunburst(tierCol, 0.09f, 8, -24f);
-
-            var glow = Ui.Image(resultRoot, SpriteBank.Circle, "Glow");
-            glow.raycastTarget = false;
-            glow.color = new Color(tierCol.r, tierCol.g, tierCol.b, 0.3f);
-            Ui.Place((RectTransform)glow.transform, new Vector2(0.5f, 0.5f), new Vector2(0, -20), new Vector2(450, 450));
-            StartCoroutine(GlowPulse(glow));
 
             // 4) 실루엣 서스펜스 → 컬러 공개
             var frames = SpriteBank.GetFrames(result.unit.SpriteName, "move");
@@ -518,17 +530,53 @@ namespace GameMaker.Screens
             if (img != null) Destroy(img.gameObject);
         }
 
-        IEnumerator GlowPulse(Image glow)
+        /// <summary>상자 뚜껑이 벌컥 열리는 프레임 애니메이션 (gacha_chest_0..4).</summary>
+        IEnumerator ChestOpenAnim()
         {
-            var rt = (RectTransform)glow.transform;
-            Color c0 = glow.color;
-            while (glow != null)
+            for (int i = 1; i <= 4; i++)
             {
-                float p = 1f + 0.08f * Mathf.Sin(Time.time * 4f);
-                rt.localScale = new Vector3(p, p, 1f);
-                glow.color = new Color(c0.r, c0.g, c0.b, c0.a * (0.85f + 0.15f * Mathf.Sin(Time.time * 3f)));
+                chest.sprite = SpriteBank.GetEnv("gacha_chest_" + i);
+                yield return new WaitForSeconds(0.05f);
+            }
+        }
+
+        /// <summary>상시 배경 — 금가루가 바닥에서 피어올라 사라진다.</summary>
+        IEnumerator GoldDust()
+        {
+            while (true)
+            {
+                var dust = Ui.Image(root, SpriteBank.Circle, "Dust");
+                dust.raycastTarget = false;
+                dust.color = new Color(1f, 0.88f, 0.55f, Random.Range(0.25f, 0.5f));
+                var rt = (RectTransform)dust.transform;
+                float size = Random.Range(6f, 13f);
+                Ui.Place(rt, new Vector2(0.5f, 0.5f),
+                    new Vector2(Random.Range(-700f, 700f), Random.Range(-480f, -260f)),
+                    new Vector2(size, size));
+                rt.SetSiblingIndex(1); // 무대 요소 위, 상자/UI 아래
+                StartCoroutine(DustRise(rt, dust));
+                yield return new WaitForSeconds(Random.Range(0.12f, 0.28f));
+            }
+        }
+
+        IEnumerator DustRise(RectTransform rt, Image img)
+        {
+            float t = 0f;
+            float life = Random.Range(1.6f, 2.6f);
+            float vy = Random.Range(45f, 95f);
+            float sway = Random.Range(15f, 40f);
+            float phase = Random.Range(0f, 6.28f);
+            Color c0 = img.color;
+            while (t < life)
+            {
+                t += Time.deltaTime;
+                if (img == null) yield break;
+                rt.anchoredPosition += new Vector2(Mathf.Sin(t * 2.2f + phase) * sway * Time.deltaTime, vy * Time.deltaTime);
+                float k = t / life;
+                img.color = new Color(c0.r, c0.g, c0.b, c0.a * (k < 0.2f ? k / 0.2f : 1f - (k - 0.2f) / 0.8f));
                 yield return null;
             }
+            if (img != null) Destroy(img.gameObject);
         }
 
         IEnumerator ShakeRoot(float dur, float amp)
