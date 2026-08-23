@@ -145,7 +145,6 @@ namespace GameMaker.Dev
                 if (engaged) ClickSpawnButtons();
                 SetSpeed(ctrl, 1);
                 yield return new WaitForSecondsRealtime(0.4f);
-                HideToast(); // 연속 소환 클릭으로 뜬 "돈이 부족합니다" 안내는 촬영에서 제외
                 yield return Shot("battle_stage" + stage);
 
                 if (stage == 1)
@@ -263,11 +262,6 @@ namespace GameMaker.Dev
             if (apply != null && ctrl != null) apply.Invoke(ctrl, null); else Time.timeScale = speed;
         }
 
-        static void HideToast()
-        {
-            var t = GameObject.Find("Toast");
-            if (t != null) t.SetActive(false);
-        }
 
         static List<Battle.Unit> Party(Battle.BattlefieldController ctrl, string field) =>
             (List<Battle.Unit>)typeof(Battle.BattlefieldController)
