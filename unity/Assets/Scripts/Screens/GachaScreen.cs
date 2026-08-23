@@ -57,23 +57,7 @@ namespace GameMaker.Screens
             root = Ui.Panel(canvas.transform, new Color(0, 0, 0, 0), "Root");
             Ui.Place(root, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(1920, 1080));
 
-            // ── 상시 무대 배경: 느리게 도는 온기 선버스트 + 바닥 조명 + 피어오르는 금가루 ──
-            var stagePivot = Ui.Panel(root, new Color(0, 0, 0, 0), "StageBurst");
-            Ui.Place(stagePivot, new Vector2(0.5f, 0.5f), new Vector2(0, -190), new Vector2(10, 10));
-            for (int i = 0; i < 14; i++)
-            {
-                var blade = Ui.Image(stagePivot, SpriteBank.Circle, "Blade");
-                blade.raycastTarget = false;
-                blade.color = new Color(1f, 0.85f, 0.45f, 0.05f);
-                var brt = (RectTransform)blade.transform;
-                brt.anchorMin = brt.anchorMax = new Vector2(0.5f, 0.5f);
-                brt.pivot = new Vector2(0f, 0.5f);
-                brt.anchoredPosition = Vector2.zero;
-                brt.sizeDelta = new Vector2(1200f, 90f);
-                brt.localRotation = Quaternion.Euler(0, 0, i * (360f / 14f));
-            }
-            StartCoroutine(Rotate(stagePivot, 7f));
-
+            // ── 상시 배경: 바닥 조명 + 피어오르는 금가루 (요란한 효과는 뽑기 순간에만) ──
             var floorGlow = Ui.Image(root, SpriteBank.Circle, "FloorGlow");
             floorGlow.raycastTarget = false;
             floorGlow.color = new Color(1f, 0.85f, 0.45f, 0.2f);
@@ -158,7 +142,7 @@ namespace GameMaker.Screens
             for (int pulse = 0; pulse < 3; pulse++)
             {
                 float amp = 5f + pulse * 6f;
-                Color glowCol = pulse == 2 && tier >= 3 ? tierCol : new Color(1f, 0.85f, 0.4f);
+                Color glowCol = new Color(1f, 0.85f, 0.4f); // 항상 노란빛 — 등급 힌트 없음
                 float t = 0f;
                 const float dur = 0.3f;
                 while (t < dur)
@@ -171,67 +155,106 @@ namespace GameMaker.Screens
                     charge.color = new Color(glowCol.r, glowCol.g, glowCol.b, 0.18f + 0.1f * pulse);
                     yield return null;
                 }
-                // 펄스 마침표: 링 팝 + 반짝이 별
+                // 펄스 마침표: 링 팝 + 반짝이 별 (전부 노란빛)
                 PopRing(new Vector2(0, -190), 220f + pulse * 90f, glowCol, 0.5f);
                 for (int s = 0; s < 3 + pulse * 2; s++)
                     Sparkle(new Vector2(Random.Range(-170f, 170f), -190 + Random.Range(-90f, 120f)),
-                        pulse == 2 ? tierCol : new Color(1f, 0.95f, 0.6f));
+                        new Color(1f, 0.95f, 0.6f));
                 yield return new WaitForSeconds(0.1f);
             }
             chestRt.localRotation = Quaternion.identity;
             chestRt.anchoredPosition = new Vector2(0, -190);
             Destroy(charge.gameObject);
 
-            // 2) 개봉 — 뚜껑이 벌컥 열리는 프레임 애니메이션 + 섬광 + 폭발 + 이중 파동 링 + 광선 방사
+            // 2) 개봉 — 뚜껑이 벌컥 열리는 프레임 애니메이션 + 섬광 + 폭발 + 파동 링 + 광선 (전부 금빛)
+            var gold = new Color(1f, 0.9f, 0.55f);
             StartCoroutine(FlashOnce(0.95f, 0.06f, 0.35f));
             StartCoroutine(ChestOpenAnim());
             SpawnBurst(new Vector2(0, -170), 460f);
             PopRing(new Vector2(0, -170), 520f, Color.white, 0.8f);
-            PopRing(new Vector2(0, -170), 760f, tierCol, 0.6f);
-            SpawnRays(root, new Vector2(0, -170), tierCol, 12, 560f);
+            PopRing(new Vector2(0, -170), 760f, gold, 0.6f);
+            SpawnRays(root, new Vector2(0, -170), gold, 12, 560f);
             if (tier >= 4) StartCoroutine(ShakeRoot(0.4f, tier == 5 ? 24f : 13f));
             yield return new WaitForSeconds(0.2f);
 
-            // 3) 회전 선버스트 무대 (결과가 살아있는 동안 계속 돈다)
-            Sunburst(tierCol, 0.16f, 12, 40f);
-            Sunburst(tierCol, 0.09f, 8, -24f);
+            // 3) 스포트라이트 — 위에서 아래로 넓게 비추는 원뿔 조명
+            Spotlight();
 
-            // 4) 실루엣 서스펜스 → 컬러 공개
-            var frames = SpriteBank.GetFrames(result.unit.SpriteName, "move");
-            var unitImg = Ui.Image(resultRoot, frames.Length > 0 ? frames[0] : null, "Unit");
+            // 4) 유닛 등장 — 정면 프레임이 있으면 "화면 앞으로 달려오는" 등장,
+            //    없으면 실루엣 서스펜스 → 컬러 공개
+            var front = SpriteBank.GetFrames(result.unit.SpriteName, "front");
+            var move = SpriteBank.GetFrames(result.unit.SpriteName, "move");
+            bool hasFront = front.Length > 0 && (move.Length == 0 || front[0] != move[0]);
+
+            var unitImg = Ui.Image(resultRoot, null, "Unit");
             unitImg.raycastTarget = false;
             unitImg.preserveAspect = true;
-            unitImg.color = new Color(0.05f, 0.05f, 0.1f, 1f); // 검은 실루엣
             var unitRt = (RectTransform)unitImg.transform;
             Ui.Place(unitRt, new Vector2(0.5f, 0.5f), new Vector2(0, -30), new Vector2(340, 340));
-
             float pt = 0f;
-            while (pt < 0.3f) // 실루엣 상승
-            {
-                pt += Time.deltaTime;
-                float k = Mathf.Clamp01(pt / 0.3f);
-                float s = Mathf.Lerp(0.25f, 1f, 1f - (1f - k) * (1f - k));
-                unitRt.localScale = new Vector3(s, s, 1f);
-                unitRt.anchoredPosition = new Vector2(0, Mathf.Lerp(-170, -30, k));
-                yield return null;
-            }
-            yield return new WaitForSeconds(0.22f); // "누구지?" 한 박자
 
-            StartCoroutine(FlashOnce(0.55f, 0.05f, 0.22f)); // 재섬광과 함께 정체 공개
-            unitImg.color = Color.white;
-            PopRing(new Vector2(0, -30), 560f, tierCol, 0.55f, resultRoot);
-            Confetti(26 + tier * 6, tier);
-            StartCoroutine(TwinkleAround(unitRt, tierCol));
-            pt = 0f;
-            while (pt < 0.18f) // 펀치 스케일
+            if (hasFront)
             {
-                pt += Time.deltaTime;
-                float k = Mathf.Clamp01(pt / 0.18f);
-                float s = 1f + 0.28f * Mathf.Sin(k * Mathf.PI);
-                unitRt.localScale = new Vector3(s, s, 1f);
-                yield return null;
+                // 달려온다: 멀리(작게)에서 스포트라이트 안으로 뛰어 들어오며 커진다
+                unitImg.sprite = front[0];
+                unitImg.color = Color.white;
+                const float runDur = 0.75f;
+                int fi = 0;
+                float ft = 0f;
+                while (pt < runDur)
+                {
+                    pt += Time.deltaTime;
+                    ft += Time.deltaTime;
+                    if (ft >= 0.09f) { ft = 0f; fi = (fi + 1) % front.Length; unitImg.sprite = front[fi]; }
+                    float k = Mathf.Clamp01(pt / runDur);
+                    float e = 1f - (1f - k) * (1f - k);
+                    float s = Mathf.Lerp(0.22f, 1.12f, e);
+                    unitRt.localScale = new Vector3(s, s, 1f);
+                    unitRt.anchoredPosition = new Vector2(0, Mathf.Lerp(-150, -30, e) + Mathf.Abs(Mathf.Sin(pt * 16f)) * 14f * (1f - k));
+                    yield return null;
+                }
+                unitImg.sprite = front[0];
+                Confetti(26 + tier * 6, tier);
+                pt = 0f;
+                while (pt < 0.16f) // 도착 펀치
+                {
+                    pt += Time.deltaTime;
+                    float k = Mathf.Clamp01(pt / 0.16f);
+                    float s = 1.12f - 0.12f * k + 0.1f * Mathf.Sin(k * Mathf.PI);
+                    unitRt.localScale = new Vector3(s, s, 1f);
+                    yield return null;
+                }
+                unitRt.localScale = Vector3.one;
             }
-            unitRt.localScale = Vector3.one;
+            else
+            {
+                unitImg.sprite = move.Length > 0 ? move[0] : null;
+                unitImg.color = new Color(0.05f, 0.05f, 0.1f, 1f); // 검은 실루엣
+                while (pt < 0.3f) // 실루엣 상승
+                {
+                    pt += Time.deltaTime;
+                    float k = Mathf.Clamp01(pt / 0.3f);
+                    float s = Mathf.Lerp(0.25f, 1f, 1f - (1f - k) * (1f - k));
+                    unitRt.localScale = new Vector3(s, s, 1f);
+                    unitRt.anchoredPosition = new Vector2(0, Mathf.Lerp(-170, -30, k));
+                    yield return null;
+                }
+                yield return new WaitForSeconds(0.22f); // "누구지?" 한 박자
+
+                StartCoroutine(FlashOnce(0.55f, 0.05f, 0.22f)); // 재섬광과 함께 정체 공개
+                unitImg.color = Color.white;
+                Confetti(26 + tier * 6, tier);
+                pt = 0f;
+                while (pt < 0.18f) // 펀치 스케일
+                {
+                    pt += Time.deltaTime;
+                    float k = Mathf.Clamp01(pt / 0.18f);
+                    float s = 1f + 0.28f * Mathf.Sin(k * Mathf.PI);
+                    unitRt.localScale = new Vector3(s, s, 1f);
+                    yield return null;
+                }
+                unitRt.localScale = Vector3.one;
+            }
 
             // 5) ★ 하나씩 + 이름 펀치 인 + NEW/+N 배지
             var starText = Ui.OutlinedLabel(resultRoot, "", 36, tierCol, "Stars");
@@ -239,7 +262,6 @@ namespace GameMaker.Screens
             for (int i = 0; i < tier; i++)
             {
                 starText.text += "★";
-                Sparkle(new Vector2((i - (tier - 1) * 0.5f) * 40f, 202f + 130f), tierCol, resultRoot);
                 yield return new WaitForSeconds(0.09f);
             }
             starText.text += " " + TierNames[tier];
@@ -275,10 +297,10 @@ namespace GameMaker.Screens
             }
             badgeRt.localScale = Vector3.one;
 
-            // 6) 전설 피날레: 2차 광선 + 금빛 세례
+            // 6) 전설 피날레: 2차 금빛 광선 + 콘페티 세례
             if (tier == 5)
             {
-                SpawnRays(resultRoot, new Vector2(0, -30), tierCol, 14, 700f);
+                SpawnRays(resultRoot, new Vector2(0, -30), new Color(1f, 0.85f, 0.35f), 14, 700f);
                 Confetti(30, 5);
                 StartCoroutine(ShakeRoot(0.3f, 10f));
             }
@@ -379,45 +401,31 @@ namespace GameMaker.Screens
             if (img != null) Destroy(img.gameObject);
         }
 
-        /// <summary>결과가 살아있는 동안 유닛 주변에 반짝임을 계속 뿌린다.</summary>
-        IEnumerator TwinkleAround(RectTransform target, Color c)
+        /// <summary>스포트라이트 — 위에서 아래로 넓어지는 원뿔 조명 + 바닥 풀.
+        /// 세로로 쌓은 타원들로 원뿔을 근사한다.</summary>
+        void Spotlight()
         {
-            while (target != null)
+            var spot = Ui.Panel(resultRoot, new Color(0, 0, 0, 0), "Spotlight");
+            Ui.Place(spot, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(10, 10));
+            spot.SetAsFirstSibling(); // 유닛 뒤
+            for (int i = 0; i < 7; i++)
             {
-                Sparkle((Vector2)target.anchoredPosition +
-                    new Vector2(Random.Range(-190f, 190f), Random.Range(-150f, 190f)), c, resultRoot);
-                yield return new WaitForSeconds(Random.Range(0.08f, 0.18f));
-            }
-        }
-
-        /// <summary>회전 선버스트 — 결과 뒤에서 계속 도는 방사 광선판.</summary>
-        void Sunburst(Color c, float alpha, int blades, float degPerSec)
-        {
-            var pivot = Ui.Panel(resultRoot, new Color(0, 0, 0, 0), "Sunburst");
-            Ui.Place(pivot, new Vector2(0.5f, 0.5f), new Vector2(0, -20), new Vector2(10, 10));
-            pivot.SetAsFirstSibling(); // 유닛/글로우 뒤
-            for (int i = 0; i < blades; i++)
-            {
-                var blade = Ui.Image(pivot, SpriteBank.Circle, "Blade");
-                blade.raycastTarget = false;
-                blade.color = new Color(c.r, c.g, c.b, alpha);
-                var rt = (RectTransform)blade.transform;
+                float k = i / 6f;
+                var seg = Ui.Image(spot, SpriteBank.Circle, "Seg");
+                seg.raycastTarget = false;
+                seg.color = new Color(1f, 0.97f, 0.85f, Mathf.Lerp(0.3f, 0.08f, k));
+                var rt = (RectTransform)seg.transform;
                 rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-                rt.pivot = new Vector2(0f, 0.5f); // 중심에서 바깥으로 뻗는 날개
-                rt.anchoredPosition = Vector2.zero;
-                rt.sizeDelta = new Vector2(560f, 54f);
-                rt.localRotation = Quaternion.Euler(0, 0, i * (360f / blades));
+                rt.anchoredPosition = new Vector2(0, Mathf.Lerp(340f, -120f, k));
+                rt.sizeDelta = new Vector2(Mathf.Lerp(150f, 760f, k), Mathf.Lerp(210f, 280f, k));
             }
-            StartCoroutine(Rotate(pivot, degPerSec));
-        }
-
-        IEnumerator Rotate(RectTransform rt, float degPerSec)
-        {
-            while (rt != null)
-            {
-                rt.Rotate(0, 0, degPerSec * Time.deltaTime);
-                yield return null;
-            }
+            var pool = Ui.Image(spot, SpriteBank.Circle, "Pool");
+            pool.raycastTarget = false;
+            pool.color = new Color(1f, 0.95f, 0.8f, 0.3f);
+            var prt = (RectTransform)pool.transform;
+            prt.anchorMin = prt.anchorMax = new Vector2(0.5f, 0.5f);
+            prt.anchoredPosition = new Vector2(0, -165f);
+            prt.sizeDelta = new Vector2(640f, 150f);
         }
 
         /// <summary>콘페티 — 색색 조각이 위에서 쏟아지며 회전 낙하.</summary>

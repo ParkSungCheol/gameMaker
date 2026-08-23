@@ -32,7 +32,7 @@ namespace GameMaker.Screens
 
         Canvas canvas;
         RectTransform grid;
-        Text pageText, toastText;
+        Text pageText, toastText, slotHeader;
         float toastUntil;
         List<List<MonsterData>> pages; // 등급별 보유 유닛
         int page;
@@ -51,17 +51,26 @@ namespace GameMaker.Screens
 
             var title = Ui.OutlinedLabel(canvas.transform, "배치", 48, Color.white, "Title");
             Ui.Place((RectTransform)title.transform, new Vector2(0.5f, 1f), new Vector2(0, -50));
-            var hintLabel = Ui.OutlinedLabel(canvas.transform, "보유 유닛을 위 칸으로 끌어다 배치하세요 (슬롯 밖으로 끌면 해제)",
-                24, new Color(1f, 1f, 1f, 0.75f), "Hint");
-            Ui.Place((RectTransform)hintLabel.transform, new Vector2(0.5f, 1f), new Vector2(0, -108), new Vector2(1100, 34));
 
             var back = Ui.CircleIconButton(canvas.transform, "icon_return", 92,
                 () => ScreenRouter.I.Show(ScreenId.Main), "BackButton");
             Ui.Place((RectTransform)back.transform, new Vector2(1f, 0f), new Vector2(-58, 50));
 
-            // 출전 슬롯 5칸 — 아래 보유 목록과 확실히 분리된 상단 밴드
-            slotRow = Ui.Panel(canvas.transform, new Color(0, 0, 0, 0), "SlotRow");
-            Ui.Place(slotRow, new Vector2(0.5f, 1f), new Vector2(0, -300), new Vector2(1200, 270));
+            // ── 상단 섹션: 출전 배치 (전용 배경 밴드로 아래와 확실히 구분) ──
+            var topBand = Ui.RoundedPanel(canvas.transform, new Color(0.07f, 0.09f, 0.14f, 0.88f), "TopBand");
+            Ui.Place((RectTransform)topBand.transform, new Vector2(0.5f, 1f), new Vector2(0, -290), new Vector2(1320, 340));
+            slotHeader = Ui.OutlinedLabel(topBand.transform, "", 30, new Color(1f, 0.9f, 0.5f), "SlotHeader");
+            Ui.Place((RectTransform)slotHeader.transform, new Vector2(0.5f, 1f), new Vector2(0, -26), new Vector2(600, 38));
+
+            slotRow = Ui.Panel(topBand.transform, new Color(0, 0, 0, 0), "SlotRow");
+            Ui.Place(slotRow, new Vector2(0.5f, 0.5f), new Vector2(0, -20), new Vector2(1200, 260));
+
+            // ── 하단 섹션: 보유 유닛 (별도 배경 밴드) ──
+            var botBand = Ui.RoundedPanel(canvas.transform, new Color(0.07f, 0.09f, 0.14f, 0.88f), "BotBand");
+            Ui.Place((RectTransform)botBand.transform, new Vector2(0.5f, 0f), new Vector2(0, 330), new Vector2(1820, 500));
+            var botHeader = Ui.OutlinedLabel(botBand.transform, "보유 유닛 — 위 칸으로 드래그해 배치, 배치된 유닛은 클릭으로 해제",
+                24, new Color(1f, 1f, 1f, 0.8f), "BotHeader");
+            Ui.Place((RectTransform)botHeader.transform, new Vector2(0.5f, 1f), new Vector2(0, -24), new Vector2(1300, 34));
 
             // 보유 목록 (등급별 페이지)
             var prev = Ui.CircleIconButton(canvas.transform, "icon_return", 64,
@@ -80,7 +89,7 @@ namespace GameMaker.Screens
             Ui.Place((RectTransform)toastText.transform, new Vector2(0.5f, 0f), new Vector2(0, 104), new Vector2(900, 40));
 
             grid = Ui.Panel(canvas.transform, new Color(0, 0, 0, 0), "Grid");
-            Ui.Place(grid, new Vector2(0.5f, 0f), new Vector2(0, 300), new Vector2(1760, 430));
+            Ui.Place(grid, new Vector2(0.5f, 0f), new Vector2(0, 295), new Vector2(1760, 410));
 
             // 보유 유닛만 (성 제외 — 성은 항상 출전)
             var owned = DataHub.I.GetMonsters()
@@ -118,6 +127,7 @@ namespace GameMaker.Screens
         void RebuildSlots()
         {
             foreach (Transform c in slotRow) Destroy(c.gameObject);
+            slotHeader.text = "출전 배치  " + slots.Count(s => s != null) + "/" + LocalDataService.LoadoutMax;
             float gap = 1200f / LocalDataService.LoadoutMax;
             for (int i = 0; i < LocalDataService.LoadoutMax; i++)
             {
@@ -130,14 +140,14 @@ namespace GameMaker.Screens
                 var rt = (RectTransform)border.transform;
                 rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
                 rt.anchoredPosition = new Vector2((i - (LocalDataService.LoadoutMax - 1) * 0.5f) * gap, 0);
-                rt.sizeDelta = new Vector2(gap - 14, 258);
+                rt.sizeDelta = new Vector2(gap - 14, 250);
                 slotRects[i] = rt;
 
                 var inner = Ui.RoundedPanel(border.transform, filled
                     ? new Color(0.24f, 0.19f, 0.1f, 0.97f)
                     : new Color(0.14f, 0.13f, 0.11f, 0.95f), "Inner");
                 Ui.Place((RectTransform)inner.transform, new Vector2(0.5f, 0.5f), Vector2.zero,
-                    new Vector2(gap - 26, 246));
+                    new Vector2(gap - 26, 238));
 
                 // 슬롯 번호
                 var num = Ui.Label(border.transform, (i + 1).ToString(), 20, new Color(1f, 1f, 1f, 0.5f), "Num");
@@ -170,7 +180,7 @@ namespace GameMaker.Screens
             int tier = units[0].tier;
             pageText.text = TierNames[tier] + "  " + (page + 1) + "/" + pages.Count + "  (" + units.Count + "종)";
 
-            float cellW = 1760f / Cols, cellH = 430f / Rows;
+            float cellW = 1760f / Cols, cellH = 410f / Rows;
             for (int i = 0; i < Mathf.Min(Cols * Rows, units.Count); i++)
             {
                 var m = units[i];
@@ -234,6 +244,18 @@ namespace GameMaker.Screens
             return -1;
         }
 
+        /// <summary>배치된 유닛 클릭 = 배치 해제 (슬롯/보유 목록 어디서든).</summary>
+        public void HandleClick(MonsterData m)
+        {
+            int idx = System.Array.IndexOf(slots, m.name);
+            if (idx < 0) return; // 미배치 유닛 클릭은 무시 (배치는 드래그로)
+            if (slots.Count(s => s != null) <= 1) { Toast("최소 1명은 배치해야 합니다."); return; }
+            slots[idx] = null;
+            Save();
+            RebuildSlots();
+            RebuildList();
+        }
+
         public void HandleDrop(MonsterData m, int fromSlot, Vector2 screenPos, Camera cam)
         {
             int target = SlotAt(screenPos, cam);
@@ -274,7 +296,7 @@ namespace GameMaker.Screens
         }
 
         /// <summary>유닛 카드 드래그 — 반투명 고스트가 손가락을 따라온다.</summary>
-        class DragCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+        class DragCard : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
         {
             DeployScreen screen;
             MonsterData data;
@@ -313,6 +335,12 @@ namespace GameMaker.Screens
             {
                 if (ghost != null) Destroy(ghost.gameObject);
                 screen.HandleDrop(data, fromSlot, e.position, e.pressEventCamera);
+            }
+
+            public void OnPointerClick(PointerEventData e)
+            {
+                if (e.dragging) return; // 드래그 후 릴리즈는 클릭 아님
+                screen.HandleClick(data);
             }
         }
     }
