@@ -527,7 +527,8 @@ namespace GameMaker.Screens
             key.raycastTarget = false;
             var keyRt = (RectTransform)key.transform;
             keyRt.anchorMin = keyRt.anchorMax = new Vector2(0.5f, 0.5f);
-            keyRt.pivot = new Vector2(0.18f, 0.5f); // 회전축 = 열쇠 끝(구멍에 꽂힌 지점)
+            keyRt.pivot = new Vector2(0.9f, 0.5f); // 회전축 = 키 끝(오른쪽) — 구멍에 꽂히는 지점.
+                                                   // 스프라이트: 왼쪽 = 동그란 손잡이, 오른쪽 = 키 날
             keyRt.sizeDelta = new Vector2(96, 64);
             keyRt.anchoredPosition = new Vector2(240, -150);
             key.color = new Color(1f, 1f, 1f, 0f);
