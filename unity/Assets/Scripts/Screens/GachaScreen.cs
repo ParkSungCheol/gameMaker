@@ -17,7 +17,8 @@ namespace GameMaker.Screens
     /// </summary>
     public class GachaScreen : MonoBehaviour
     {
-        public const int Cost = 100;
+        /// <summary>1회 비용 — 테스트 모드(Dev.FreeGacha)에서는 0 (무한 뽑기).</summary>
+        public static int Cost => Core.Dev.FreeGacha ? 0 : 100;
 
         static readonly Color[] TierColors =
         {
