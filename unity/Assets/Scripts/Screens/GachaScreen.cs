@@ -78,7 +78,7 @@ namespace GameMaker.Screens
             Ui.Place((RectTransform)back.transform, new Vector2(1f, 0f), new Vector2(-58, 50));
 
             resultRoot = Ui.Panel(root, new Color(0, 0, 0, 0), "Result");
-            Ui.Place(resultRoot, new Vector2(0.5f, 0.5f), new Vector2(0, 130), new Vector2(1100, 640));
+            Ui.Place(resultRoot, new Vector2(0.5f, 0.5f), new Vector2(0, 40), new Vector2(1100, 820));
 
             // 보물상자 (황금 상자, 열림 애니메이션 보유) — 가만히 놓여 있다
             chest = Ui.Image(root, SpriteBank.GetEnv("gacha_chest_0"), "Chest");
@@ -174,7 +174,7 @@ namespace GameMaker.Screens
             unitImg.raycastTarget = false;
             unitImg.preserveAspect = true;
             var unitRt = (RectTransform)unitImg.transform;
-            Ui.Place(unitRt, new Vector2(0.5f, 0.5f), new Vector2(0, -120), new Vector2(380, 380));
+            Ui.Place(unitRt, new Vector2(0.5f, 0.5f), new Vector2(0, -180), new Vector2(380, 380)); // 발이 바닥 하이라이트에 닿게
             float pt = 0f;
 
             if (hasFront)
@@ -220,7 +220,7 @@ namespace GameMaker.Screens
                     float k = Mathf.Clamp01(pt / 0.3f);
                     float s = Mathf.Lerp(0.25f, 1f, 1f - (1f - k) * (1f - k));
                     unitRt.localScale = new Vector3(s, s, 1f);
-                    unitRt.anchoredPosition = new Vector2(0, Mathf.Lerp(-320, -120, k));
+                    unitRt.anchoredPosition = new Vector2(0, Mathf.Lerp(-300, -180, k));
                     yield return null;
                 }
                 yield return new WaitForSeconds(0.22f); // "누구지?" 한 박자
@@ -242,7 +242,7 @@ namespace GameMaker.Screens
 
             // 5) ★ 하나씩 + 이름 펀치 인 + NEW/+N 배지
             var starText = Ui.OutlinedLabel(resultRoot, "", 36, tierCol, "Stars");
-            Ui.Place((RectTransform)starText.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 202), new Vector2(600, 46));
+            Ui.Place((RectTransform)starText.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 160), new Vector2(600, 46));
             for (int i = 0; i < tier; i++)
             {
                 starText.text += "★";
@@ -253,7 +253,7 @@ namespace GameMaker.Screens
             var plate = Ui.Image(resultRoot, SpriteBank.GetEnv("panel_parchment_m"), "NamePlate");
             plate.raycastTarget = false;
             var nameRt = (RectTransform)plate.transform;
-            Ui.Place(nameRt, new Vector2(0.5f, 0.5f), new Vector2(0, 262), new Vector2(560, 88));
+            Ui.Place(nameRt, new Vector2(0.5f, 0.5f), new Vector2(0, 235), new Vector2(560, 88));
             var nameLabel = Ui.OutlinedLabel(nameRt, result.unit.DisplayName, 48, Color.white, "Name");
             Ui.Place((RectTransform)nameLabel.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 2), new Vector2(540, 62));
             pt = 0f;
@@ -270,7 +270,7 @@ namespace GameMaker.Screens
                 ? new Color(0.2f, 0.7f, 0.3f, 0.95f)
                 : new Color(0.92f, 0.76f, 0.15f, 0.95f), "Badge");
             var badgeRt = (RectTransform)badge.transform;
-            Ui.Place(badgeRt, new Vector2(0.5f, 0.5f), new Vector2(0, 150), new Vector2(230, 54));
+            Ui.Place(badgeRt, new Vector2(0.5f, 0.5f), new Vector2(0, 92), new Vector2(230, 54));
             var badgeText = Ui.Label(badge.transform, result.isNew ? "NEW!" : "+" + result.dupes + " 강화!",
                 30, result.isNew ? Color.white : new Color(0.25f, 0.15f, 0f), "BadgeText");
             badgeText.alignment = TextAnchor.MiddleCenter;
@@ -287,7 +287,7 @@ namespace GameMaker.Screens
             // 6) 전설 피날레: 2차 금빛 광선 + 콘페티 세례
             if (tier == 5)
             {
-                SpawnRays(resultRoot, new Vector2(0, -120), new Color(1f, 0.85f, 0.35f), 14, 700f);
+                SpawnRays(resultRoot, new Vector2(0, -180), new Color(1f, 0.85f, 0.35f), 14, 700f);
                 Confetti(30, 5);
                 StartCoroutine(ShakeRoot(0.3f, 10f));
             }
@@ -403,7 +403,7 @@ namespace GameMaker.Screens
                 seg.color = new Color(1f, 0.97f, 0.85f, Mathf.Lerp(0.3f, 0.06f, k));
                 var rt = (RectTransform)seg.transform;
                 rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-                rt.anchoredPosition = new Vector2(0, Mathf.Lerp(380f, -460f, k));
+                rt.anchoredPosition = new Vector2(0, Mathf.Lerp(340f, -520f, k));
                 rt.sizeDelta = new Vector2(Mathf.Lerp(130f, 1240f, k), Mathf.Lerp(200f, 300f, k)); // 아래로 갈수록 계속 확장
             }
         }
@@ -534,11 +534,11 @@ namespace GameMaker.Screens
             var chestRt2 = (RectTransform)chest.transform;
 
             // 왼쪽 걸쇠 → 오른쪽 걸쇠
-            float[] holes = { -60f, 66f };
+            float[] holes = { -98f, 50f }; // 상자 스프라이트 실측 걸쇠 위치 (표시 320px 기준)
             for (int h = 0; h < 2; h++)
             {
                 Vector2 from = keyRt.anchoredPosition;
-                Vector2 to = new Vector2(holes[h], -232f); // 걸쇠(열쇠 구멍) 위치
+                Vector2 to = new Vector2(holes[h], -226f); // 걸쇠(열쇠 구멍) 위치
                 float t = 0f;
                 const float slide = 0.26f;
                 while (t < slide)
@@ -588,7 +588,7 @@ namespace GameMaker.Screens
             rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
             rt.pivot = new Vector2(0.5f, 1f); // 위쪽 경첩 기준으로 젖혀진다
             rt.sizeDelta = new Vector2(24, 22);
-            rt.anchoredPosition = new Vector2(x, -224f);
+            rt.anchoredPosition = new Vector2(x, -222f);
             float sign = x < 0 ? 1f : -1f; // 바깥쪽으로
             float t = 0f;
             const float dur = 0.34f;
@@ -598,7 +598,7 @@ namespace GameMaker.Screens
                 if (latch == null) yield break;
                 float k = Mathf.Clamp01(t / dur);
                 rt.localRotation = Quaternion.Euler(0, 0, 115f * sign * k);
-                rt.anchoredPosition = new Vector2(x + 14f * sign * k, -224f - 34f * k * k);
+                rt.anchoredPosition = new Vector2(x + 14f * sign * k, -222f - 34f * k * k);
                 latch.color = new Color(0.5f, 0.34f, 0.12f, 1f - k * k);
                 yield return null;
             }

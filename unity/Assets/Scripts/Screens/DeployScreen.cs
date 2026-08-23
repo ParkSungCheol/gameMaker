@@ -66,7 +66,7 @@ namespace GameMaker.Screens
             Ui.Place(slotRow, new Vector2(0.5f, 0.5f), new Vector2(0, -18), new Vector2(1200, 250));
 
             // ── 하단 섹션: 보유 유닛 (별도 배경 밴드) ──
-            var botBand = Ui.Panel(canvas.transform, new Color(0.15f, 0.11f, 0.07f, 0.5f), "BotBand" /* 나무 그늘 톤 — 메뉴의 목재/양피지 팔레트와 동계열 */);
+            var botBand = Ui.Panel(canvas.transform, new Color(0, 0, 0, 0), "BotBand");
             Ui.Place(botBand, new Vector2(0.5f, 0f), new Vector2(0, 90), new Vector2(1820, 480));
             var botHeader = Ui.OutlinedLabel(botBand, "보유 유닛 — 위 칸으로 드래그해 배치, 배치된 유닛은 클릭으로 해제",
                 24, new Color(1f, 1f, 1f, 0.8f), "BotHeader");
@@ -164,6 +164,9 @@ namespace GameMaker.Screens
                 var m = DataHub.I.FindMonster(slots[i]);
                 if (m == null) { slots[i] = null; continue; }
                 BuildUnitCard(inner, m, inner.sizeDelta * 0.84f, i); // 나무 테두리 안쪽 여백
+                // 나무 박스 어디를 클릭해도 해제되도록 — 박스 전체가 유닛 단위
+                var boxDrag = frameImg.gameObject.AddComponent<DragCard>();
+                boxDrag.Init(this, m, i);
             }
         }
 
