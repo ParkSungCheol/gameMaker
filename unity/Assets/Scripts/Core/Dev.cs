@@ -13,5 +13,8 @@ namespace GameMaker.Core
 
         /// <summary>true 면 전투 배속에 x10/x20/x30 추가 (빠른 전체 테스트용).</summary>
         public const bool TestSpeeds = true;
+
+        /// <summary>true 면 메인 메뉴에 "유닛 뷰어" 버튼 노출 — 전 유닛 모션(걷기/공격/사망) 열람.</summary>
+        public const bool UnitViewer = true;
     }
 }
