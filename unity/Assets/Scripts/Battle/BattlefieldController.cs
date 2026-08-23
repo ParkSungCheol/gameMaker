@@ -60,7 +60,16 @@ namespace GameMaker.Battle
         readonly List<float> spawnTimers = new List<float>();      // 남은 쿨타임
         readonly List<Image> partyPips = new List<Image>();        // 부대 정원 게이지 (10칸)
 
-        static readonly string[] SpawnableUnits = { "ourbasic", "ourtank", "ourbattle", "ourmass" };
+        // 출전 유닛 = 배치 화면에서 고른 로드아웃 (기본: 기본 4종). 최초 접근 시 1회 로드.
+        string[] spawnableCache;
+        string[] SpawnableUnits
+        {
+            get
+            {
+                if (spawnableCache == null) spawnableCache = DataHub.I.GetLoadout().ToArray();
+                return spawnableCache;
+            }
+        }
 
         void Start()
         {
@@ -426,7 +435,7 @@ namespace GameMaker.Battle
                 var btn = Ui.ImageButton(hud.transform, SpriteBank.GetEnv("btn_wood"), new Vector2(150, 140),
                     () => TrySpawnOur(unitName), "Spawn_" + unitName);
                 Ui.Place((RectTransform)btn.transform, new Vector2(0.5f, 0f),
-                    new Vector2((i - (SpawnableUnits.Length - 1) * 0.5f) * 175f, 85));
+                    new Vector2((i - (SpawnableUnits.Length - 1) * 0.5f) * (SpawnableUnits.Length > 5 ? 150f : 175f), 85));
 
                 var face = Ui.Image(btn.transform, portrait, "Portrait");
                 Ui.Place((RectTransform)face.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 8), new Vector2(100, 100));
@@ -687,7 +696,8 @@ namespace GameMaker.Battle
             // 업그레이드 적용: 레벨당 HP/공격 +20%
             if (data.IsOur)
             {
-                int level = DataHub.I.GetUpgradeCount(name);
+                // 골드 강화(최대 10) + 중복 뽑기 강화(+N, 무제한) — 레벨당 +20%
+                int level = DataHub.I.GetUpgradeCount(name) + DataHub.I.GetDupeCount(name);
                 if (level > 0)
                 {
                     data.hp = Mathf.RoundToInt(data.hp * (1f + 0.2f * level));

@@ -10,7 +10,8 @@ namespace GameMaker.Core
         Main,         // MainActivity
         Map,          // MapActivity
         Battlefield,  // BattlefieldActivity
-        Upgrade,      // UpgradeActivity
+        Upgrade,      // UpgradeActivity — 강화 + 배치(출전 관리)
+        Gacha,        // 뽑기
         UnitTest      // [DEV] 유닛 모션 뷰어 (Core.Dev.UnitViewer)
     }
 
@@ -34,6 +35,7 @@ namespace GameMaker.Core
                 case ScreenId.Main:        current.AddComponent<MainScreen>(); break;
                 case ScreenId.Map:         current.AddComponent<MapScreen>(); break;
                 case ScreenId.Upgrade:     current.AddComponent<UpgradeScreen>(); break;
+                case ScreenId.Gacha:       current.AddComponent<GachaScreen>(); break;
                 case ScreenId.Battlefield: current.AddComponent<Battle.BattlefieldController>().mapNumber = arg; break;
                 case ScreenId.UnitTest:    current.AddComponent<UnitTestScreen>(); break;
             }

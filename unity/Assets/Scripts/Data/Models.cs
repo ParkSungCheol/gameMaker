@@ -106,6 +106,19 @@ namespace GameMaker.Data
         public string name = "A";
         public int money = 0;
         public int[] mapClear = new int[130];
+        // 뽑기 보유: 뽑은 유닛 이름 + 중복 횟수(+N 강화). 기본 4종은 항상 보유로 취급.
+        public List<string> gachaNames = new List<string>();
+        public List<int> gachaDupes = new List<int>();
+        // 배치(출전 슬롯) — 전투 소환 바에 나갈 유닛들. 비어있으면 기본 4종.
+        public List<string> loadout = new List<string>();
+    }
+
+    /// <summary>뽑기 1회 결과.</summary>
+    public class GachaResult
+    {
+        public MonsterData unit;
+        public bool isNew;    // 처음 뽑음
+        public int dupes;     // 뽑은 뒤의 중복 강화 수 (+N)
     }
 
     /// <summary>유닛별 업그레이드 상태(레거시 UpgradeActivity 기능 복원).</summary>

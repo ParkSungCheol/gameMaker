@@ -20,6 +20,13 @@ namespace GameMaker.Data
         int Clear(int mapNumber);                            // 레거시 PlayerRepository.clear — 클리어 보상(획득액 반환)
         int GetUpgradeCount(string monsterName);
         void Upgrade(string monsterName);                    // 레거시 UpgradeActivity 기능 복원(돈 차감 + 레벨업)
+
+        // ── 뽑기/배치 ──
+        bool OwnsUnit(string monsterName);                   // 기본 4종은 항상 true
+        int GetDupeCount(string monsterName);                // 중복 뽑기 강화 수 (+N)
+        GachaResult DrawGacha(int cost);                     // 뽑기 1회 (돈 차감, 중복이면 +1)
+        List<string> GetLoadout();                           // 출전 유닛 (기본: 기본 4종)
+        void SetLoadout(List<string> names);
     }
 
     public static class DataHub
@@ -106,18 +113,87 @@ namespace GameMaker.Data
         public int GetUpgradeCount(string monsterName) => upgrades.Get(monsterName);
 
         /// <summary>비용 = (성이면 50, 아니면 cost) * (현재레벨 + 1). 부족하면 예외 대신 GameException.</summary>
+        public const int MaxGoldLevel = 10; // 골드 강화 상한 — 이후는 중복 뽑기(+N)로만
+
         public void Upgrade(string monsterName)
         {
             var m = FindMonster(monsterName);
             if (m == null) throw new GameException("존재하지 않는 유닛입니다.");
 
             int level = upgrades.Get(monsterName);
+            if (level >= MaxGoldLevel) throw new GameException("최대 강화입니다. 중복 뽑기로만 강화할 수 있습니다.");
             int cost = (m.IsCastle ? 50 : m.cost) * (level + 1);
             if (player.money < cost) throw new GameException("돈이 부족합니다. [ " + cost + " ] 필요");
 
             player.money -= cost;
             upgrades.Set(monsterName, level + 1);
             PlayerPrefs.SetString(UpgradeKey, JsonUtility.ToJson(upgrades));
+            SavePlayer(player);
+        }
+
+        // ─────────────────── 뽑기 / 배치 ───────────────────
+
+        static readonly string[] BasicUnits = { "ourbasic", "ourtank", "ourbattle", "ourmass" };
+        /// <summary>등급별 확률(%) — 계획서: 일반 40 / 고급 30 / 희귀 18 / 영웅 9 / 전설 3.</summary>
+        static readonly int[] TierWeights = { 0, 40, 30, 18, 9, 3 };
+        public const int LoadoutMax = 6; // 출전 슬롯 수 (전투 소환 바)
+
+        public bool OwnsUnit(string monsterName) =>
+            System.Array.IndexOf(BasicUnits, monsterName) >= 0 || player.gachaNames.Contains(monsterName);
+
+        public int GetDupeCount(string monsterName)
+        {
+            int i = player.gachaNames.IndexOf(monsterName);
+            return i < 0 ? 0 : player.gachaDupes[i];
+        }
+
+        public GachaResult DrawGacha(int cost)
+        {
+            if (player.money < cost) throw new GameException("돈이 부족합니다. [ " + cost + " ] 필요");
+
+            // 등급 추첨 → 해당 등급에서 균등 추첨
+            int roll = Random.Range(0, 100), tier = 1, acc = 0;
+            for (int t = 1; t <= 5; t++)
+            {
+                acc += TierWeights[t];
+                if (roll < acc) { tier = t; break; }
+            }
+            var pool = monsters.FindAll(m => m.IsOur && !m.IsCastle && m.tier == tier);
+            if (pool.Count == 0) throw new GameException("뽑기 풀이 비어 있습니다.");
+            var unit = pool[Random.Range(0, pool.Count)];
+
+            player.money -= cost;
+            var result = new GachaResult { unit = unit };
+            int i = player.gachaNames.IndexOf(unit.name);
+            if (i < 0)
+            {
+                player.gachaNames.Add(unit.name);
+                player.gachaDupes.Add(0);
+                result.isNew = true;
+            }
+            else
+            {
+                player.gachaDupes[i]++;      // 중복 = +1 강화 (골드 1강화와 동급, 무제한)
+                result.dupes = player.gachaDupes[i];
+            }
+            SavePlayer(player);
+            return result;
+        }
+
+        public List<string> GetLoadout()
+        {
+            // 저장본에서 유효한(보유 중인) 유닛만 — 비어있으면 기본 4종
+            var list = new List<string>();
+            foreach (var n in player.loadout)
+                if (OwnsUnit(n) && FindMonster(n) != null && !list.Contains(n)) list.Add(n);
+            if (list.Count == 0) list.AddRange(BasicUnits);
+            if (list.Count > LoadoutMax) list.RemoveRange(LoadoutMax, list.Count - LoadoutMax);
+            return list;
+        }
+
+        public void SetLoadout(List<string> names)
+        {
+            player.loadout = new List<string>(names);
             SavePlayer(player);
         }
     }
