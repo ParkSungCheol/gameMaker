@@ -123,7 +123,7 @@ namespace GameMaker.Screens
         }
 
         int PriceOf(MonsterData m) =>
-            (m.IsCastle ? 50 : m.cost) * (DataHub.I.GetUpgradeCount(m.name) + 1);
+            Core.Dev.FreeUpgrade ? 0 : (m.IsCastle ? 50 : m.cost) * (DataHub.I.GetUpgradeCount(m.name) + 1);
 
         void Rebuild()
         {

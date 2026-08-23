@@ -122,7 +122,7 @@ namespace GameMaker.Data
 
             int level = upgrades.Get(monsterName);
             if (level >= MaxGoldLevel) throw new GameException("최대 강화입니다. 중복 뽑기로만 강화할 수 있습니다.");
-            int cost = (m.IsCastle ? 50 : m.cost) * (level + 1);
+            int cost = Core.Dev.FreeUpgrade ? 0 : (m.IsCastle ? 50 : m.cost) * (level + 1);
             if (player.money < cost) throw new GameException("돈이 부족합니다. [ " + cost + " ] 필요");
 
             player.money -= cost;

@@ -19,11 +19,13 @@ namespace GameMaker.Core
         const bool testSpeeds = true;          // 전투 배속 x10/x20/x30 추가
         const bool unitViewer = true;          // 메인 메뉴 "유닛 뷰어" 버튼
         const bool freeGacha = true;           // 뽑기 무료 (무한 뽑기 테스트)
+        const bool freeUpgrade = true;         // 유닛 골드 강화 무료
 
         public static bool UnlockAllStages => Enabled && unlockAllStages;
         public static bool InvincibleOurCastle => Enabled && invincibleOurCastle;
         public static bool TestSpeeds => Enabled && testSpeeds;
         public static bool UnitViewer => Enabled && unitViewer;
         public static bool FreeGacha => Enabled && freeGacha;
+        public static bool FreeUpgrade => Enabled && freeUpgrade;
     }
 }
