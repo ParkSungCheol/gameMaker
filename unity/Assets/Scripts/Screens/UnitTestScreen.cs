@@ -25,11 +25,12 @@ namespace GameMaker.Screens
         RectTransform grid;
         Text pageText;
         readonly List<Button> actionButtons = new List<Button>();
+        readonly List<Button> tabButtons = new List<Button>();
 
         List<MonsterData> allies, enemies;
         bool showingEnemies = true;
         int page;
-        string globalAction = "move";
+        string globalAction = "idle"; // 기본: 가만히 서 있기
 
         void Start()
         {
@@ -51,7 +52,8 @@ namespace GameMaker.Screens
             MakeTab("아군", new Vector2(90, -50), () => { showingEnemies = false; page = 0; Rebuild(); });
             MakeTab("적군", new Vector2(230, -50), () => { showingEnemies = true; page = 0; Rebuild(); });
 
-            // 우상단: 모션 버튼 (전체 적용)
+            // 우상단: 모션 버튼 (전체 적용) — 기본은 대기
+            MakeAction("대기", "idle", new Vector2(-700, -50));
             MakeAction("걷기", "move", new Vector2(-560, -50));
             MakeAction("공격", "attack", new Vector2(-420, -50));
             MakeAction("사망", "defeat", new Vector2(-280, -50));
@@ -81,6 +83,16 @@ namespace GameMaker.Screens
             var b = Ui.TextButton(canvas.transform, label, 30, new Vector2(120, 62),
                 () => onClick(), new Color(0.35f, 0.3f, 0.22f), label + "Tab");
             Ui.Place((RectTransform)b.transform, new Vector2(0f, 1f), pos);
+            tabButtons.Add(b);
+        }
+
+        void RefreshTabColors()
+        {
+            // [0]=아군, [1]=적군 — 선택된 탭 노란색 강조
+            for (int i = 0; i < tabButtons.Count; i++)
+                tabButtons[i].GetComponent<Image>().color = (i == 1) == showingEnemies
+                    ? new Color(0.95f, 0.75f, 0.25f)
+                    : new Color(0.35f, 0.3f, 0.22f);
         }
 
         void MakeAction(string label, string action, Vector2 pos)
@@ -99,7 +111,7 @@ namespace GameMaker.Screens
 
         void RefreshActionColors()
         {
-            string[] acts = { "move", "attack", "defeat" };
+            string[] acts = { "idle", "move", "attack", "defeat" };
             for (int i = 0; i < actionButtons.Count && i < acts.Length; i++)
                 actionButtons[i].GetComponent<Image>().color = acts[i] == globalAction
                     ? new Color(0.95f, 0.75f, 0.25f)
@@ -110,6 +122,7 @@ namespace GameMaker.Screens
         {
             foreach (Transform c in grid) Destroy(c.gameObject);
             RefreshActionColors();
+            RefreshTabColors();
 
             var list = Current;
             pageText.text = (page + 1) + " / " + PageCount + "  (" + list.Count + "종)";
@@ -137,7 +150,7 @@ namespace GameMaker.Screens
     /// <summary>유닛 1칸: 스프라이트 모션 재생 + 클릭 시 걷기→공격→사망 순환.</summary>
     public class UnitMotionCell : MonoBehaviour
     {
-        static readonly string[] Cycle = { "move", "attack", "defeat" };
+        static readonly string[] Cycle = { "idle", "move", "attack", "defeat" };
 
         MonsterData data;
         Image img;
@@ -180,7 +193,8 @@ namespace GameMaker.Screens
         public void SetAction(string a)
         {
             action = a;
-            frames = SpriteBank.GetFrames(data.SpriteName, a);
+            // "idle" = 걷기 첫 프레임에서 정지 (전용 idle 프레임은 없음)
+            frames = SpriteBank.GetFrames(data.SpriteName, a == "idle" ? "move" : a);
             frame = 0;
             timer = 0;
             holdUntil = 0;
@@ -195,6 +209,7 @@ namespace GameMaker.Screens
 
         void Update()
         {
+            if (action == "idle") return; // 대기: 정지 화면
             if (frames == null || frames.Length == 0) return;
             if (Time.unscaledTime < holdUntil) return;
 

@@ -34,12 +34,13 @@ namespace GameMaker.Screens
             MakeMenuButton(SpriteBank.GetEnv("portrait_tank"), new Vector2(126, 126),
                 "배치", new Vector2(504, -150), true, null);
 
-            // [DEV] 유닛 뷰어 — 전 유닛 모션(걷기/공격/사망)을 스테이지 진입 없이 열람 (Core/Dev.cs 로 토글)
+            // [DEV] 유닛 뷰어 — 메뉴 그리드를 건드리지 않도록 우상단 구석의 작은 버튼 (Core/Dev.cs 로 토글)
             if (Core.Dev.UnitViewer)
             {
-                MakeMenuButton(SpriteBank.GetEnv("stage1thumb"), new Vector2(140, 76),
-                    "유닛 뷰어", new Vector2(0, -360), false,
-                    () => ScreenRouter.I.Show(ScreenId.UnitTest));
+                var devBtn = Ui.TextButton(canvas.transform, "유닛 뷰어", 26, new Vector2(190, 58),
+                    () => ScreenRouter.I.Show(ScreenId.UnitTest),
+                    new Color(0.3f, 0.25f, 0.15f, 0.9f), "UnitViewerBtn");
+                Ui.Place((RectTransform)devBtn.transform, new Vector2(1f, 1f), new Vector2(-125, -55));
             }
         }
 
