@@ -173,49 +173,71 @@ namespace GameMaker.Screens
         }
     }
 
-    /// <summary>유닛 1칸: 스프라이트 모션 재생 + 클릭 시 걷기→공격→사망 순환.</summary>
+    /// <summary>유닛 1칸 — 전투(Unit.cs)와 같은 규칙·수치로 모션 재현.
+    /// 걷기: 밥(bob)/비행 부유, 공격: 공격주기(진입 즉시 첫 타)·근접 아키타입(런지/덮치기/들이받기/내려찍기)·
+    /// 발사체(화살/탄환/돌/구슬)·마법사 메테오·보스 3타째 내리찍기+충격파.
+    /// 사망만 소멸 대신 쓰러진 모습을 유지했다 반복. 좌표 오프셋은 전투 픽셀 × k(칸 배율).</summary>
     public class UnitMotionCell : MonoBehaviour
     {
         static readonly string[] Cycle = { "idle", "move", "attack", "defeat" };
+        static Sprite[] burstFrames;
 
         MonsterData data;
+        RectTransform card;   // 이펙트 부모 — RectMask2D 로 옆 칸 침범 방지
+        RectTransform body;
         Image img;
-        Text label;
         string action;
         Sprite[] frames;
         float timer;
         int frame;
-        float holdUntil; // 사망 모션 후 잠깐 멈췄다 재시작
+        float holdUntil;
+
+        float k;              // 전투 픽셀 → 칸 픽셀 배율
+        float th;             // 전투 targetHeight 의 칸 스케일 값 (= 표시 높이)
+        Vector2 basePos;
+        float sign;           // 좌우 반전 부호 (-1 = 왼쪽 보기)
+        float walkPhase;
+        float footY;          // 발밑 y — 지면 이펙트 기준
+        int strikeCount;
+        readonly List<GameObject> fxList = new List<GameObject>();
 
         public void Init(MonsterData m, string startAction, float cellW, float cellH)
         {
             data = m;
 
-            // 배경 카드 (클릭 영역)
-            var card = Ui.RoundedPanel(transform, new Color(1f, 1f, 1f, 0.08f), "Card");
-            Ui.Place((RectTransform)card.transform, new Vector2(0.5f, 0.5f), Vector2.zero,
-                new Vector2(cellW - 10, cellH - 10));
-            var btn = card.gameObject.AddComponent<Button>();
+            // 배경 카드 (클릭 영역 + 이펙트 클리핑)
+            var cardPanel = Ui.RoundedPanel(transform, new Color(1f, 1f, 1f, 0.08f), "Card");
+            card = (RectTransform)cardPanel.transform;
+            Ui.Place(card, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(cellW - 10, cellH - 10));
+            cardPanel.gameObject.AddComponent<RectMask2D>();
+            var btn = cardPanel.gameObject.AddComponent<Button>();
             btn.onClick.AddListener(CycleAction);
 
-            img = Ui.Image(card.transform, null, "Sprite");
+            img = Ui.Image(card, null, "Sprite");
             img.raycastTarget = false;
             img.preserveAspect = true;
             // 유닛 크기 비례 표시 (셀 안에서 상대 크기 유지, 너무 작지 않게)
             float h = Mathf.Clamp(m.height * 0.42f, 55f, cellH - 70f);
-            Ui.Place((RectTransform)img.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 12),
-                new Vector2(cellW - 30, h));
+            body = (RectTransform)img.transform;
+            Ui.Place(body, new Vector2(0.5f, 0.5f), new Vector2(0, 12), new Vector2(cellW - 30, h));
+            basePos = body.anchoredPosition;
+            k = h / Mathf.Max(m.height, 1f);
+            th = h;
+            footY = basePos.y - h * 0.5f;
             // 적군은 전투 화면과 같은 방향(왼쪽 보기)으로
             bool flip = m.facing == "left" ? m.IsOur : !m.IsOur;
-            img.transform.localScale = new Vector3(flip ? -1f : 1f, 1f, 1f);
+            sign = flip ? -1f : 1f;
+            body.localScale = new Vector3(sign, 1f, 1f);
+            // 전투와 동일: 위치 기반 걸음 위상 (유닛마다 다르게)
+            walkPhase = (((RectTransform)transform).anchoredPosition.x + basePos.x) * 0.037f;
 
             // 한글명 (크게) + 내부 id (작게 — 수정 요청 시 함께 확인용)
-            label = Ui.Label(card.transform, m.DisplayName, 22, new Color(1f, 1f, 1f, 0.95f), "Name");
+            var label = Ui.Label(card, m.DisplayName, 22, new Color(1f, 1f, 1f, 0.95f), "Name");
             label.alignment = TextAnchor.MiddleCenter;
             Ui.Place(label.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 30), new Vector2(cellW - 12, 28));
             // 적군은 소속 스테이지(테마-서브)도 함께 — 수정 요청 시 특정용
             string idStr = m.stage > 0 ? (m.stage / 10) + "-" + (m.stage % 10) + " · " + m.name : m.name;
-            var idText = Ui.Label(card.transform, idStr, 14, new Color(1f, 1f, 1f, 0.45f), "Id");
+            var idText = Ui.Label(card, idStr, 14, new Color(1f, 1f, 1f, 0.45f), "Id");
             idText.alignment = TextAnchor.MiddleCenter;
             Ui.Place(idText.rectTransform, new Vector2(0.5f, 0f), new Vector2(0, 10), new Vector2(cellW - 12, 20));
 
@@ -224,13 +246,28 @@ namespace GameMaker.Screens
 
         public void SetAction(string a)
         {
+            StopAllCoroutines();
+            foreach (var fx in fxList) if (fx != null) Destroy(fx);
+            fxList.Clear();
+            ResetBody();
+
             action = a;
+            strikeCount = 0;
             // "idle" = 걷기 첫 프레임에서 정지 (전용 idle 프레임은 없음)
-            frames = SpriteBank.GetFrames(data.SpriteName, a == "idle" ? "move" : a);
+            frames = SpriteBank.GetFrames(data.SpriteName, a == "attack" || a == "idle" ? "move" : a);
             frame = 0;
             timer = 0;
             holdUntil = 0;
             if (frames.Length > 0) img.sprite = frames[0];
+            if (a == "attack") StartCoroutine(AttackLoop());
+        }
+
+        void ResetBody()
+        {
+            if (body == null) return;
+            body.localRotation = Quaternion.identity;
+            body.localScale = new Vector3(sign, 1f, 1f);
+            body.anchoredPosition = basePos;
         }
 
         void CycleAction()
@@ -241,20 +278,342 @@ namespace GameMaker.Screens
 
         void Update()
         {
-            if (action == "idle") return; // 대기: 정지 화면
             if (frames == null || frames.Length == 0) return;
-            if (Time.unscaledTime < holdUntil) return;
 
-            timer += Time.unscaledDeltaTime;
-            if (timer < 1f / 10f) return; // 10fps — 전투(SimpleSpriteAnimator 기본값)와 동일
-            timer = 0;
-            frame++;
-            if (frame >= frames.Length)
+            if (action == "move")
             {
-                frame = 0;
-                if (action == "defeat") holdUntil = Time.unscaledTime + 0.6f; // 쓰러진 모습 잠깐 유지
+                StepFrame(true);
+                // 전투 MoveForward 의 밥/부유 (전진만 제외)
+                if (data.fly > 0f)
+                {
+                    float ft = Time.unscaledTime * 2.6f + walkPhase;
+                    body.localRotation = Quaternion.Euler(0, 0, Mathf.Sin(ft * 0.7f) * 3f);
+                    body.localScale = new Vector3(sign, 1f, 1f);
+                    body.anchoredPosition = basePos + new Vector2(0, Mathf.Sin(ft) * 14f * k);
+                }
+                else
+                {
+                    float t = Time.unscaledTime * 9f + walkPhase;
+                    body.localRotation = Quaternion.Euler(0, 0, Mathf.Sin(t) * 1.6f);
+                    body.localScale = new Vector3(sign, 1f + 0.022f * Mathf.Sin(t * 2f), 1f);
+                    body.anchoredPosition = basePos + new Vector2(0, Mathf.Abs(Mathf.Sin(t)) * th * 0.025f);
+                }
             }
+            else if (action == "defeat")
+            {
+                if (Time.unscaledTime < holdUntil) return;
+                timer += Time.unscaledDeltaTime;
+                if (timer < 0.1f) return; // 10fps — 전투(SimpleSpriteAnimator 기본값)와 동일
+                timer = 0;
+                frame++;
+                if (frame >= frames.Length)
+                {
+                    // 전투에선 여기서 유닛이 소멸 — 뷰어는 쓰러진 모습 유지 후 반복
+                    frame = -1;
+                    holdUntil = Time.unscaledTime + 1.2f;
+                    return;
+                }
+                img.sprite = frames[frame];
+            }
+            // idle: 정지 / attack: 코루틴이 스프라이트·모션을 전담
+        }
+
+        void StepFrame(bool loop)
+        {
+            timer += Time.unscaledDeltaTime;
+            if (timer < 0.1f) return;
+            timer = 0;
+            frame = loop ? (frame + 1) % frames.Length : Mathf.Min(frame + 1, frames.Length - 1);
             img.sprite = frames[frame];
+        }
+
+        // ─────────── 공격 재현 (Unit.cs Strike 계열과 동일 수치) ───────────
+
+        IEnumerator AttackLoop()
+        {
+            float atkTimer = data.attackInterval; // 사거리 진입 즉시 첫 타 (전투와 동일)
+            while (true)
+            {
+                atkTimer += Time.unscaledDeltaTime;
+                if (data.attackInterval > 0 && atkTimer >= data.attackInterval)
+                {
+                    atkTimer = 0f;
+                    yield return Strike();
+                }
+                yield return null;
+            }
+        }
+
+        IEnumerator Strike()
+        {
+            strikeCount++;
+            StartCoroutine(PlayAttackAnim());
+            if (data.name == "ourmass") yield return Meteor();
+            else if (data.aoe > 0 && strikeCount % 3 == 0) yield return BossSlam();
+            else if (data.range >= 200 || !string.IsNullOrEmpty(data.projectile)) yield return Projectile();
+            else if (data.melee == "pounce") yield return Pounce();
+            else if (data.melee == "ram") yield return Ram();
+            else if (data.melee == "stomp") yield return Stomp();
+            else yield return Lunge();
+        }
+
+        IEnumerator PlayAttackAnim()
+        {
+            var af = SpriteBank.GetFrames(data.SpriteName, "attack");
+            for (int i = 0; i < af.Length; i++)
+            {
+                img.sprite = af[i];
+                yield return new WaitForSecondsRealtime(0.1f);
+            }
+            // 전투 AttackTick 과 동일: 다음 공격까지 대기 자세(걷기 첫 프레임)
+            var mv = SpriteBank.GetFrames(data.SpriteName, "move");
+            if (mv.Length > 0) img.sprite = mv[0];
+        }
+
+        float Dir => data.IsOur ? 1f : -1f;
+
+        IEnumerator Lunge()
+        {
+            float dist = th * 0.22f;
+            float t = 0f;
+            while (t < 0.22f)
+            {
+                t += Time.unscaledDeltaTime;
+                float p = t < 0.08f ? t / 0.08f : 1f - (t - 0.08f) / 0.14f;
+                body.anchoredPosition = basePos + new Vector2(Dir * dist * Mathf.Clamp01(p), 0);
+                yield return null;
+            }
+            body.anchoredPosition = basePos;
+        }
+
+        IEnumerator Pounce()
+        {
+            float dist = th * 0.45f, rise = th * 0.4f, dur = 0.28f, t = 0f;
+            while (t < dur)
+            {
+                t += Time.unscaledDeltaTime;
+                float p = Mathf.Clamp01(t / dur);
+                body.anchoredPosition = basePos + new Vector2(Dir * dist * p, rise * 4f * p * (1f - p));
+                yield return null;
+            }
+            t = 0f;
+            while (t < 0.12f)
+            {
+                t += Time.unscaledDeltaTime;
+                body.anchoredPosition = basePos + new Vector2(Dir * dist * (1f - Mathf.Clamp01(t / 0.12f)), 0);
+                yield return null;
+            }
+            body.anchoredPosition = basePos;
+        }
+
+        IEnumerator Ram()
+        {
+            float back = th * 0.12f, dist = th * 0.6f, t = 0f;
+            while (t < 0.12f) // 움츠리기
+            {
+                t += Time.unscaledDeltaTime;
+                body.anchoredPosition = basePos + new Vector2(-Dir * back * Mathf.Clamp01(t / 0.12f), 0);
+                yield return null;
+            }
+            t = 0f;
+            while (t < 0.08f) // 폭발적 돌진
+            {
+                t += Time.unscaledDeltaTime;
+                body.anchoredPosition = basePos + new Vector2(Mathf.Lerp(-Dir * back, Dir * dist, Mathf.Clamp01(t / 0.08f)), 0);
+                yield return null;
+            }
+            t = 0f;
+            while (t < 0.16f) // 복귀
+            {
+                t += Time.unscaledDeltaTime;
+                body.anchoredPosition = basePos + new Vector2(Dir * dist * (1f - Mathf.Clamp01(t / 0.16f)), 0);
+                yield return null;
+            }
+            body.anchoredPosition = basePos;
+        }
+
+        IEnumerator Stomp()
+        {
+            float rise = th * 0.28f, t = 0f;
+            while (t < 0.18f)
+            {
+                t += Time.unscaledDeltaTime;
+                body.anchoredPosition = basePos + new Vector2(0, rise * Mathf.Clamp01(t / 0.18f));
+                yield return null;
+            }
+            t = 0f;
+            while (t < 0.07f)
+            {
+                t += Time.unscaledDeltaTime;
+                body.anchoredPosition = basePos + new Vector2(0, rise * (1f - Mathf.Clamp01(t / 0.07f)));
+                yield return null;
+            }
+            body.anchoredPosition = basePos;
+            StartCoroutine(ShockRing(new Vector2(basePos.x + Dir * 60f * k, footY + 22f * k), th * 0.5f));
+        }
+
+        IEnumerator BossSlam()
+        {
+            float centerX = basePos.x + Dir * 200f * k; // 전투: 타겟 위치
+            float rise = th * 0.45f, t = 0f;
+            while (t < 0.22f) // 떠오르기
+            {
+                t += Time.unscaledDeltaTime;
+                body.anchoredPosition = basePos + new Vector2(0, rise * Mathf.Sin(Mathf.Clamp01(t / 0.22f) * Mathf.PI * 0.5f));
+                yield return null;
+            }
+            t = 0f;
+            while (t < 0.09f) // 내리찍기
+            {
+                t += Time.unscaledDeltaTime;
+                body.anchoredPosition = basePos + new Vector2(0, rise * (1f - Mathf.Clamp01(t / 0.09f)));
+                yield return null;
+            }
+            body.anchoredPosition = basePos;
+            StartCoroutine(ShockRing(new Vector2(centerX, footY + 30f * k), data.aoe * k));
+        }
+
+        IEnumerator Projectile()
+        {
+            string kind = string.IsNullOrEmpty(data.projectile) ? "arrow" : data.projectile;
+            float dur = 0.16f, arc = 0f;
+            Image p;
+            switch (kind)
+            {
+                case "bullet":
+                    p = Fx(SpriteBank.Circle, new Color(1f, 0.9f, 0.4f), new Vector2(18f, 10f) * k, "Bullet");
+                    dur = 0.07f;
+                    break;
+                case "rock":
+                    p = Fx(SpriteBank.Circle, new Color(0.55f, 0.52f, 0.48f), new Vector2(35f, 32f) * k, "Rock");
+                    dur = 0.34f;
+                    arc = 140f;
+                    break;
+                case "orb":
+                    p = Fx(SpriteBank.Circle, new Color(0.75f, 0.45f, 1f), new Vector2(32f, 32f) * k, "Orb");
+                    var glow = Fx(SpriteBank.Circle, new Color(0.6f, 0.3f, 1f, 0.4f), new Vector2(54f, 54f) * k, "Glow");
+                    glow.transform.SetParent(p.transform, false);
+                    glow.rectTransform.anchoredPosition = Vector2.zero;
+                    dur = 0.24f;
+                    arc = 60f;
+                    break;
+                default: // arrow
+                    p = Fx(SpriteBank.Arrow, Color.white, SpriteBank.Arrow.bounds.size * 3.2f * k, "Arrow");
+                    break;
+            }
+
+            // 몸 중심에서 사거리만큼 앞의 가상 타겟으로 (전투와 동일 비례)
+            Vector2 from = basePos + new Vector2(0, th * 0.1f);
+            Vector2 to = new Vector2(basePos.x + Dir * Mathf.Max(200f, data.range) * k, basePos.y);
+            var d = to - from;
+            if (kind == "arrow" || kind == "bullet")
+                p.rectTransform.localRotation = Quaternion.Euler(0, 0, Mathf.Atan2(d.y, d.x) * Mathf.Rad2Deg);
+
+            float t = 0f;
+            while (t < dur)
+            {
+                t += Time.unscaledDeltaTime;
+                if (p == null) yield break;
+                float pr = Mathf.Clamp01(t / dur);
+                var pos = Vector2.Lerp(from, to, pr);
+                pos.y += arc * k * 4f * pr * (1f - pr); // 포물선 궤적
+                p.rectTransform.anchoredPosition = pos;
+                if (kind == "rock") p.rectTransform.Rotate(0, 0, 620f * Time.unscaledDeltaTime);
+                yield return null;
+            }
+            if (p != null) Destroy(p.gameObject);
+            if (kind == "orb") SpawnBurst(to); // 마법구: 착탄 이펙트
+        }
+
+        IEnumerator Meteor()
+        {
+            float tx = basePos.x + Dir * 200f * k; // 전투: 타겟 위치
+            var m = Fx(SpriteBank.Circle, new Color(1f, 0.55f, 0.15f), new Vector2(96f, 154f) * k, "Meteor");
+            var glow = Fx(SpriteBank.Circle, new Color(1f, 0.35f, 0.08f, 0.4f), new Vector2(144f, 215f) * k, "Glow");
+            glow.transform.SetParent(m.transform, false);
+            glow.rectTransform.anchoredPosition = Vector2.zero;
+
+            Vector2 from = new Vector2(tx + 70f * k, footY + 780f * k);
+            Vector2 to = new Vector2(tx, footY + 40f * k);
+            var dir = to - from;
+            m.rectTransform.localRotation = Quaternion.Euler(0, 0, Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg + 90f);
+
+            float dur = 0.3f, t = 0f;
+            while (t < dur)
+            {
+                t += Time.unscaledDeltaTime;
+                if (m == null) yield break;
+                float pr = t / dur;
+                m.rectTransform.anchoredPosition = Vector2.Lerp(from, to, pr * pr); // 가속 낙하
+                yield return null;
+            }
+            if (m != null) Destroy(m.gameObject);
+            SpawnBurst(to);
+        }
+
+        IEnumerator ShockRing(Vector2 center, float radius)
+        {
+            var ring = Fx(SpriteBank.Circle, new Color(1f, 0.75f, 0.35f, 0.55f), Vector2.zero, "ShockRing");
+            ring.rectTransform.anchoredPosition = center;
+            float dur = 0.32f, t = 0f;
+            while (t < dur)
+            {
+                t += Time.unscaledDeltaTime;
+                if (ring == null) yield break;
+                float p = Mathf.Clamp01(t / dur);
+                float dm = radius * 2f * (0.25f + 0.75f * p);
+                ring.rectTransform.sizeDelta = new Vector2(dm, dm * 0.38f); // 납작한 지면 링
+                ring.color = new Color(1f, 0.75f, 0.35f, 0.55f * (1f - p));
+                yield return null;
+            }
+            if (ring != null) Destroy(ring.gameObject);
+        }
+
+        void SpawnBurst(Vector2 pos)
+        {
+            if (burstFrames == null)
+            {
+                var list = new List<Sprite>();
+                for (int i = 0; i < 8; i++)
+                {
+                    var s = Resources.Load<Sprite>("Sprites/fx/magicburst_" + i);
+                    if (s == null) break;
+                    list.Add(s);
+                }
+                burstFrames = list.ToArray();
+            }
+            if (burstFrames.Length == 0) return;
+
+            var b = Fx(burstFrames[0], new Color(1f, 0.6f, 0.2f), Vector2.one * 240f * k, "Burst");
+            b.preserveAspect = true;
+            b.rectTransform.anchoredPosition = pos;
+            StartCoroutine(PlayFxOnce(b, burstFrames, 18f));
+        }
+
+        IEnumerator PlayFxOnce(Image i, Sprite[] fr, float fps)
+        {
+            foreach (var s in fr)
+            {
+                if (i == null) yield break;
+                i.sprite = s;
+                yield return new WaitForSecondsRealtime(1f / fps);
+            }
+            if (i != null) Destroy(i.gameObject);
+        }
+
+        Image Fx(Sprite s, Color c, Vector2 size, string n)
+        {
+            var go = new GameObject(n, typeof(RectTransform));
+            go.transform.SetParent(card, false);
+            var i = go.AddComponent<Image>();
+            i.sprite = s;
+            i.color = c;
+            i.raycastTarget = false;
+            var rt = (RectTransform)go.transform;
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = size;
+            fxList.Add(go);
+            return i;
         }
     }
 }
