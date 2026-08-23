@@ -133,7 +133,7 @@ namespace GameMaker.Screens
             upBtnPrice.Clear();
 
             var g = groups[Mathf.Clamp(page, 0, groups.Count - 1)];
-            tierText.text = "◀  " + g.title + " (" + g.units.Count + "종)  ▶";
+            tierText.text = g.title + " (" + g.units.Count + "종)"; // 화살표는 실제 버튼이 담당
 
             float width = Mathf.Max(1920f, 170f * 2f + (g.units.Count - 1) * Gap + 120f);
             content.sizeDelta = new Vector2(width, 0);

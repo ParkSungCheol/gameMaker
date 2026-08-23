@@ -662,7 +662,7 @@ namespace GameMaker.Battle
 
             cost -= require;
             costSpeedMs = newSpeed;
-            costMax += 20;
+            costMax += 50; // 업그레이드 비용(50×레벨)에 걸맞게 용량도 +50 — 고코스트 유닛 소환이 가능해진다
             RefreshCostHud();
         }
 
