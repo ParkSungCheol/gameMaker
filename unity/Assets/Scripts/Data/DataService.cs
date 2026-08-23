@@ -18,6 +18,8 @@ namespace GameMaker.Data
         PlayerData GetPlayer();                              // 레거시 PlayerDao.getPlayer("A")
         void SavePlayer(PlayerData player);
         int Clear(int mapNumber);                            // 레거시 PlayerRepository.clear — 클리어 보상(획득액 반환)
+        void MarkTried(int mapNumber);                       // 전투 시작 기록 — 도감 적군 공개용
+        bool HasTried(int mapNumber);                        // 시작해 봤거나 클리어한 적 있는 스테이지
         int GetUpgradeCount(string monsterName);
         void Upgrade(string monsterName);                    // 레거시 UpgradeActivity 기능 복원(돈 차감 + 레벨업)
 
@@ -107,6 +109,19 @@ namespace GameMaker.Data
             SavePlayer(player);
             return money;
         }
+
+        public void MarkTried(int mapNumber)
+        {
+            if (player.triedStages == null) player.triedStages = new List<int>();
+            if (player.triedStages.Contains(mapNumber)) return;
+            player.triedStages.Add(mapNumber);
+            SavePlayer(player);
+        }
+
+        /// <summary>시작 기록이 없어도 클리어 기록이 있으면(구버전 세이브) 트라이한 것으로 본다.</summary>
+        public bool HasTried(int mapNumber) =>
+            (player.triedStages != null && player.triedStages.Contains(mapNumber))
+            || (mapNumber >= 0 && mapNumber < player.mapClear.Length && player.mapClear[mapNumber] > 0);
 
         /// <summary>클리어 보상액 — clearTime 은 '이번 클리어까지 포함한' 횟수. 맵 화면 미리보기와 같은 식.
         /// 난이도기준 * (11 - 횟수) 를 10단위 반올림, 최소 10.</summary>

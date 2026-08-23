@@ -114,6 +114,8 @@ namespace GameMaker.Data
         public List<int> gachaDupes = new List<int>();
         // 배치(출전 슬롯) — 전투 소환 바에 나갈 유닛들. 비어있으면 기본 4종.
         public List<string> loadout = new List<string>();
+        // 한 번이라도 시작해 본 스테이지 ID — 도감 적군 공개 기준 (클리어 여부와 무관)
+        public List<int> triedStages = new List<int>();
     }
 
     /// <summary>뽑기 1회 결과.</summary>

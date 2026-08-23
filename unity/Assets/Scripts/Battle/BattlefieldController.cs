@@ -74,6 +74,7 @@ namespace GameMaker.Battle
         void Start()
         {
             if (mapNumber < 10) mapNumber = mapNumber * 10 + 1; // 레거시 호출 호환
+            DataHub.I.MarkTried(mapNumber); // 도감: 시작한 스테이지의 적은 공개
             stage = DataHub.I.GetStage(Theme);
             bossName = stage.BossOf(Sub);
             SetupCamera();

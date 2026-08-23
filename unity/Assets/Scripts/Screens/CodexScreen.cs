@@ -142,18 +142,13 @@ namespace GameMaker.Screens
             }
         }
 
-        /// <summary>적군: 해당 테마의 첫 서브스테이지를 한 번이라도 클리어(또는 이전 테마 클리어로 해금)했으면 공개.</summary>
+        /// <summary>적군: 소속 서브스테이지를 한 번이라도 시작해 봤으면(클리어 불문) 공개.
+        /// 맵이 이전 서브를 깨야 다음 서브가 열리는 구조라, 시작 기록만으로도 순서가 보장된다.</summary>
         bool EnemyRevealed(MonsterData m)
         {
             if (Core.Dev.UnlockAllStages) return true;
-            int theme = m.stage / 10;
-            if (theme <= 1) return true;
-            var clear = DataHub.I.GetPlayer().mapClear;
-            // 이 테마의 어떤 서브라도 클리어했거나, 이 테마에 도달(이전 테마 마지막 서브 클리어)했으면 공개
-            for (int s = theme * 10 + 1; s < theme * 10 + 10 && s < clear.Length; s++) if (clear[s] > 0) return true;
-            var prevStage = DataHub.I.GetStage(theme - 1);
-            int lastPrev = (theme - 1) * 10 + Mathf.Max(1, prevStage.subCount);
-            return lastPrev < clear.Length && clear[lastPrev] > 0;
+            if (m.stage <= 0) return true;
+            return DataHub.I.HasTried(m.stage);
         }
 
         void RebuildGrid()
