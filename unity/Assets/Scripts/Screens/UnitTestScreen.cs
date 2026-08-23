@@ -370,7 +370,88 @@ namespace GameMaker.Screens
             else if (data.melee == "pounce") yield return Pounce();
             else if (data.melee == "ram") yield return Ram();
             else if (data.melee == "stomp") yield return Stomp();
-            else yield return Lunge();
+            else yield return StyleMotion();
+        }
+
+        /// <summary>공격 스타일별 몸 움직임 — 전투(Unit.StyleMotion)와 동일 수치.</summary>
+        IEnumerator StyleMotion()
+        {
+            float fw = -Dir;
+            IEnumerator Phase(float dur, System.Action<float> f)
+            {
+                float t = 0f;
+                while (t < dur)
+                {
+                    t += Time.unscaledDeltaTime;
+                    f(Mathf.Clamp01(t / dur));
+                    yield return null;
+                }
+            }
+            void Pose(float x, float y, float rot, float sx, float sy)
+            {
+                body.anchoredPosition = basePos + new Vector2(x * th * Dir, y * th);
+                body.localRotation = Quaternion.Euler(0, 0, rot * fw);
+                body.localScale = new Vector3(sign * sx, sy, 1f);
+            }
+
+            switch (data.atkStyle)
+            {
+                case "spin":
+                    yield return Phase(0.32f, k => Pose(0.1f * Mathf.Sin(k * Mathf.PI), 0, 360f * k, 1, 1));
+                    break;
+                case "flurry":
+                    yield return Phase(0.42f, k => Pose(0.16f * Mathf.Abs(Mathf.Sin(k * Mathf.PI * 3f)), 0, 5f * Mathf.Sin(k * Mathf.PI * 6f), 1, 1));
+                    break;
+                case "bite":
+                    yield return Phase(0.1f, k => Pose(-0.05f * k, 0, -6f * k, 1f, 1f - 0.1f * k));
+                    yield return Phase(0.09f, k => Pose(-0.05f + 0.27f * k, 0, -6f + 20f * k, 1f + 0.06f * k, 0.9f + 0.1f * k));
+                    yield return Phase(0.14f, k => Pose(0.22f * (1f - k), 0, 14f * (1f - k), 1, 1));
+                    break;
+                case "peck":
+                    yield return Phase(0.08f, k => Pose(-0.04f * k, 0.03f * k, -12f * k, 1, 1));
+                    yield return Phase(0.07f, k => Pose(-0.04f + 0.18f * k, 0.03f - 0.06f * k, -12f + 34f * k, 1, 1));
+                    yield return Phase(0.12f, k => Pose(0.14f * (1f - k), -0.03f * (1f - k), 22f * (1f - k), 1, 1));
+                    break;
+                case "horn":
+                    yield return Phase(0.12f, k => Pose(-0.08f * k, -0.04f * k, 10f * k, 1, 1));
+                    yield return Phase(0.09f, k => Pose(-0.08f + 0.26f * k, -0.04f + 0.1f * k, 10f - 26f * k, 1, 1));
+                    yield return Phase(0.14f, k => Pose(0.18f * (1f - k), 0.06f * (1f - k), -16f * (1f - k), 1, 1));
+                    break;
+                case "buck":
+                    yield return Phase(0.1f, k => Pose(0.05f * k, 0, 14f * k, 1, 1));
+                    yield return Phase(0.08f, k => Pose(0.05f - 0.2f * k, 0.04f * k, 14f - 34f * k, 1, 1));
+                    yield return Phase(0.14f, k => Pose(-0.15f * (1f - k), 0.04f * (1f - k), -20f * (1f - k), 1, 1));
+                    break;
+                case "trample":
+                    yield return Phase(0.13f, k => Pose(0, 0.2f * k, -4f * k, 0.96f, 1f + 0.08f * k));
+                    yield return Phase(0.07f, k => Pose(0.04f * k, 0.2f * (1f - k), -4f + 8f * k, 0.96f + 0.1f * k, 1.08f - 0.24f * k));
+                    yield return Phase(0.13f, k => Pose(0.04f * (1f - k), 0, 4f * (1f - k), Mathf.Lerp(1.06f, 1f, k), Mathf.Lerp(0.84f, 1f, k)));
+                    break;
+                case "squash":
+                    yield return Phase(0.12f, k => Pose(0, -0.05f * k, 0, 1f + 0.16f * k, 1f - 0.22f * k));
+                    yield return Phase(0.09f, k => Pose(0.14f * k, -0.05f + 0.09f * k, 5f * k, 1.16f - 0.22f * k, 0.78f + 0.32f * k));
+                    yield return Phase(0.13f, k => Pose(0.14f * (1f - k), 0.04f * (1f - k), 5f * (1f - k), Mathf.Lerp(0.94f, 1f, k), Mathf.Lerp(1.1f, 1f, k)));
+                    break;
+                case "flap":
+                    yield return Phase(0.14f, k => Pose(-0.03f * k, 0.24f * k, -8f * k, 1, 1));
+                    yield return Phase(0.1f, k => Pose(-0.03f + 0.23f * k, 0.24f * (1f - k), -8f + 20f * k, 1, 1));
+                    yield return Phase(0.13f, k => Pose(0.2f * (1f - k), 0, 12f * (1f - k), 1, 1));
+                    break;
+                case "cast":
+                    yield return Phase(0.16f, k => Pose(0, 0.06f * k, -4f * k, 1f - 0.06f * k, 1f + 0.04f * k));
+                    yield return Phase(0.09f, k => Pose(0, 0.06f * (1f - k), -4f + 6f * k, Mathf.Lerp(0.94f, 1.12f, k), Mathf.Lerp(1.04f, 1.08f, k)));
+                    yield return Phase(0.13f, k => Pose(0, 0, 2f * (1f - k), Mathf.Lerp(1.12f, 1f, k), Mathf.Lerp(1.08f, 1f, k)));
+                    break;
+                case "swing":
+                    yield return Phase(0.12f, k => Pose(-0.06f * k, 0, -16f * k, 1, 1));
+                    yield return Phase(0.09f, k => Pose(-0.06f + 0.26f * k, 0, -16f + 42f * k, 1, 1));
+                    yield return Phase(0.15f, k => Pose(0.2f * (1f - k), 0, 26f * (1f - k), 1, 1));
+                    break;
+                default:
+                    yield return Lunge();
+                    yield break;
+            }
+            Pose(0, 0, 0, 1, 1);
         }
 
         IEnumerator PlayAttackAnim()

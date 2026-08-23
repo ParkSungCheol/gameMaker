@@ -31,6 +31,8 @@ namespace GameMaker.Data
         public string melee;         // 근접 타입: "pounce"(점프덮치기)/"ram"(들이받기)/"stomp"(내려찍기)/빈 값(기본 런지)
         public int tier;             // 아군 뽑기 등급: 0 기본 / 1 일반 ~ 5 전설 (적군은 0)
         public int stage;            // 적군 소속 스테이지 ID (테마*10+서브, 아군은 0)
+        public string atkStyle;      // 공격 모션 스타일 — 스프라이트(베이크)와 몸 움직임(전투/뷰어) 공용:
+                                     // swing/spin/flurry/bite/peck/horn/buck/trample/squash/flap/cast/빈 값(기본 런지)
 
         public string SpriteName => string.IsNullOrEmpty(sprite) ? name : sprite;
         public string DisplayName => string.IsNullOrEmpty(label) ? name : label;

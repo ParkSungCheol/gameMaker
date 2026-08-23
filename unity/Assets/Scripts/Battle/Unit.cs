@@ -158,9 +158,96 @@ namespace GameMaker.Battle
             }
             else
             {
-                if (!IsCastle) StartCoroutine(Lunge());
+                if (!IsCastle) StartCoroutine(StyleMotion());
                 target.TakeDamage(data.attack); // 근접: 휘두르는 순간 데미지
             }
+        }
+
+        /// <summary>공격 스타일별 몸 움직임 — 스프라이트 프레임과 짝을 이루는 시그니처 모션.
+        /// 모든 변위는 몸집(targetHeight)의 45% 이내라 다른 유닛 영역을 침범하지 않는다.
+        /// 알 수 없는/빈 스타일은 기본 런지.</summary>
+        IEnumerator StyleMotion()
+        {
+            float dir = IsOur ? 1f : -1f;
+            float th = targetHeight;
+            float fw = -dir; // 진행 방향으로 기울이는 회전 부호
+
+            // 페이즈: dur 동안 f(0→1) 적용
+            IEnumerator Phase(float dur, System.Action<float> f)
+            {
+                float t = 0f;
+                while (t < dur)
+                {
+                    t += Time.deltaTime;
+                    f(Mathf.Clamp01(t / dur));
+                    yield return null;
+                }
+            }
+            void Pose(float x, float y, float rot, float sx, float sy)
+            {
+                body.localPosition = new Vector3(x * th * dir, bodyBaseY + y * th, 0);
+                body.localRotation = Quaternion.Euler(0, 0, rot * fw);
+                body.localScale = new Vector3(bodyScale * sx, bodyScale * sy, 1f);
+            }
+
+            switch (data.atkStyle)
+            {
+                case "spin": // 한 바퀴 회전 휘몰이
+                    yield return Phase(0.32f, k => Pose(0.1f * Mathf.Sin(k * Mathf.PI), 0, 360f * k, 1, 1));
+                    break;
+                case "flurry": // 3연속 잽
+                    yield return Phase(0.42f, k => Pose(0.16f * Mathf.Abs(Mathf.Sin(k * Mathf.PI * 3f)), 0, 5f * Mathf.Sin(k * Mathf.PI * 6f), 1, 1));
+                    break;
+                case "bite": // 웅크렸다 콱 물기
+                    yield return Phase(0.1f, k => Pose(-0.05f * k, 0, -6f * k, 1f, 1f - 0.1f * k));
+                    yield return Phase(0.09f, k => Pose(-0.05f + 0.27f * k, 0, -6f + 20f * k, 1f + 0.06f * k, 0.9f + 0.1f * k));
+                    yield return Phase(0.14f, k => Pose(0.22f * (1f - k), 0, 14f * (1f - k), 1, 1));
+                    break;
+                case "peck": // 고개 콱 찍기
+                    yield return Phase(0.08f, k => Pose(-0.04f * k, 0.03f * k, -12f * k, 1, 1));
+                    yield return Phase(0.07f, k => Pose(-0.04f + 0.18f * k, 0.03f - 0.06f * k, -12f + 34f * k, 1, 1));
+                    yield return Phase(0.12f, k => Pose(0.14f * (1f - k), -0.03f * (1f - k), 22f * (1f - k), 1, 1));
+                    break;
+                case "horn": // 숙였다 퍼올리는 박치기
+                    yield return Phase(0.12f, k => Pose(-0.08f * k, -0.04f * k, 10f * k, 1, 1));
+                    yield return Phase(0.09f, k => Pose(-0.08f + 0.26f * k, -0.04f + 0.1f * k, 10f - 26f * k, 1, 1));
+                    yield return Phase(0.14f, k => Pose(0.18f * (1f - k), 0.06f * (1f - k), -16f * (1f - k), 1, 1));
+                    break;
+                case "buck": // 앞으로 숙였다 뒤로 차기
+                    yield return Phase(0.1f, k => Pose(0.05f * k, 0, 14f * k, 1, 1));
+                    yield return Phase(0.08f, k => Pose(0.05f - 0.2f * k, 0.04f * k, 14f - 34f * k, 1, 1));
+                    yield return Phase(0.14f, k => Pose(-0.15f * (1f - k), 0.04f * (1f - k), -20f * (1f - k), 1, 1));
+                    break;
+                case "trample": // 곧추섰다 내리누르기
+                    yield return Phase(0.13f, k => Pose(0, 0.2f * k, -4f * k, 0.96f, 1f + 0.08f * k));
+                    yield return Phase(0.07f, k => Pose(0.04f * k, 0.2f * (1f - k), -4f + 8f * k, 0.96f + 0.1f * k, 1.08f - 0.24f * k));
+                    yield return Phase(0.13f, k => Pose(0.04f * (1f - k), 0, 4f * (1f - k), Mathf.Lerp(1.06f, 1f, k), Mathf.Lerp(0.84f, 1f, k)));
+                    break;
+                case "squash": // 눌렀다 튕기는 슬라임
+                    yield return Phase(0.12f, k => Pose(0, -0.05f * k, 0, 1f + 0.16f * k, 1f - 0.22f * k));
+                    yield return Phase(0.09f, k => Pose(0.14f * k, -0.05f + 0.09f * k, 5f * k, 1.16f - 0.22f * k, 0.78f + 0.32f * k));
+                    yield return Phase(0.13f, k => Pose(0.14f * (1f - k), 0.04f * (1f - k), 5f * (1f - k), Mathf.Lerp(0.94f, 1f, k), Mathf.Lerp(1.1f, 1f, k)));
+                    break;
+                case "flap": // 솟았다 앞으로 덮치기
+                    yield return Phase(0.14f, k => Pose(-0.03f * k, 0.24f * k, -8f * k, 1, 1));
+                    yield return Phase(0.1f, k => Pose(-0.03f + 0.23f * k, 0.24f * (1f - k), -8f + 20f * k, 1, 1));
+                    yield return Phase(0.13f, k => Pose(0.2f * (1f - k), 0, 12f * (1f - k), 1, 1));
+                    break;
+                case "cast": // 모았다가 방출
+                    yield return Phase(0.16f, k => Pose(0, 0.06f * k, -4f * k, 1f - 0.06f * k, 1f + 0.04f * k));
+                    yield return Phase(0.09f, k => Pose(0, 0.06f * (1f - k), -4f + 6f * k, Mathf.Lerp(0.94f, 1.12f, k), Mathf.Lerp(1.04f, 1.08f, k)));
+                    yield return Phase(0.13f, k => Pose(0, 0, 2f * (1f - k), Mathf.Lerp(1.12f, 1f, k), Mathf.Lerp(1.08f, 1f, k)));
+                    break;
+                case "swing": // 감았다 크게 휘두르기
+                    yield return Phase(0.12f, k => Pose(-0.06f * k, 0, -16f * k, 1, 1));
+                    yield return Phase(0.09f, k => Pose(-0.06f + 0.26f * k, 0, -16f + 42f * k, 1, 1));
+                    yield return Phase(0.15f, k => Pose(0.2f * (1f - k), 0, 26f * (1f - k), 1, 1));
+                    break;
+                default: // 기본 런지
+                    yield return Lunge();
+                    yield break;
+            }
+            Pose(0, 0, 0, 1, 1);
         }
 
         /// <summary>점프 덮치기 — 포물선으로 뛰어올라 적 위로 떨어지며 타격 (개·고양이·개구리류).</summary>
