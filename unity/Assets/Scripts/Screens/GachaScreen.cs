@@ -136,32 +136,13 @@ namespace GameMaker.Screens
             // 0) 암전 — 무대에 집중
             yield return Fade(dimmer, 0f, 0.6f, 0.18f);
 
-            // 1) 3단 요동 — 단계마다 더 격해지고, 링이 터지며, 마지막엔 등급 힌트 색으로 물든다
-            var charge = Ui.Image(root, SpriteBank.Circle, "Charge");
-            charge.raycastTarget = false;
-            charge.transform.SetSiblingIndex(chest.transform.GetSiblingIndex());
-            Ui.Place((RectTransform)charge.transform, new Vector2(0.5f, 0.5f), new Vector2(0, -190), new Vector2(80, 80));
-            for (int pulse = 0; pulse < 3; pulse++)
-            {
-                float amp = 5f + pulse * 6f;
-                Color glowCol = new Color(1f, 0.85f, 0.4f); // 항상 노란빛 — 등급 힌트 없음
-                float t = 0f;
-                const float dur = 0.3f;
-                while (t < dur)
-                {
-                    t += Time.deltaTime;
-                    float k = t / dur;
-                    chestRt.anchoredPosition = new Vector2(Mathf.Sin(t * 60f) * amp * k, -190 + Mathf.Abs(Mathf.Sin(t * 34f)) * amp * k);
-                    chestRt.localRotation = Quaternion.Euler(0, 0, Mathf.Sin(t * 52f) * (4f + pulse * 4f) * k);
-                    ((RectTransform)charge.transform).sizeDelta = Vector2.one * (80f + 130f * pulse + 130f * k);
-                    charge.color = new Color(glowCol.r, glowCol.g, glowCol.b, 0.18f + 0.1f * pulse);
-                    yield return null;
-                }
-                yield return new WaitForSeconds(0.1f); // 상자를 가리지 않게 — 링/반짝이 없이 요동만
-            }
-            chestRt.localRotation = Quaternion.identity;
-            chestRt.anchoredPosition = new Vector2(0, -190);
-            Destroy(charge.gameObject);
+            // 1) 어두운 분위기 속 상자만 — 뚜껑이 '띡' 조금 열리고, 긴장의 정지
+            yield return Fade(dimmer, 0.6f, 0.78f, 0.25f); // 더 깊은 암전, 상자만 남는다
+            yield return new WaitForSeconds(0.25f);
+            chest.sprite = SpriteBank.GetEnv("gacha_chest_1"); // 띡 — 실눈만큼 열림
+            yield return new WaitForSeconds(0.3f);
+            chest.sprite = SpriteBank.GetEnv("gacha_chest_2");
+            yield return new WaitForSeconds(0.55f);              // ...정적 (긴장감)
 
             // 2) 개봉 — 뚜껑이 벌컥 열리는 프레임 애니메이션 + 섬광 + 폭발 + 파동 링 + 광선 (전부 금빛)
             var gold = new Color(1f, 0.9f, 0.55f);
@@ -404,24 +385,17 @@ namespace GameMaker.Screens
             var spot = Ui.Panel(resultRoot, new Color(0, 0, 0, 0), "Spotlight");
             Ui.Place(spot, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(10, 10));
             spot.SetAsFirstSibling(); // 유닛 뒤
-            for (int i = 0; i < 7; i++)
+            for (int i = 0; i < 9; i++)
             {
-                float k = i / 6f;
+                float k = i / 8f;
                 var seg = Ui.Image(spot, SpriteBank.Circle, "Seg");
                 seg.raycastTarget = false;
-                seg.color = new Color(1f, 0.97f, 0.85f, Mathf.Lerp(0.3f, 0.08f, k));
+                seg.color = new Color(1f, 0.97f, 0.85f, Mathf.Lerp(0.3f, 0.06f, k));
                 var rt = (RectTransform)seg.transform;
                 rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-                rt.anchoredPosition = new Vector2(0, Mathf.Lerp(360f, -160f, k));
-                rt.sizeDelta = new Vector2(Mathf.Lerp(150f, 820f, k), Mathf.Lerp(210f, 280f, k));
+                rt.anchoredPosition = new Vector2(0, Mathf.Lerp(380f, -460f, k));
+                rt.sizeDelta = new Vector2(Mathf.Lerp(130f, 1240f, k), Mathf.Lerp(200f, 300f, k)); // 아래로 갈수록 계속 확장
             }
-            var pool = Ui.Image(spot, SpriteBank.Circle, "Pool");
-            pool.raycastTarget = false;
-            pool.color = new Color(1f, 0.95f, 0.8f, 0.3f);
-            var prt = (RectTransform)pool.transform;
-            prt.anchorMin = prt.anchorMax = new Vector2(0.5f, 0.5f);
-            prt.anchoredPosition = new Vector2(0, -315f);
-            prt.sizeDelta = new Vector2(700f, 150f);
         }
 
         /// <summary>콘페티 — 색색 조각이 위에서 쏟아지며 회전 낙하.</summary>
@@ -534,13 +508,13 @@ namespace GameMaker.Screens
             if (img != null) Destroy(img.gameObject);
         }
 
-        /// <summary>상자 뚜껑이 벌컥 열리는 프레임 애니메이션 (gacha_chest_0..4).</summary>
+        /// <summary>'똭' — 남은 뚜껑 프레임(3~4)이 순간에 열린다.</summary>
         IEnumerator ChestOpenAnim()
         {
-            for (int i = 1; i <= 4; i++)
+            for (int i = 3; i <= 4; i++)
             {
                 chest.sprite = SpriteBank.GetEnv("gacha_chest_" + i);
-                yield return new WaitForSeconds(0.05f);
+                yield return new WaitForSeconds(0.04f);
             }
         }
 
