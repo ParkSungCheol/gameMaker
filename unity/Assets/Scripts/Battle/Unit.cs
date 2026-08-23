@@ -527,12 +527,12 @@ namespace GameMaker.Battle
             }
             else
             {
-                float t = Time.time * 9f + walkPhase;
-                body.localRotation = Quaternion.Euler(0, 0, Mathf.Sin(t) * 1.6f);
-                float squash = 1f + 0.022f * Mathf.Sin(t * 2f);
-                body.localScale = new Vector3(bodyScale, bodyScale * squash, 1f);
-                body.localPosition = new Vector3(body.localPosition.x,
-                    bodyBaseY + Mathf.Abs(Mathf.Sin(t)) * targetHeight * 0.025f, 0);
+                // 지상 유닛은 발이 땅에 붙은 채로 걷는다 — 절차적 밥/스쿼시 없이 프레임에 맡기고,
+                // 프레임 높이가 달라도(슬라임 꿀렁 등) 발바닥이 항상 지면에 닿도록 프레임별 정렬
+                body.localRotation = Quaternion.identity;
+                body.localScale = new Vector3(bodyScale, bodyScale, 1f);
+                float half = (sr.sprite != null ? sr.sprite.bounds.size.y : targetHeight / bodyScale) * bodyScale * 0.5f;
+                body.localPosition = new Vector3(body.localPosition.x, half - data.sink, 0);
             }
 
             float dir = IsOur ? 1f : -1f;

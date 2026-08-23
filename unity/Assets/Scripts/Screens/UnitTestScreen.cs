@@ -221,15 +221,19 @@ namespace GameMaker.Screens
             // 유닛 크기 비례 표시 (셀 안에서 상대 크기 유지, 너무 작지 않게)
             float h = Mathf.Clamp(m.height * 0.42f, 55f, cellH - 70f);
             body = (RectTransform)img.transform;
-            Ui.Place(body, new Vector2(0.5f, 0.5f), new Vector2(0, 12), new Vector2(h, h));
+            // 지상 유닛은 카드 하단 지면선에 발을 붙이고, 비행 유닛은 중앙에 떠 있게 —
+            // 뷰어에서 지상/공중이 한눈에 구분된다
+            bool flying = m.fly > 0f;
+            float groundLine = -(cellH - 10) / 2f + 58f; // 라벨 바로 위 = 지면선
+            basePos = flying ? new Vector2(0, 12) : new Vector2(0, groundLine + h * 0.5f);
+            Ui.Place(body, new Vector2(0.5f, 0.5f), basePos, new Vector2(h, h));
             // 전투와 동일하게 "걷기 첫 프레임 기준 고정 배율"로 모든 프레임 표시 —
             // 프레임마다 사각형에 맞춰 늘리면 사망(눕기) 프레임이 갑자기 커진다
             var mv0 = SpriteBank.GetFrames(m.SpriteName, "move");
             unitScale = mv0.Length > 0 ? h / Mathf.Max(mv0[0].bounds.size.y, 0.01f) : h;
-            basePos = body.anchoredPosition;
             k = h / Mathf.Max(m.height, 1f);
             th = h;
-            footY = basePos.y - h * 0.5f;
+            footY = flying ? basePos.y - h * 0.5f : groundLine;
             // 적군은 전투 화면과 같은 방향(왼쪽 보기)으로
             bool flip = m.facing == "left" ? m.IsOur : !m.IsOur;
             sign = flip ? -1f : 1f;
@@ -290,20 +294,13 @@ namespace GameMaker.Screens
             if (action == "move")
             {
                 StepFrame(true);
-                // 전투 MoveForward 의 밥/부유 (전진만 제외)
+                // 전투 MoveForward 와 동일: 비행만 부유, 지상은 발이 땅에 붙은 채 프레임에 맡긴다
                 if (data.fly > 0f)
                 {
                     float ft = Time.unscaledTime * 2.6f + walkPhase;
                     body.localRotation = Quaternion.Euler(0, 0, Mathf.Sin(ft * 0.7f) * 3f);
                     body.localScale = new Vector3(sign, 1f, 1f);
                     body.anchoredPosition = basePos + new Vector2(0, Mathf.Sin(ft) * 14f * k);
-                }
-                else
-                {
-                    float t = Time.unscaledTime * 9f + walkPhase;
-                    body.localRotation = Quaternion.Euler(0, 0, Mathf.Sin(t) * 1.6f);
-                    body.localScale = new Vector3(sign, 1f + 0.022f * Mathf.Sin(t * 2f), 1f);
-                    body.anchoredPosition = basePos + new Vector2(0, Mathf.Abs(Mathf.Sin(t)) * th * 0.025f);
                 }
             }
             else if (action == "defeat")
@@ -335,11 +332,15 @@ namespace GameMaker.Screens
             SetSprite(frames[frame]);
         }
 
-        /// <summary>스프라이트 교체 — 크기는 항상 고정 배율(unitScale)로, 전투의 bodyScale 과 동일 규칙.</summary>
+        /// <summary>스프라이트 교체 — 크기는 항상 고정 배율(unitScale)로, 전투의 bodyScale 과 동일 규칙.
+        /// 지상 유닛은 프레임 높이가 달라도(슬라임 꿀렁/눕기) 발바닥을 지면선에 고정.
+        /// 공격 중에는 모션 코루틴이 위치를 움직이므로 건드리지 않는다.</summary>
         void SetSprite(Sprite s)
         {
             img.sprite = s;
             body.sizeDelta = (Vector2)s.bounds.size * unitScale;
+            if (data.fly <= 0f && action != "attack")
+                body.anchoredPosition = new Vector2(basePos.x, footY + body.sizeDelta.y * 0.5f);
         }
 
         // ─────────── 공격 재현 (Unit.cs Strike 계열과 동일 수치) ───────────
