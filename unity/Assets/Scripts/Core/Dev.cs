@@ -11,7 +11,10 @@ namespace GameMaker.Core
     public static class Dev
     {
         /// <summary>마스터 스위치 — 에디터 또는 Development Build 에서만 true.</summary>
-        public static bool Enabled => Application.isEditor || Debug.isDebugBuild;
+        public static bool Enabled => !ReleaseLook && (Application.isEditor || Debug.isDebugBuild);
+
+        /// <summary>스크린샷 투어용 — true 면 개발 플래그를 전부 끈 '출시 모습'으로 보인다 (유닛 뷰어 버튼, x20 배속, 무료 뽑기 등 숨김).</summary>
+        public static bool ReleaseLook;
 
         // ── 개별 토글 (개발 중 조절) ──
         const bool unlockAllStages = true;     // 맵 전체 잠금 해제

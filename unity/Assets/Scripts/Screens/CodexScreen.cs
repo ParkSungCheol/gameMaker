@@ -245,7 +245,9 @@ namespace GameMaker.Screens
                 }
             }
 
-            string kind = !string.IsNullOrEmpty(m.projectile) ? (m.aoe > 0 ? "원거리 · 범위" : "원거리 · 단일")
+            string kind = m.role == "마법사" ? "원거리 · 범위"
+                : m.role == "궁수" ? "원거리 · 단일"
+                : !string.IsNullOrEmpty(m.projectile) ? (m.aoe > 0 ? "원거리 · 범위" : "원거리 · 단일")
                 : (m.aoe > 0 ? "근접 · 범위" : "근접 · 단일");
             if (m.fly > 0) kind += " · 비행";
             var lines = new List<string>
@@ -273,7 +275,7 @@ namespace GameMaker.Screens
                 30, new Color(1f, 0.95f, 0.75f), "Desc");
             desc.alignment = TextAnchor.MiddleCenter;
             desc.horizontalOverflow = HorizontalWrapMode.Wrap;
-            Ui.Place((RectTransform)desc.transform, new Vector2(0.5f, 1f), new Vector2(0, -620), new Vector2(960, 150));
+            Ui.Place((RectTransform)desc.transform, new Vector2(0.5f, 1f), new Vector2(0, -610), new Vector2(960, 130));
         }
     }
 }

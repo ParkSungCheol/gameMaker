@@ -40,13 +40,14 @@ namespace GameMaker.Dev
             go.AddComponent<ScreenshotTour>();
         }
 
-        string backupJson;
+        string backupJson, backupUpgrades;
 
         void Start() => StartCoroutine(Tour());
 
         IEnumerator Tour()
         {
             System.IO.Directory.CreateDirectory(Dir);
+            Core.Dev.ReleaseLook = true; // 유닛 뷰어 버튼 / x20 배속 / 무료 뽑기 등 개발 흔적 숨김
             PrepareSave();
 
             yield return new WaitForSecondsRealtime(1.2f); // 타이틀 연출 자리 잡기
@@ -125,26 +126,27 @@ namespace GameMaker.Dev
                 var ctrl = FindFirstObjectByType<Battle.BattlefieldController>();
                 SetSpeed(ctrl, 3); // 컨트롤러가 매 프레임 Time.timeScale 을 자기 배속으로 덮어쓰므로 배속 필드를 직접 바꾼다
 
-                // 1) 적 전선이 화면 중앙(약 60% 지점)을 넘어올 때까지 대기 (최대 25초)
-                for (float t = 0; t < 25f; t += 0.5f)
+                // 1) 적 전선이 화면 오른쪽 1/4 지점(약 78%)까지 들어올 때까지 대기 (최대 30초)
+                for (float t = 0; t < 30f; t += 0.5f)
                 {
-                    if (EnemyFront(ctrl) < Battle.BattlefieldController.WorldWidth * 0.62f) break;
+                    if (EnemyFront(ctrl) < Battle.BattlefieldController.WorldWidth * 0.78f) break;
                     yield return new WaitForSecondsRealtime(0.5f);
                 }
 
-                // 2) 아군을 계속 투입하며 전선이 맞붙는 순간을 감지 (최대 18초)
+                // 2) 지갑을 채워 아군을 내보내고(아군은 오른쪽으로 행군) 전선이 맞붙는 순간을 감지 (최대 18초)
+                //    — 성 앞이 아니라 화면 중앙 부근에서 맞붙는 그림이 나온다
                 bool engaged = false;
                 for (float t = 0; t < 18f; t += 0.4f)
                 {
-                    ClickSpawnButtons();
+                    FillWallet(ctrl);
+                    ClickSpawnButtons(2); // 한 번에 두 종만 — 인원 초과 안내가 뜨지 않게
                     if (AllyFront(ctrl) >= EnemyFront(ctrl) - 190f) { engaged = true; break; }
                     yield return new WaitForSecondsRealtime(0.4f);
                 }
 
-                // 3) 맞붙는 순간 바로 정속 전환 — 몬스터가 죽기 전에 촬영
-                if (engaged) ClickSpawnButtons();
+                // 3) 맞붙는 순간 바로 정속 전환 — 몬스터가 죽기 전에 촬영 (안내 문구가 사라지는 1초 뒤)
                 SetSpeed(ctrl, 1);
-                yield return new WaitForSecondsRealtime(0.4f);
+                yield return new WaitForSecondsRealtime(engaged ? 1.05f : 0.4f);
                 yield return Shot("battle_stage" + stage);
 
                 if (stage == 1)
@@ -160,6 +162,7 @@ namespace GameMaker.Dev
 
             Time.timeScale = 1f;
             RestoreSave();
+            Core.Dev.ReleaseLook = false;
             UnityEditor.SessionState.SetBool("shotTour", false);
             Debug.Log("[ScreenshotTour] 완료 — " + Dir);
             UnityEditor.EditorApplication.ExitPlaymode();
@@ -188,16 +191,51 @@ namespace GameMaker.Dev
             p.loadout = new List<string> { "ourbasic", "ourtank" };
             p.loadout.AddRange(p.gachaNames.Take(3));
 
-            foreach (int s in new[] { 11, 12, 13, 21 }) if (s < p.mapClear.Length) p.mapClear[s] = Mathf.Max(p.mapClear[s], 1);
+            // 여행지 1~3 전부 + 4-1 클리어, 4-2 는 시작만 (맵에 진행감, 도감 적군은 그만큼만 공개)
             if (p.triedStages == null) p.triedStages = new List<int>();
-            foreach (int s in new[] { 11, 12, 13, 21, 22 }) if (!p.triedStages.Contains(s)) p.triedStages.Add(s);
+            var cleared = new List<int>();
+            for (int t = 1; t <= 3; t++)
+                for (int s = 1; s <= Mathf.Max(1, DataHub.I.GetStage(t).subCount); s++) cleared.Add(t * 10 + s);
+            cleared.Add(41);
+            foreach (int s in cleared) if (s < p.mapClear.Length) p.mapClear[s] = Mathf.Max(p.mapClear[s], 1);
+            foreach (int s in cleared) if (!p.triedStages.Contains(s)) p.triedStages.Add(s);
+            if (!p.triedStages.Contains(42)) p.triedStages.Add(42);
             DataHub.I.SavePlayer(p);
+
+            // 골드 강화 레벨: 전부 MAX 가 아니라 진행 중인 모습으로
+            var upField = typeof(LocalDataService).GetField("upgrades",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (DataHub.I is LocalDataService local && upField != null)
+            {
+                var up = (UpgradeState)upField.GetValue(local);
+                backupUpgrades = JsonUtility.ToJson(up);
+                var shown = new UpgradeState();
+                shown.Set("ourcastle", 3); shown.Set("ourbasic", 4); shown.Set("ourtank", 2); shown.Set("ourbattle", 1);
+                upField.SetValue(local, shown);
+            }
         }
 
         void RestoreSave()
         {
-            if (string.IsNullOrEmpty(backupJson)) return;
-            DataHub.I.SavePlayer(JsonUtility.FromJson<PlayerData>(backupJson));
+            if (!string.IsNullOrEmpty(backupJson))
+                DataHub.I.SavePlayer(JsonUtility.FromJson<PlayerData>(backupJson));
+            var upField = typeof(LocalDataService).GetField("upgrades",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (!string.IsNullOrEmpty(backupUpgrades) && DataHub.I is LocalDataService local && upField != null)
+            {
+                upField.SetValue(local, JsonUtility.FromJson<UpgradeState>(backupUpgrades));
+                PlayerPrefs.SetString("gm_upgrades_json", backupUpgrades); // 촬영 중 저장된 값 덮어쓰기
+                PlayerPrefs.Save();
+            }
+        }
+
+        /// <summary>전투 지갑을 용량까지 채운다 — 촬영용 즉시 소환.</summary>
+        static void FillWallet(Battle.BattlefieldController ctrl)
+        {
+            var tp = typeof(Battle.BattlefieldController);
+            var f = System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+            var cost = tp.GetField("cost", f); var max = tp.GetField("costMax", f);
+            if (ctrl != null && cost != null && max != null) cost.SetValue(ctrl, max.GetValue(ctrl));
         }
 
         // ─────────── 조작 도우미 ───────────
@@ -268,11 +306,12 @@ namespace GameMaker.Dev
                 .GetField(field, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
                 .GetValue(ctrl);
 
-        /// <summary>소환 바의 모든 버튼(출전 편성에 따라 이름이 달라지므로 접두사로 찾는다).</summary>
-        static void ClickSpawnButtons()
+        /// <summary>소환 바의 버튼(출전 편성에 따라 이름이 달라지므로 접두사로 찾는다) — 앞에서 count 개만.</summary>
+        static void ClickSpawnButtons(int count = 99)
         {
-            foreach (var b in FindObjectsByType<Button>(FindObjectsSortMode.None))
-                if (b.name.StartsWith("Spawn_") && b.interactable) b.onClick.Invoke();
+            int n = 0;
+            foreach (var b in FindObjectsByType<Button>(FindObjectsSortMode.None).OrderBy(b => b.transform.position.x))
+                if (b.name.StartsWith("Spawn_") && b.interactable && n++ < count) b.onClick.Invoke();
         }
 
         IEnumerator Shot(string name)

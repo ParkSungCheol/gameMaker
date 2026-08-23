@@ -339,9 +339,9 @@ namespace GameMaker.UI
 
             var titleTxt = OutlinedLabel(board, title, 48, new Color(1f, 0.82f, 0.3f), "Title");
             Place((RectTransform)titleTxt.transform, new Vector2(0.5f, 1f), new Vector2(0, -44));
-            var hint = OutlinedLabel(overlay.transform, "바깥쪽을 누르면 닫힙니다", 28, Color.white, "CloseHint");
+            var hint = OutlinedLabel(board, "바깥쪽을 누르면 닫힙니다", 26, Color.white, "CloseHint");
             hint.raycastTarget = false;
-            Place((RectTransform)hint.transform, new Vector2(0.5f, 0.5f), new Vector2(0, -size.y * 0.5f - 44), new Vector2(600, 40));
+            Place((RectTransform)hint.transform, new Vector2(0.5f, 0f), new Vector2(0, 26), new Vector2(600, 36));
             hint.gameObject.AddComponent<Blink>();
             return board;
         }

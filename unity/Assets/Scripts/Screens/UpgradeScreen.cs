@@ -137,7 +137,7 @@ namespace GameMaker.Screens
             };
             for (int i = 0; i < rows.Length; i++)
             {
-                float y = -124f - i * 134f; // 행 간격 134: 배지 / 타입 / 설명이 서로 안 겹치게 (구분선 없음)
+                float y = -118f - i * 128f; // 행 간격 128: 배지 / 타입 / 설명이 서로 안 겹치게 (구분선 없음)
                 var rc = RoleColor(rows[i][0]);
                 var pill = Ui.RoundedPanel(board, new Color(rc.r, rc.g, rc.b, 0.95f), "Pill" + i);
                 Ui.Place((RectTransform)pill.transform, new Vector2(0f, 1f), new Vector2(80, y - 2), new Vector2(140, 48));

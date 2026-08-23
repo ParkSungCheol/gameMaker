@@ -120,7 +120,7 @@ namespace GameMaker.Screens
             if (drawing) return;
             var board = Ui.Popup(canvas.transform, "뽑기 확률", new Vector2(1100, 820));
             var viewport = Ui.Panel(board, new Color(0, 0, 0, 0), "RateViewport");
-            Ui.Place(viewport, new Vector2(0.5f, 1f), new Vector2(-20, -110), new Vector2(960, 680));
+            Ui.Place(viewport, new Vector2(0.5f, 1f), new Vector2(-20, -110), new Vector2(960, 650));
             viewport.gameObject.AddComponent<RectMask2D>();
             var content = Ui.Panel(viewport, new Color(0, 0, 0, 0), "Content");
             content.anchorMin = new Vector2(0f, 1f); content.anchorMax = new Vector2(1f, 1f);
@@ -129,7 +129,7 @@ namespace GameMaker.Screens
             var sr = viewport.gameObject.AddComponent<ScrollRect>();
             sr.viewport = viewport; sr.content = content; sr.horizontal = false; sr.vertical = true;
             sr.movementType = ScrollRect.MovementType.Clamped; sr.scrollSensitivity = 40f;
-            var vbar = Ui.CleanScrollbar(board, false, new Vector2(1f, 1f), new Vector2(-34, -110), new Vector2(16, 680));
+            var vbar = Ui.CleanScrollbar(board, false, new Vector2(1f, 1f), new Vector2(-34, -110), new Vector2(16, 650));
             sr.verticalScrollbar = vbar;
             sr.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide; // 내용이 다 보이면 숨김
 

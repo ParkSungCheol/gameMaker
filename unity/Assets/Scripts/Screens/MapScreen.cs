@@ -112,7 +112,7 @@ namespace GameMaker.Screens
             }
 
             // ── 서브스테이지 선택줄: ◀ t-s ▶  (+ 보상 미리보기) ──
-            var subLabel = Ui.OutlinedLabel(canvas.transform, "", 30, Color.white, "Sub" + theme);
+            var subLabel = Ui.OutlinedLabel(canvas.transform, "", 32, Color.white, "Sub" + theme);
             Ui.Place((RectTransform)subLabel.transform, new Vector2(0.5f, 0.5f), pos + new Vector2(-30, -85), new Vector2(120, 40));
 
             var rewardLbl = Ui.OutlinedLabel(canvas.transform, "", 28, new Color(1f, 0.88f, 0.3f), "Reward" + theme);

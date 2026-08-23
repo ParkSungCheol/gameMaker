@@ -207,7 +207,7 @@ namespace GameMaker.Screens
                 {
                     var tag = Ui.OutlinedLabel(card, "배치됨", 20, new Color(1f, 0.85f, 0.4f), "Tag");
                     tag.alignment = TextAnchor.MiddleCenter;
-                    Ui.Place(tag.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, -14), new Vector2(100, 22));
+                    Ui.Place(tag.rectTransform, new Vector2(1f, 1f), new Vector2(-6, -6), new Vector2(80, 24)); // 역할 배지(왼쪽 위)와 겹치지 않게 오른쪽 위
                 }
             }
         }
