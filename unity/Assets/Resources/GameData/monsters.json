@@ -1840,7 +1840,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": "spin"
+   "atkStyle": "swing"
   },
   {
    "name": "e147ggoblin",
@@ -1960,7 +1960,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "swing"
   },
   {
    "name": "e118kappag",
@@ -2056,7 +2056,7 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "spin"
+   "atkStyle": "flurry"
   },
   {
    "name": "e118dog",
@@ -2104,7 +2104,7 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "trample"
+   "atkStyle": "bite"
   },
   {
    "name": "e118dogo",
@@ -2128,7 +2128,7 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "horn"
+   "atkStyle": "bite"
   },
   {
    "name": "e118dogy",
@@ -2152,7 +2152,7 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "buck"
+   "atkStyle": "bite"
   },
   {
    "name": "e118lioncub",
@@ -2296,7 +2296,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "spin"
+   "atkStyle": "cast"
   },
   {
    "name": "e118heartr",
@@ -2320,7 +2320,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": "flurry"
+   "atkStyle": "cast"
   },
   {
    "name": "e118axolot",
@@ -2368,7 +2368,7 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "spin"
+   "atkStyle": "bite"
   },
   {
    "name": "e118frog",
@@ -2536,7 +2536,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": "spin"
+   "atkStyle": "swing"
   },
   {
    "name": "e147pskull",
@@ -2656,7 +2656,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "bite"
+   "atkStyle": "flurry"
   },
   {
    "name": "e118mskull",
@@ -2704,7 +2704,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "spin"
+   "atkStyle": "cast"
   },
   {
    "name": "e118trexgrey",
@@ -2872,7 +2872,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "squash"
   },
   {
    "name": "e118hyena",
@@ -3000,11 +3000,11 @@
    "label": "핑크 돼지",
    "tier": 0,
    "stage": 52,
-   "hp": 330,
-   "attack": 36,
-   "range": 115,
-   "moveSpeed": 225,
-   "attackInterval": 2.1,
+   "hp": 430,
+   "attack": 44,
+   "range": 100,
+   "moveSpeed": 150,
+   "attackInterval": 2.4,
    "cost": 0,
    "cooldown": 0,
    "height": 175,
@@ -3014,9 +3014,9 @@
    "fly": 0,
    "sink": 0,
    "projectile": "",
-   "melee": "ram",
+   "melee": "stomp",
    "aoe": 0,
-   "atkStyle": "horn"
+   "atkStyle": "trample"
   },
   {
    "name": "e210piggreen1",
@@ -3048,11 +3048,11 @@
    "label": "뿔 초록 돼지",
    "tier": 0,
    "stage": 52,
-   "hp": 330,
-   "attack": 36,
-   "range": 115,
-   "moveSpeed": 225,
-   "attackInterval": 2.1,
+   "hp": 430,
+   "attack": 44,
+   "range": 100,
+   "moveSpeed": 150,
+   "attackInterval": 2.4,
    "cost": 0,
    "cooldown": 0,
    "height": 175,
@@ -3062,9 +3062,9 @@
    "fly": 0,
    "sink": 0,
    "projectile": "",
-   "melee": "ram",
+   "melee": "stomp",
    "aoe": 0,
-   "atkStyle": "buck"
+   "atkStyle": "trample"
   },
   {
    "name": "e210sheepw1",
@@ -3088,7 +3088,7 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 0,
-   "atkStyle": "squash"
+   "atkStyle": "horn"
   },
   {
    "name": "e210sheepw2",
@@ -3160,7 +3160,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "spin"
+   "atkStyle": "bite"
   },
   {
    "name": "e118octor",
@@ -3328,7 +3328,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "spin"
+   "atkStyle": "flap"
   },
   {
    "name": "e118lanterng",
@@ -3376,7 +3376,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "squash"
   },
   {
    "name": "e118cyclope",
@@ -3448,7 +3448,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "peck"
   },
   {
    "name": "e210sheepm1",
@@ -3496,7 +3496,7 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 0,
-   "atkStyle": "buck"
+   "atkStyle": "horn"
   },
   {
    "name": "e210cowm",
@@ -3520,7 +3520,7 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 230,
-   "atkStyle": "horn"
+   "atkStyle": "buck"
   },
   {
    "name": "e118trex",
@@ -3592,7 +3592,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "spin"
   },
   {
    "name": "e118boar",
@@ -3832,7 +3832,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "spin"
+   "atkStyle": "flap"
   },
   {
    "name": "e118spirit",
@@ -3928,7 +3928,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 230,
-   "atkStyle": "flurry"
+   "atkStyle": "squash"
   },
   {
    "name": "e210chickd",
@@ -3976,7 +3976,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "peck"
   },
   {
    "name": "e210chickw1",
@@ -4000,7 +4000,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "spin"
+   "atkStyle": "peck"
   },
   {
    "name": "e210chickg2",
@@ -4024,7 +4024,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "buck"
+   "atkStyle": "peck"
   },
   {
    "name": "e210chickw2",
@@ -4096,7 +4096,7 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 0,
-   "atkStyle": "buck"
+   "atkStyle": "horn"
   },
   {
    "name": "e210sheepd1",
@@ -4104,11 +4104,11 @@
    "label": "검은 좀비양",
    "tier": 0,
    "stage": 92,
-   "hp": 600,
-   "attack": 62,
-   "range": 100,
-   "moveSpeed": 150,
-   "attackInterval": 2.4,
+   "hp": 460,
+   "attack": 51,
+   "range": 115,
+   "moveSpeed": 225,
+   "attackInterval": 2.1,
    "cost": 0,
    "cooldown": 0,
    "height": 175,
@@ -4118,9 +4118,9 @@
    "fly": 0,
    "sink": 0,
    "projectile": "",
-   "melee": "stomp",
+   "melee": "ram",
    "aoe": 0,
-   "atkStyle": "trample"
+   "atkStyle": "horn"
   },
   {
    "name": "e210sheepd2",
@@ -4168,7 +4168,7 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 0,
-   "atkStyle": "horn"
+   "atkStyle": "buck"
   },
   {
    "name": "e210coww",
@@ -4176,11 +4176,11 @@
    "label": "흰 좀비소",
    "tier": 0,
    "stage": 93,
-   "hp": 620,
-   "attack": 63,
-   "range": 100,
-   "moveSpeed": 150,
-   "attackInterval": 2.4,
+   "hp": 475,
+   "attack": 53,
+   "range": 115,
+   "moveSpeed": 225,
+   "attackInterval": 2.1,
    "cost": 0,
    "cooldown": 0,
    "height": 175,
@@ -4190,9 +4190,9 @@
    "fly": 0,
    "sink": 0,
    "projectile": "",
-   "melee": "stomp",
+   "melee": "ram",
    "aoe": 0,
-   "atkStyle": "trample"
+   "atkStyle": "buck"
   },
   {
    "name": "e210cowd",
@@ -4240,7 +4240,7 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 230,
-   "atkStyle": "horn"
+   "atkStyle": "buck"
   },
   {
    "name": "e117chicken",
@@ -4288,7 +4288,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "horn"
+   "atkStyle": "buck"
   },
   {
    "name": "e117pig",
@@ -4336,7 +4336,7 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 0,
-   "atkStyle": "buck"
+   "atkStyle": "horn"
   },
   {
    "name": "e116chick",
@@ -4360,7 +4360,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "peck"
   },
   {
    "name": "e116cow",
@@ -4384,7 +4384,7 @@
    "projectile": "",
    "melee": "ram",
    "aoe": 230,
-   "atkStyle": "horn"
+   "atkStyle": "buck"
   },
   {
    "name": "e92farmer0",
@@ -4432,7 +4432,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "spin"
+   "atkStyle": "swing"
   },
   {
    "name": "e92farmer2",
@@ -4456,7 +4456,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "swing"
   },
   {
    "name": "e92farmer3",
@@ -4480,7 +4480,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "buck"
+   "atkStyle": "swing"
   },
   {
    "name": "e117boy2",
@@ -4888,7 +4888,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": ""
+   "atkStyle": "bite"
   },
   {
    "name": "e92zombie1",
@@ -4912,7 +4912,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "flurry"
+   "atkStyle": "bite"
   },
   {
    "name": "e92zombie2",
@@ -4960,7 +4960,7 @@
    "projectile": "",
    "melee": "",
    "aoe": 0,
-   "atkStyle": "trample"
+   "atkStyle": "bite"
   },
   {
    "name": "e92zombie4",
@@ -5008,7 +5008,7 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "bite"
+   "atkStyle": "flurry"
   },
   {
    "name": "e118catcyclop",
@@ -5056,7 +5056,7 @@
    "projectile": "",
    "melee": "pounce",
    "aoe": 0,
-   "atkStyle": "spin"
+   "atkStyle": "bite"
   },
   {
    "name": "e18dino",

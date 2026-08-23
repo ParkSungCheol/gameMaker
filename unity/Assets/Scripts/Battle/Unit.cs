@@ -192,8 +192,9 @@ namespace GameMaker.Battle
 
             switch (data.atkStyle)
             {
-                case "spin": // 한 바퀴 회전 휘몰이
-                    yield return Phase(0.32f, k => Pose(0.1f * Mathf.Sin(k * Mathf.PI), 0, 360f * k, 1, 1));
+                case "spin": // 제자리에서 좌우(세로축)로 한 바퀴 — 가로 폭을 cos 으로 눌러
+                             // 앞→옆→뒤→옆→앞 으로 서서 도는 느낌 (공중제비 아님)
+                    yield return Phase(0.36f, k => Pose(0.08f * Mathf.Sin(k * Mathf.PI), 0, 0, Mathf.Cos(k * Mathf.PI * 2f), 1));
                     break;
                 case "flurry": // 3연속 잽
                     yield return Phase(0.42f, k => Pose(0.16f * Mathf.Abs(Mathf.Sin(k * Mathf.PI * 3f)), 0, 5f * Mathf.Sin(k * Mathf.PI * 6f), 1, 1));

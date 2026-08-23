@@ -396,8 +396,8 @@ namespace GameMaker.Screens
 
             switch (data.atkStyle)
             {
-                case "spin":
-                    yield return Phase(0.32f, k => Pose(0.1f * Mathf.Sin(k * Mathf.PI), 0, 360f * k, 1, 1));
+                case "spin": // 제자리 좌우(세로축) 회전 — 전투와 동일
+                    yield return Phase(0.36f, k => Pose(0.08f * Mathf.Sin(k * Mathf.PI), 0, 0, Mathf.Cos(k * Mathf.PI * 2f), 1));
                     break;
                 case "flurry":
                     yield return Phase(0.42f, k => Pose(0.16f * Mathf.Abs(Mathf.Sin(k * Mathf.PI * 3f)), 0, 5f * Mathf.Sin(k * Mathf.PI * 6f), 1, 1));
