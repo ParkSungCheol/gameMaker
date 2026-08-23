@@ -136,7 +136,7 @@ namespace GameMaker.Data
         static readonly string[] BasicUnits = { "ourbasic", "ourtank", "ourbattle", "ourmass" };
         /// <summary>등급별 확률(%) — 계획서: 일반 40 / 고급 30 / 희귀 18 / 영웅 9 / 전설 3.</summary>
         static readonly int[] TierWeights = { 0, 40, 30, 18, 9, 3 };
-        public const int LoadoutMax = 6; // 출전 슬롯 수 (전투 소환 바)
+        public const int LoadoutMax = 5; // 출전 슬롯 수 (냥코식 5칸 배치)
 
         public bool OwnsUnit(string monsterName) =>
             System.Array.IndexOf(BasicUnits, monsterName) >= 0 || player.gachaNames.Contains(monsterName);

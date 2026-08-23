@@ -32,7 +32,7 @@ namespace GameMaker.Screens
             MakeMenuButton(SpriteBank.GetEnv("icon_chest_closed"), new Vector2(150, 94),
                 "뽑기", new Vector2(168, -150), false, () => ScreenRouter.I.Show(ScreenId.Gacha));
             MakeMenuButton(SpriteBank.GetEnv("portrait_tank"), new Vector2(126, 126),
-                "배치", new Vector2(504, -150), false, () => ScreenRouter.I.Show(ScreenId.Upgrade));
+                "배치", new Vector2(504, -150), false, () => ScreenRouter.I.Show(ScreenId.Deploy));
 
             // [DEV] 유닛 뷰어 — 메뉴 그리드를 건드리지 않도록 우상단 구석의 작은 버튼 (Core/Dev.cs 로 토글)
             if (Core.Dev.UnitViewer)

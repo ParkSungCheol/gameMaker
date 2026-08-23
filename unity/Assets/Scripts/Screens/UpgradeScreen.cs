@@ -10,11 +10,10 @@ using UnityEngine.UI;
 namespace GameMaker.Screens
 {
     /// <summary>
-    /// 부대 관리 — 강화 + 배치(출전).
+    /// 업그레이드 — 골드 강화 전용 (배치는 DeployScreen).
     /// 등급별 페이지(기본/일반/고급/희귀/영웅/전설)에 전체 아군을 카드로 나열:
     /// - 골드 강화: 카드의 [강화] 버튼, 레벨 10에서 MAX 로 잠김 (이후 중복 뽑기 +N 로만)
     /// - 중복 뽑기 강화: 이름 옆 노란 +N 배지 (무제한)
-    /// - 배치: [배치] 토글 — 출전 슬롯 최대 6, 최소 1. 배치된 카드는 금테 강조
     /// - 미보유(뽑기 전) 유닛: 실루엣 + 자물쇠, 조작 불가
     /// </summary>
     public class UpgradeScreen : MonoBehaviour
@@ -26,22 +25,19 @@ namespace GameMaker.Screens
 
         Canvas canvas;
         RectTransform grid;
-        Text moneyText, pageText, loadoutText, toastText;
+        Text moneyText, pageText, toastText;
         float toastUntil;
         List<Group> groups;
         int page;
-        List<string> loadout;
         readonly Dictionary<string, Image> upBtnImages = new Dictionary<string, Image>();
         readonly Dictionary<string, int> upBtnPrice = new Dictionary<string, int>();
 
         void Start()
         {
-            loadout = DataHub.I.GetLoadout();
-
             canvas = Ui.CreateCanvas(transform, "UpgradeCanvas");
             MenuBackdrop.Build(this, canvas, dim: 0.55f, withGround: false);
 
-            var title = Ui.OutlinedLabel(canvas.transform, "부대 강화 · 배치", 48, Color.white, "Title");
+            var title = Ui.OutlinedLabel(canvas.transform, "업그레이드", 48, Color.white, "Title");
             Ui.Place((RectTransform)title.transform, new Vector2(0.5f, 1f), new Vector2(0, -50));
 
             var moneyPanel = Ui.Image(canvas.transform, SpriteBank.GetEnv("panel_parchment"), "MoneyPanel");
@@ -49,9 +45,6 @@ namespace GameMaker.Screens
             moneyText = Ui.CenteredIconValue(moneyPanel.transform, SpriteBank.GetEnv("icon_coin"),
                 "0", 42, Color.white, "Money");
             Ui.Place((RectTransform)moneyText.transform.parent, new Vector2(0.5f, 0.5f), new Vector2(0, 2));
-
-            loadoutText = Ui.OutlinedLabel(canvas.transform, "", 30, new Color(1f, 0.9f, 0.5f), "LoadoutCount");
-            Ui.Place((RectTransform)loadoutText.transform, new Vector2(1f, 1f), new Vector2(-170, -55), new Vector2(280, 40));
 
             var back = Ui.CircleIconButton(canvas.transform, "icon_return", 92,
                 () => ScreenRouter.I.Show(ScreenId.Main), "BackButton");
@@ -119,7 +112,6 @@ namespace GameMaker.Screens
 
             var g = groups[Mathf.Clamp(page, 0, groups.Count - 1)];
             pageText.text = g.title + "  " + (page + 1) + "/" + groups.Count + "  (" + g.units.Count + "종)";
-            loadoutText.text = "배치 " + loadout.Count + "/" + LocalDataService.LoadoutMax;
 
             float cellW = 1760f / Cols, cellH = 760f / Rows;
             for (int i = 0; i < Mathf.Min(Cols * Rows, g.units.Count); i++)
@@ -139,15 +131,11 @@ namespace GameMaker.Screens
         void BuildCell(Transform slot, MonsterData m, float cellW, float cellH)
         {
             bool owned = m.IsCastle || DataHub.I.OwnsUnit(m.name);
-            bool deployed = loadout.Contains(m.name);
             int goldLv = DataHub.I.GetUpgradeCount(m.name);
             int dupes = DataHub.I.GetDupeCount(m.name);
             bool maxed = goldLv >= LocalDataService.MaxGoldLevel;
 
-            // 카드 — 배치된 유닛은 금테 느낌의 밝은 배경
-            var card = Ui.RoundedPanel(slot, deployed
-                ? new Color(1f, 0.85f, 0.35f, 0.22f)
-                : new Color(1f, 1f, 1f, 0.08f), "Card");
+            var card = Ui.RoundedPanel(slot, new Color(1f, 1f, 1f, 0.08f), "Card");
             Ui.Place((RectTransform)card.transform, new Vector2(0.5f, 0.5f), Vector2.zero,
                 new Vector2(cellW - 10, cellH - 10));
 
@@ -190,27 +178,15 @@ namespace GameMaker.Screens
                 // [강화] — MAX 면 잠김 표시
                 int price = PriceOf(m);
                 var upBtn = Ui.TextButton(card.transform, maxed ? "MAX" : price + " 강화", 18,
-                    new Vector2(m.IsCastle ? cellW - 26 : (cellW - 30) * 0.55f, 42),
+                    new Vector2(cellW - 26, 42),
                     () => TryUpgrade(m), maxed
                         ? new Color(0.35f, 0.3f, 0.25f, 0.9f)
                         : new Color(0.2f, 0.4f, 0.22f, 0.95f), "UpBtn");
-                Ui.Place((RectTransform)upBtn.transform, new Vector2(m.IsCastle ? 0.5f : 0.31f, 0f),
-                    new Vector2(0, 28));
+                Ui.Place((RectTransform)upBtn.transform, new Vector2(0.5f, 0f), new Vector2(0, 28));
                 if (!maxed)
                 {
                     upBtnImages[m.name] = upBtn.GetComponent<Image>();
                     upBtnPrice[m.name] = price;
-                }
-
-                // [배치] 토글 — 성은 항상 출전이라 없음
-                if (!m.IsCastle)
-                {
-                    var depBtn = Ui.TextButton(card.transform, deployed ? "배치됨" : "배치", 18,
-                        new Vector2((cellW - 30) * 0.4f, 42),
-                        () => ToggleDeploy(m), deployed
-                            ? new Color(0.85f, 0.65f, 0.15f, 0.95f)
-                            : new Color(0.3f, 0.32f, 0.4f, 0.95f), "DepBtn");
-                    Ui.Place((RectTransform)depBtn.transform, new Vector2(0.79f, 0f), new Vector2(0, 28));
                 }
             }
             else
@@ -238,24 +214,5 @@ namespace GameMaker.Screens
             }
         }
 
-        void ToggleDeploy(MonsterData m)
-        {
-            if (loadout.Contains(m.name))
-            {
-                if (loadout.Count <= 1) { Toast("최소 1명은 배치해야 합니다."); return; }
-                loadout.Remove(m.name);
-            }
-            else
-            {
-                if (loadout.Count >= LocalDataService.LoadoutMax)
-                {
-                    Toast("배치는 최대 " + LocalDataService.LoadoutMax + "명까지입니다.");
-                    return;
-                }
-                loadout.Add(m.name);
-            }
-            DataHub.I.SetLoadout(loadout);
-            Rebuild();
-        }
     }
 }
