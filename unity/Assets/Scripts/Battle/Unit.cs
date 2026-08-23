@@ -167,10 +167,22 @@ namespace GameMaker.Battle
 
         // ─────────── 공격 이펙트 프리미티브 (Circle 스프라이트 합성) ───────────
 
+        /// <summary>전투 이펙트용 오브젝트 — 반드시 전장 루트(컨트롤러) 밑에 둔다.
+        /// 루트에 두면 화면 전환(결과 팝업 중 timeScale 0 → 메인 복귀)에 코루틴만 끊기고 오브젝트가 남아
+        /// 다음 맵까지 화살/구슬이 떠 있는 버그가 난다. 쏜 유닛이 먼저 죽어 코루틴이 끊겨도
+        /// life 초 뒤에는 스스로 사라진다.</summary>
+        GameObject FxObject(string name, float life)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(transform.parent, true);
+            Destroy(go, life);
+            return go;
+        }
+
         SpriteRenderer AtkFx(float fx, float fy, Vector2 size, Color c, float ang = 0f)
         {
             float dir = IsOur ? 1f : -1f;
-            var go = new GameObject("AtkFx");
+            var go = FxObject("AtkFx", 1.5f);
             go.transform.position = transform.position +
                 new Vector3(fx * targetHeight * dir, bodyBaseY + fy * targetHeight, 0);
             go.transform.rotation = Quaternion.Euler(0, 0, ang * -dir);
@@ -551,7 +563,7 @@ namespace GameMaker.Battle
         /// <summary>바닥에서 퍼지는 충격파 링 — 범위공격 반경 시각화.</summary>
         IEnumerator ShockRing(Vector3 center, float radius)
         {
-            var go = new GameObject("ShockRing");
+            var go = FxObject("ShockRing", 1.5f);
             go.transform.position = center;
             var sr2 = go.AddComponent<SpriteRenderer>();
             sr2.sprite = SpriteBank.Circle;
@@ -599,7 +611,7 @@ namespace GameMaker.Battle
         {
             string kind = string.IsNullOrEmpty(data.projectile) ? "arrow" : data.projectile;
 
-            var go = new GameObject("Projectile");
+            var go = FxObject("Projectile", 1.5f);
             var psr = go.AddComponent<SpriteRenderer>();
             psr.sortingOrder = 30;
 
@@ -682,7 +694,7 @@ namespace GameMaker.Battle
         /// <summary>마법사 화염 강타 — 하늘에서 불덩이가 내리꽂히고 착탄 순간 광역 데미지.</summary>
         IEnumerator MeteorStrike(float targetX)
         {
-            var go = new GameObject("Meteor");
+            var go = FxObject("Meteor", 2.5f);
             var psr = go.AddComponent<SpriteRenderer>();
             psr.sprite = SpriteBank.Circle;
             psr.color = new Color(1f, 0.55f, 0.15f);
@@ -738,7 +750,7 @@ namespace GameMaker.Battle
             }
             if (burstFrames.Length == 0) return;
 
-            var go = new GameObject("MagicBurst");
+            var go = FxObject("MagicBurst", 1.5f);
             go.transform.position = pos;
             var bsr = go.AddComponent<SpriteRenderer>();
             bsr.sortingOrder = 31;
@@ -748,7 +760,7 @@ namespace GameMaker.Battle
             go.transform.localScale = new Vector3(scale, scale, 1f);
 
             // 바닥 충격 링 — 범위를 시각적으로 표시
-            var ring = new GameObject("ImpactRing");
+            var ring = FxObject("ImpactRing", 1.5f);
             ring.transform.position = new Vector3(pos.x, GroundY + 14f, 0);
             var rsr = ring.AddComponent<SpriteRenderer>();
             rsr.sprite = SpriteBank.Circle;
@@ -938,7 +950,7 @@ namespace GameMaker.Battle
         {
             var mv = SpriteBank.GetFrames(data.SpriteName, "move");
             if (mv.Length == 0) return;
-            var go = new GameObject("Soul");
+            var go = FxObject("Soul", 3f);
             go.transform.position = body.position;
             var ssr = go.AddComponent<SpriteRenderer>();
             ssr.sprite = mv[0];

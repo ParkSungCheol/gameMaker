@@ -119,11 +119,11 @@ namespace GameMaker.Dev
             // ── 전투: 여행지별 첫 판, 전선이 맞붙는 순간 (+ 1번 여행지는 승리 팝업까지) ──
             for (int stage = 1; stage <= 12; stage++)
             {
-                ScreenRouter.I.Show(ScreenId.Battlefield, stage);
+                ScreenRouter.I.Show(ScreenId.Battlefield, stage * 10 + 1); // 각 여행지 첫 판 (stageId)
                 yield return new WaitForSecondsRealtime(0.6f);
-                Time.timeScale = 3f;
 
                 var ctrl = FindFirstObjectByType<Battle.BattlefieldController>();
+                SetSpeed(ctrl, 3); // 컨트롤러가 매 프레임 Time.timeScale 을 자기 배속으로 덮어쓰므로 배속 필드를 직접 바꾼다
 
                 // 1) 적 전선이 화면 중앙(약 60% 지점)을 넘어올 때까지 대기 (최대 25초)
                 for (float t = 0; t < 25f; t += 0.5f)
@@ -143,8 +143,9 @@ namespace GameMaker.Dev
 
                 // 3) 맞붙는 순간 바로 정속 전환 — 몬스터가 죽기 전에 촬영
                 if (engaged) ClickSpawnButtons();
-                Time.timeScale = 1f;
+                SetSpeed(ctrl, 1);
                 yield return new WaitForSecondsRealtime(0.4f);
+                HideToast(); // 연속 소환 클릭으로 뜬 "돈이 부족합니다" 안내는 촬영에서 제외
                 yield return Shot("battle_stage" + stage);
 
                 if (stage == 1)
@@ -249,6 +250,23 @@ namespace GameMaker.Dev
             foreach (var u in Party(ctrl, "ourParty"))
                 if (u != null && !u.Dead && !u.IsCastle) front = Mathf.Max(front, u.X);
             return front;
+        }
+
+        /// <summary>전투 배속(gameSpeed 필드) 직접 설정 — 촬영용 빨리감기/정속.</summary>
+        static void SetSpeed(Battle.BattlefieldController ctrl, int speed)
+        {
+            var f = typeof(Battle.BattlefieldController).GetField("gameSpeed",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (f != null && ctrl != null) f.SetValue(ctrl, speed);
+            var apply = typeof(Battle.BattlefieldController).GetMethod("ApplySpeed",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (apply != null && ctrl != null) apply.Invoke(ctrl, null); else Time.timeScale = speed;
+        }
+
+        static void HideToast()
+        {
+            var t = GameObject.Find("Toast");
+            if (t != null) t.SetActive(false);
         }
 
         static List<Battle.Unit> Party(Battle.BattlefieldController ctrl, string field) =>

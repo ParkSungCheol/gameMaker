@@ -393,7 +393,7 @@ namespace GameMaker.Battle
         void SetupHud()
         {
             hud = Ui.CreateCanvas(transform, "BattleHud");
-            toast = Ui.CreateToast(hud.transform, 195); // 소환 버튼 줄(85±70) 바로 위
+            toast = Ui.CreateToast(hud.transform, 262); // 소환 버튼(바닥 85~225) 바로 위
 
             // 여행지 이름: 상단 중앙 — 기존 스타일 (외곽선 흰 글씨)
             var placeText = Ui.OutlinedLabel(hud.transform,
