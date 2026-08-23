@@ -298,6 +298,29 @@ namespace GameMaker.UI
             Place((RectTransform)txt.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 2));
         }
 
+        /// <summary>범용 팝업 보드 — 승/패 팝업과 같은 금테 프레임을 크기만 바꿔 재사용.
+        /// 제목 + [닫기] 버튼을 갖추고, 내용을 붙일 보드 RectTransform 을 돌려준다.
+        /// 바깥(어두운 영역) 클릭으로도 닫힌다.</summary>
+        public static RectTransform Popup(Transform canvas, string title, Vector2 size, Action onClose = null)
+        {
+            var overlay = Panel(canvas, new Color(0, 0, 0, 0.65f), "PopupOverlay");
+            Stretch(overlay);
+            overlay.SetAsLastSibling();
+            overlay.gameObject.AddComponent<Button>().onClick.AddListener(() =>
+            { UnityEngine.Object.Destroy(overlay.gameObject); onClose?.Invoke(); });
+
+            var board = Image(overlay.transform, Resources.Load<Sprite>("Sprites/env/popup_frame"), "Board");
+            Place((RectTransform)board.transform, new Vector2(0.5f, 0.5f), Vector2.zero, size);
+            board.gameObject.AddComponent<Button>(); // 보드 클릭은 닫히지 않게 (레이캐스트 흡수)
+
+            var titleTxt = OutlinedLabel(board.transform, title, 56, new Color(1f, 0.72f, 0.1f), "Title");
+            Place((RectTransform)titleTxt.transform, new Vector2(0.5f, 1f), new Vector2(0, -92));
+
+            MakeTextButton(board.transform, "닫기", Color.white, new Vector2(0, 58),
+                () => { UnityEngine.Object.Destroy(overlay.gameObject); onClose?.Invoke(); }, koreanFont: true);
+            return (RectTransform)board.transform;
+        }
+
         /// <summary>확인 팝업 — 결과 모달과 같은 카툰 프레임 재활용. 그림 + 메시지 + [계속]/[확인] 두 버튼.</summary>
         public static void ConfirmDialog(Transform canvas, string title, string message,
             string stayLabel, string leaveLabel, Action onStay, Action onLeave, Sprite image = null)

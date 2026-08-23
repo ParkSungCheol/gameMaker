@@ -105,6 +105,7 @@ namespace GameMaker.Data
             int clearTime = player.mapClear[mapNumber];
             int baseVal = mapNumber >= 10 ? (mapNumber / 10) * 3 + (mapNumber % 10) : mapNumber;
             int money = baseVal * (11 - clearTime) <= 0 ? 1 : baseVal * (11 - clearTime);
+            money = Mathf.Max(10, Mathf.RoundToInt(money / 10f) * 10); // 10단위 반올림 (최소 10)
             player.money += money;
             SavePlayer(player);
             return money;

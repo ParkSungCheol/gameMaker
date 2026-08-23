@@ -89,6 +89,26 @@ namespace GameMaker.Screens
             // 뷰포트(투명 전체 패널)가 위 UI 의 클릭을 가로채지 않도록 배경 바로 위 층으로
             viewport.SetSiblingIndex(title.transform.GetSiblingIndex());
 
+            // 하단 가로 스크롤바 — 어디까지 넘겼는지 보이게
+            var sbBg = Ui.RoundedPanel(canvas.transform, new Color(0f, 0f, 0f, 0.35f), "ScrollbarBg");
+            Ui.Place((RectTransform)sbBg.transform, new Vector2(0.5f, 0f), new Vector2(0, 24), new Vector2(1200, 22));
+            var sb = sbBg.gameObject.AddComponent<Scrollbar>();
+            var handle = Ui.RoundedPanel(sbBg.transform, new Color(0.95f, 0.8f, 0.4f, 0.95f), "Handle");
+            var handleRt = (RectTransform)handle.transform;
+            Ui.Stretch(handleRt);
+            handleRt.offsetMin = new Vector2(3, 3);
+            handleRt.offsetMax = new Vector2(-3, -3);
+            sb.handleRect = handleRt;
+            sb.targetGraphic = handle;
+            sb.direction = Scrollbar.Direction.LeftToRight;
+            scroll.horizontalScrollbar = sb;
+            scroll.horizontalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHide;
+
+            // 직업(포지션) 안내 — 등급명 오른쪽 ? 버튼
+            var helpBtn = Ui.TextButton(canvas.transform, "?", 34, new Vector2(56, 56), ShowRoleGuide,
+                new Color(0.3f, 0.26f, 0.18f, 0.95f), "RoleHelp");
+            Ui.Place((RectTransform)helpBtn.transform, new Vector2(0.5f, 1f), new Vector2(345, -135));
+
             // 그룹: 기본(성+기본 4종) + 뽑기 등급 1~5
             var all = DataHub.I.GetMonsters().Where(m => m.IsOur).ToList();
             groups = new List<Group>();
@@ -122,7 +142,37 @@ namespace GameMaker.Screens
             toastUntil = Time.time + 1.6f;
         }
 
-        static Color RoleColor(string role) =>
+        /// <summary>직업(포지션) 안내 팝업 — 승/패 팝업과 같은 보드.</summary>
+        void ShowRoleGuide()
+        {
+            var board = Ui.Popup(canvas.transform, "포지션 안내", new Vector2(980, 820));
+            string[][] rows = {
+                new[] { "탱커",   "근접 · 단일", "체력이 높고 공격은 약하다. 맨 앞에서 적을 막아 뒤를 지킨다." },
+                new[] { "전사",   "근접 · 단일", "체력과 공격이 균형. 어디에 넣어도 무난한 근접 주력." },
+                new[] { "암살자", "근접 · 단일", "빠르고 공격이 강하지만 체력이 약하다. 먼저 때리고 먼저 죽는 유리칼." },
+                new[] { "궁수",   "원거리 · 단일", "멀리서 화살로 한 명씩 정확히. 앞에 탱커가 있어야 산다." },
+                new[] { "마법사", "원거리 · 범위", "구슬이 떨어진 자리 주변을 한꺼번에 태운다. 뭉친 적에게 강하다." },
+            };
+            for (int i = 0; i < rows.Length; i++)
+            {
+                float y = -170f - i * 118f;
+                var rc = RoleColor(rows[i][0]);
+                var pill = Ui.RoundedPanel(board, new Color(rc.r, rc.g, rc.b, 0.95f), "Pill" + i);
+                Ui.Place((RectTransform)pill.transform, new Vector2(0f, 1f), new Vector2(150, y - 26), new Vector2(120, 44));
+                var pt = Ui.Label(pill.transform, rows[i][0], 24, Color.white, "PillText");
+                pt.alignment = TextAnchor.MiddleCenter;
+                Ui.Stretch(pt.rectTransform);
+                var kind = Ui.OutlinedLabel(board, rows[i][1], 22, new Color(1f, 0.85f, 0.45f), "Kind" + i);
+                kind.alignment = TextAnchor.MiddleLeft;
+                Ui.Place((RectTransform)kind.transform, new Vector2(0f, 1f), new Vector2(225, y), new Vector2(200, 30));
+                var body = Ui.OutlinedLabel(board, rows[i][2], 24, Color.white, "Body" + i);
+                body.alignment = TextAnchor.UpperLeft;
+                body.horizontalOverflow = HorizontalWrapMode.Wrap;
+                Ui.Place((RectTransform)body.transform, new Vector2(0f, 1f), new Vector2(225, y - 30), new Vector2(640, 64));
+            }
+        }
+
+        internal static Color RoleColor(string role) =>
             role == "탱커" ? new Color(0.3f, 0.5f, 0.85f)
             : role == "암살자" ? new Color(0.55f, 0.38f, 0.8f)
             : role == "궁수" ? new Color(0.3f, 0.65f, 0.32f)
@@ -184,6 +234,19 @@ namespace GameMaker.Screens
             nameRt.pivot = new Vector2(0.5f, 0.5f);
             nameRt.anchoredPosition = new Vector2(x, 455f);
             nameRt.sizeDelta = new Vector2(320f, 50f);
+
+            // 도감 병맛 설명 — 가격 버튼 아래 섹션
+            if (!string.IsNullOrEmpty(m.desc))
+            {
+                var desc = Ui.OutlinedLabel(content, m.desc, 20, new Color(1f, 0.95f, 0.8f, 0.92f), "Desc_" + m.name);
+                desc.horizontalOverflow = HorizontalWrapMode.Wrap;
+                desc.alignment = TextAnchor.UpperCenter;
+                var descRt = (RectTransform)desc.transform;
+                descRt.anchorMin = descRt.anchorMax = new Vector2(0f, 0f);
+                descRt.pivot = new Vector2(0.5f, 1f);
+                descRt.anchoredPosition = new Vector2(x, 760f);
+                descRt.sizeDelta = new Vector2(310f, 60f);
+            }
 
             if (!owned)
             {

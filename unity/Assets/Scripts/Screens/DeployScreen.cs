@@ -35,6 +35,10 @@ namespace GameMaker.Screens
         Text pageText, toastText, slotHeader;
         float toastUntil;
         List<List<MonsterData>> pages; // 등급별 보유 유닛
+        static readonly string[] SortKeys = { "이름", "공격력", "체력", "사거리", "비용", "등급" };
+        int sortKey;          // SortKeys 인덱스
+        bool sortAsc = true;  // 오름차순/내림차순
+        Button sortBtn, dirBtn;
         int page;
         string[] slots;                 // 출전 5칸 (null = 빈 칸)
         readonly RectTransform[] slotRects = new RectTransform[LocalDataService.LoadoutMax];
@@ -84,6 +88,16 @@ namespace GameMaker.Screens
             pageText = Ui.OutlinedLabel(canvas.transform, "", 32, Color.white, "Page");
             pageText.raycastTarget = false;
             Ui.Place((RectTransform)pageText.transform, new Vector2(0.5f, 0f), new Vector2(0, 55), new Vector2(640, 42));
+
+            // 정렬 — 키 순환 버튼 + 오름/내림 토글 (냥코식)
+            sortBtn = Ui.TextButton(canvas.transform, "정렬: 이름", 24, new Vector2(210, 52),
+                () => { sortKey = (sortKey + 1) % SortKeys.Length; RebuildList(); },
+                new Color(0.3f, 0.26f, 0.18f, 0.95f), "SortBtn");
+            Ui.Place((RectTransform)sortBtn.transform, new Vector2(0f, 0f), new Vector2(40, 40));
+            dirBtn = Ui.TextButton(canvas.transform, "▲", 24, new Vector2(56, 52),
+                () => { sortAsc = !sortAsc; RebuildList(); },
+                new Color(0.3f, 0.26f, 0.18f, 0.95f), "DirBtn");
+            Ui.Place((RectTransform)dirBtn.transform, new Vector2(0f, 0f), new Vector2(258, 40));
 
             toastText = Ui.OutlinedLabel(canvas.transform, "", 28, new Color(1f, 0.6f, 0.5f), "Toast");
             toastText.raycastTarget = false;
@@ -176,8 +190,10 @@ namespace GameMaker.Screens
         void RebuildList()
         {
             foreach (Transform c in grid) Destroy(c.gameObject);
-            var units = pages[Mathf.Clamp(page, 0, pages.Count - 1)];
+            var units = Sorted(pages[Mathf.Clamp(page, 0, pages.Count - 1)]);
             int tier = units[0].tier;
+            sortBtn.GetComponentInChildren<Text>().text = "정렬: " + SortKeys[sortKey];
+            dirBtn.GetComponentInChildren<Text>().text = sortAsc ? "▲" : "▼";
             pageText.text = TierNames[tier] + "  " + (page + 1) + "/" + pages.Count + "  (" + units.Count + "종)";
 
             float cellW = 1760f / Cols, cellH = 400f / Rows;
@@ -205,6 +221,23 @@ namespace GameMaker.Screens
                     Ui.Place(tag.rectTransform, new Vector2(0.5f, 1f), new Vector2(0, -14), new Vector2(100, 22));
                 }
             }
+        }
+
+        List<MonsterData> Sorted(List<MonsterData> src)
+        {
+            System.Comparison<MonsterData> cmp;
+            switch (sortKey)
+            {
+                case 1: cmp = (a, b) => a.attack.CompareTo(b.attack); break;
+                case 2: cmp = (a, b) => a.hp.CompareTo(b.hp); break;
+                case 3: cmp = (a, b) => a.range.CompareTo(b.range); break;
+                case 4: cmp = (a, b) => a.cost.CompareTo(b.cost); break;
+                case 5: cmp = (a, b) => a.tier.CompareTo(b.tier); break;
+                default: cmp = (a, b) => string.CompareOrdinal(a.DisplayName, b.DisplayName); break;
+            }
+            var list = new List<MonsterData>(src);
+            list.Sort((a, b) => sortAsc ? cmp(a, b) : cmp(b, a));
+            return list;
         }
 
         /// <summary>슬롯/목록 공용 유닛 카드 — 드래그 가능. fromSlot -1 = 목록.</summary>

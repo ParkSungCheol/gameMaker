@@ -24,15 +24,17 @@ namespace GameMaker.Screens
             // 타이틀 화면과 같은 게임명 (조금 작게, 상단)
             MenuBackdrop.TitleLabel(canvas, 92, new Vector2(0.5f, 1f), new Vector2(0, -105));
 
-            // 메뉴 4개 — 전투 소환 버튼과 같은 나무 프레임, 2x2 큰 버튼. 아이콘은 게임 속 아트 재사용
-            MakeMenuButton(SpriteBank.GetEnv("stage1thumb"), new Vector2(180, 96),
-                "맵", new Vector2(-504, -150), false, () => ScreenRouter.I.Show(ScreenId.Map));
-            MakeMenuButton(SpriteBank.GetEnv("icon_arrowup"), new Vector2(118, 118),
-                "업그레이드", new Vector2(-168, -150), false, () => ScreenRouter.I.Show(ScreenId.Upgrade));
-            MakeMenuButton(SpriteBank.GetEnv("icon_chest_closed"), new Vector2(150, 94),
-                "뽑기", new Vector2(168, -150), false, () => ScreenRouter.I.Show(ScreenId.Gacha));
-            MakeMenuButton(SpriteBank.GetEnv("portrait_tank"), new Vector2(126, 126),
-                "배치", new Vector2(504, -150), false, () => ScreenRouter.I.Show(ScreenId.Deploy));
+            // 메뉴 5개 — 전투 소환 버튼과 같은 나무 프레임 한 줄. 아이콘은 게임 속 아트 재사용
+            MakeMenuButton(SpriteBank.GetEnv("stage1thumb"), new Vector2(164, 88),
+                "맵", new Vector2(-600, -150), false, () => ScreenRouter.I.Show(ScreenId.Map));
+            MakeMenuButton(SpriteBank.GetEnv("icon_arrowup"), new Vector2(108, 108),
+                "업그레이드", new Vector2(-300, -150), false, () => ScreenRouter.I.Show(ScreenId.Upgrade));
+            MakeMenuButton(SpriteBank.GetEnv("icon_chest_closed"), new Vector2(138, 86),
+                "뽑기", new Vector2(0, -150), false, () => ScreenRouter.I.Show(ScreenId.Gacha));
+            MakeMenuButton(SpriteBank.GetEnv("portrait_tank"), new Vector2(116, 116),
+                "배치", new Vector2(300, -150), false, () => ScreenRouter.I.Show(ScreenId.Deploy));
+            MakeMenuButton(SpriteBank.GetEnv("portrait_mass"), new Vector2(116, 116),
+                "도감", new Vector2(600, -150), false, () => ScreenRouter.I.Show(ScreenId.Codex));
 
             // [DEV] 유닛 뷰어 — 메뉴 그리드를 건드리지 않도록 우상단 구석의 작은 버튼 (Core/Dev.cs 로 토글)
             if (Core.Dev.UnitViewer)
@@ -47,7 +49,7 @@ namespace GameMaker.Screens
         void MakeMenuButton(Sprite iconSprite, Vector2 iconSize, string label, Vector2 pos, bool locked, System.Action onClick)
         {
             // 나무 프레임 원본 비율(150:140) 유지 — 옆으로 늘리면 무늬가 왜곡되어 조잡해진다
-            var btn = Ui.ImageButton(canvas.transform, SpriteBank.GetEnv("btn_wood"), new Vector2(300, 280),
+            var btn = Ui.ImageButton(canvas.transform, SpriteBank.GetEnv("btn_wood"), new Vector2(276, 258),
                 null, "Btn_" + label);
             Ui.Place((RectTransform)btn.transform, new Vector2(0.5f, 0.5f), pos);
             Ui.PressedSwap(btn, SpriteBank.GetEnv("btn_wood_pressed"));
@@ -57,8 +59,8 @@ namespace GameMaker.Screens
             Ui.Place((RectTransform)icon.transform, new Vector2(0.5f, 0.5f), new Vector2(0, 42), iconSize);
             icon.preserveAspect = true;
 
-            var txt = Ui.OutlinedLabel(btn.transform, label, 40, Color.white, "Label");
-            Ui.Place((RectTransform)txt.transform, new Vector2(0.5f, 0f), new Vector2(0, 40), new Vector2(270, 44));
+            var txt = Ui.OutlinedLabel(btn.transform, label, 36, Color.white, "Label");
+            Ui.Place((RectTransform)txt.transform, new Vector2(0.5f, 0f), new Vector2(0, 36), new Vector2(250, 42));
 
             if (locked)
             {

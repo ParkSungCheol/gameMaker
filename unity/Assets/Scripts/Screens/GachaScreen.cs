@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using GameMaker.Battle;
 using GameMaker.Core;
 using GameMaker.Data;
@@ -66,6 +67,10 @@ namespace GameMaker.Screens
 
             var title = Ui.OutlinedLabel(root, "뽑기", 52, Color.white, "Title");
             Ui.Place((RectTransform)title.transform, new Vector2(0.5f, 1f), new Vector2(0, -55));
+            // 확률표 ? 버튼
+            var rateBtn = Ui.TextButton(root, "확률 ?", 28, new Vector2(130, 54), ShowRates,
+                new Color(0.3f, 0.26f, 0.18f, 0.95f), "RateBtn");
+            Ui.Place((RectTransform)rateBtn.transform, new Vector2(0.5f, 1f), new Vector2(190, -55));
 
             var moneyPanel = Ui.Image(root, SpriteBank.GetEnv("panel_parchment"), "MoneyPanel");
             Ui.Place((RectTransform)moneyPanel.transform, new Vector2(0f, 1f), new Vector2(160, -55), new Vector2(280, 82));
@@ -104,6 +109,58 @@ namespace GameMaker.Screens
         }
 
         void RefreshMoney() => moneyText.text = DataHub.I.GetPlayer().money.ToString();
+
+        static readonly int[] TierRates = { 0, 40, 30, 18, 9, 3 };
+
+        /// <summary>확률표 팝업 — 등급별 확률 + 등급 안 유닛별(1/n) 확률을 스크롤 목록으로.</summary>
+        void ShowRates()
+        {
+            if (drawing) return;
+            var board = Ui.Popup(canvas.transform, "뽑기 확률", new Vector2(1180, 920));
+            var viewport = Ui.Panel(board, new Color(0, 0, 0, 0.18f), "RateViewport");
+            Ui.Place(viewport, new Vector2(0.5f, 1f), new Vector2(0, -150), new Vector2(1040, 620));
+            viewport.gameObject.AddComponent<RectMask2D>();
+            var content = Ui.Panel(viewport, new Color(0, 0, 0, 0), "Content");
+            content.anchorMin = new Vector2(0f, 1f); content.anchorMax = new Vector2(1f, 1f);
+            content.pivot = new Vector2(0.5f, 1f);
+            content.offsetMin = Vector2.zero; content.offsetMax = Vector2.zero;
+            var sr = viewport.gameObject.AddComponent<ScrollRect>();
+            sr.viewport = viewport; sr.content = content; sr.horizontal = false; sr.vertical = true;
+            sr.movementType = ScrollRect.MovementType.Clamped; sr.scrollSensitivity = 40f;
+
+            var all = DataHub.I.GetMonsters().Where(m => m.IsOur && !m.IsCastle && m.tier > 0).ToList();
+            float y = -8f;
+            for (int t = 1; t <= 5; t++)
+            {
+                var units = all.Where(m => m.tier == t).ToList();
+                if (units.Count == 0) continue;
+                float each = TierRates[t] / (float)units.Count;
+                var head = Ui.OutlinedLabel(content, new string('★', t) + " " + TierNames[t] + "  " + TierRates[t] + "%   (" +
+                    units.Count + "종 · 1종당 " + each.ToString("0.00") + "%)", 28, TierColors[t], "Head" + t);
+                head.alignment = TextAnchor.MiddleLeft;
+                Ui.Place((RectTransform)head.transform, new Vector2(0f, 1f), new Vector2(24, y), new Vector2(980, 44));
+                y -= 50f;
+                foreach (var u in units)
+                {
+                    var fr = SpriteBank.GetFrames(u.SpriteName, "move");
+                    var img = Ui.Image(content, fr.Length > 0 ? fr[0] : null, "Img_" + u.name);
+                    img.preserveAspect = true; img.raycastTarget = false;
+                    Ui.Place((RectTransform)img.transform, new Vector2(0f, 1f), new Vector2(60, y), new Vector2(46, 46));
+                    var nm = Ui.OutlinedLabel(content, u.DisplayName, 24, Color.white, "Nm_" + u.name);
+                    nm.alignment = TextAnchor.MiddleLeft;
+                    Ui.Place((RectTransform)nm.transform, new Vector2(0f, 1f), new Vector2(120, y - 8), new Vector2(300, 32));
+                    var role = Ui.OutlinedLabel(content, u.role, 22, new Color(1f, 0.9f, 0.6f), "Role_" + u.name);
+                    role.alignment = TextAnchor.MiddleLeft;
+                    Ui.Place((RectTransform)role.transform, new Vector2(0f, 1f), new Vector2(480, y - 8), new Vector2(160, 32));
+                    var pr = Ui.OutlinedLabel(content, each.ToString("0.00") + "%", 24, Color.white, "Pr_" + u.name);
+                    pr.alignment = TextAnchor.MiddleRight;
+                    Ui.Place((RectTransform)pr.transform, new Vector2(1f, 1f), new Vector2(-30, y - 8), new Vector2(160, 32));
+                    y -= 50f;
+                }
+                y -= 12f;
+            }
+            content.sizeDelta = new Vector2(0, -y + 20f);
+        }
 
         void TryDraw()
         {
