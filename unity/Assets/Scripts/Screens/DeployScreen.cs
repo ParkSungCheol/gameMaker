@@ -57,18 +57,18 @@ namespace GameMaker.Screens
             Ui.Place((RectTransform)back.transform, new Vector2(1f, 0f), new Vector2(-58, 50));
 
             // ── 상단 섹션: 출전 배치 (전용 배경 밴드로 아래와 확실히 구분) ──
-            var topBand = CrispBand(canvas.transform, "TopBand");
-            Ui.Place((RectTransform)topBand.transform, new Vector2(0.5f, 1f), new Vector2(0, -120), new Vector2(1320, 330));
-            slotHeader = Ui.OutlinedLabel(topBand.transform, "", 30, new Color(1f, 0.9f, 0.5f), "SlotHeader");
+            var topBand = Ui.Panel(canvas.transform, new Color(0, 0, 0, 0), "TopBand");
+            Ui.Place(topBand, new Vector2(0.5f, 1f), new Vector2(0, -120), new Vector2(1320, 330));
+            slotHeader = Ui.OutlinedLabel(topBand, "", 30, new Color(1f, 0.9f, 0.5f), "SlotHeader");
             Ui.Place((RectTransform)slotHeader.transform, new Vector2(0.5f, 1f), new Vector2(0, -26), new Vector2(600, 38));
 
-            slotRow = Ui.Panel(topBand.transform, new Color(0, 0, 0, 0), "SlotRow");
+            slotRow = Ui.Panel(topBand, new Color(0, 0, 0, 0), "SlotRow");
             Ui.Place(slotRow, new Vector2(0.5f, 0.5f), new Vector2(0, -18), new Vector2(1200, 250));
 
             // ── 하단 섹션: 보유 유닛 (별도 배경 밴드) ──
-            var botBand = CrispBand(canvas.transform, "BotBand");
-            Ui.Place((RectTransform)botBand.transform, new Vector2(0.5f, 0f), new Vector2(0, 90), new Vector2(1820, 480));
-            var botHeader = Ui.OutlinedLabel(botBand.transform, "보유 유닛 — 위 칸으로 드래그해 배치, 배치된 유닛은 클릭으로 해제",
+            var botBand = Ui.Panel(canvas.transform, new Color(0.05f, 0.08f, 0.13f, 0.42f), "BotBand");
+            Ui.Place(botBand, new Vector2(0.5f, 0f), new Vector2(0, 90), new Vector2(1820, 480));
+            var botHeader = Ui.OutlinedLabel(botBand, "보유 유닛 — 위 칸으로 드래그해 배치, 배치된 유닛은 클릭으로 해제",
                 24, new Color(1f, 1f, 1f, 0.8f), "BotHeader");
             Ui.Place((RectTransform)botHeader.transform, new Vector2(0.5f, 1f), new Vector2(0, -24), new Vector2(1300, 34));
 
@@ -120,13 +120,6 @@ namespace GameMaker.Screens
         {
             var list = slots.Where(s => s != null).ToList();
             DataHub.I.SetLoadout(list);
-        }
-
-        /// <summary>섹션 보드 — 승/패 팝업과 같은 Layer Lab 금테 보드로 게임 화풍 통일.</summary>
-        RectTransform CrispBand(Transform parent, string name)
-        {
-            var img = Ui.Image(parent, SpriteBank.GetEnv("popup_frame"), name);
-            return (RectTransform)img.transform;
         }
 
         // ─────────── 출전 슬롯 ───────────

@@ -141,23 +141,15 @@ namespace GameMaker.Screens
             yield return new WaitForSeconds(0.2f);
             yield return KeyTurn();
 
-            // 2) 뚜껑이 '띡' 조금 열리고 — 틈새로 빛이 새며, 긴장의 정지
+            // 2) 열쇠가 돌아가자 뚜껑이 조금씩... 점점 빨리 열린다
             chest.sprite = SpriteBank.GetEnv("gacha_chest_1");
-            var leak = Ui.Image(root, SpriteBank.Circle, "Leak");
-            leak.raycastTarget = false;
-            leak.color = new Color(1f, 0.95f, 0.7f, 0.25f);
-            Ui.Place((RectTransform)leak.transform, new Vector2(0.5f, 0.5f), new Vector2(0, -120), new Vector2(190, 10));
-            yield return new WaitForSeconds(0.3f);
+            yield return new WaitForSeconds(0.4f);
             chest.sprite = SpriteBank.GetEnv("gacha_chest_2");
-            ((RectTransform)leak.transform).sizeDelta = new Vector2(250, 14);
-            leak.color = new Color(1f, 0.95f, 0.7f, 0.45f);
-            // 심장박동 — 암전이 두 번 꿀렁이며 조여온다
+            // 심장박동 — 암전이 꿀렁이며 조여온다
             yield return Fade(dimmer, 0.78f, 0.88f, 0.12f);
             yield return Fade(dimmer, 0.88f, 0.78f, 0.12f);
-            yield return Fade(dimmer, 0.78f, 0.88f, 0.12f);
-            yield return Fade(dimmer, 0.88f, 0.78f, 0.12f);
-            yield return new WaitForSeconds(0.18f);
-            Destroy(leak.gameObject);
+            chest.sprite = SpriteBank.GetEnv("gacha_chest_3");
+            yield return new WaitForSeconds(0.22f);
 
             // 2) 개봉 — 뚜껑이 벌컥 열리는 프레임 애니메이션 + 섬광 + 폭발 + 파동 링 + 광선 (전부 금빛)
             var gold = new Color(1f, 0.9f, 0.55f);
@@ -534,7 +526,7 @@ namespace GameMaker.Screens
             key.preserveAspect = true;
             key.raycastTarget = false;
             var keyRt = (RectTransform)key.transform;
-            Ui.Place(keyRt, new Vector2(0.5f, 0.5f), new Vector2(210, -110), new Vector2(120, 80));
+            Ui.Place(keyRt, new Vector2(0.5f, 0.5f), new Vector2(230, -140), new Vector2(96, 64));
             key.color = new Color(1f, 1f, 1f, 0f);
             var chestRt2 = (RectTransform)chest.transform;
 
@@ -544,28 +536,25 @@ namespace GameMaker.Screens
                 t += Time.deltaTime;
                 float k = Mathf.Clamp01(t / 0.28f);
                 float e = 1f - (1f - k) * (1f - k);
-                keyRt.anchoredPosition = new Vector2(Mathf.Lerp(210f, 26f, e), Mathf.Lerp(-110f, -178f, e));
+                keyRt.anchoredPosition = new Vector2(Mathf.Lerp(230f, 4f, e), Mathf.Lerp(-140f, -206f, e)); // 자물쇠 위치로
                 key.color = new Color(1f, 1f, 1f, k);
                 yield return null;
             }
             yield return new WaitForSeconds(0.22f);
 
-            for (int turn = 0; turn < 2; turn++) // 철컥 x2
+            // 철컥 — 좌에서 우로 한 번만 돌린다 (열쇠 구멍 축 기준)
+            t = 0f;
+            while (t < 0.14f)
             {
-                float from = -90f * turn, to = -90f * (turn + 1);
-                t = 0f;
-                while (t < 0.1f)
-                {
-                    t += Time.deltaTime;
-                    float k = Mathf.Clamp01(t / 0.1f);
-                    keyRt.localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(from, to, k));
-                    float p = 1f + 0.05f * Mathf.Sin(k * Mathf.PI); // 상자 움찔
-                    chestRt2.localScale = new Vector3(p, p, 1f);
-                    yield return null;
-                }
-                chestRt2.localScale = Vector3.one;
-                yield return new WaitForSeconds(turn == 0 ? 0.35f : 0.25f);
+                t += Time.deltaTime;
+                float k = Mathf.Clamp01(t / 0.14f);
+                keyRt.localRotation = Quaternion.Euler(0, 0, Mathf.Lerp(0f, -90f, k));
+                float p = 1f + 0.05f * Mathf.Sin(k * Mathf.PI); // 상자 움찔
+                chestRt2.localScale = new Vector3(p, p, 1f);
+                yield return null;
             }
+            chestRt2.localScale = Vector3.one;
+            yield return new WaitForSeconds(0.3f);
 
             t = 0f; // 열쇠 퇴장
             while (t < 0.18f)
@@ -577,14 +566,11 @@ namespace GameMaker.Screens
             Destroy(key.gameObject);
         }
 
-        /// <summary>'똭' — 남은 뚜껑 프레임(3~4)이 순간에 열린다.</summary>
+        /// <summary>'똭' — 마지막 프레임, 완전 개방.</summary>
         IEnumerator ChestOpenAnim()
         {
-            for (int i = 3; i <= 4; i++)
-            {
-                chest.sprite = SpriteBank.GetEnv("gacha_chest_" + i);
-                yield return new WaitForSeconds(0.04f);
-            }
+            chest.sprite = SpriteBank.GetEnv("gacha_chest_4");
+            yield break;
         }
 
         /// <summary>캐릭터 등장 직전, 상자가 스르르 사라진다 — 무대는 캐릭터의 것.</summary>
