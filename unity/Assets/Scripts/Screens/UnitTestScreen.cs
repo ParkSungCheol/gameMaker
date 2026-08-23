@@ -373,6 +373,54 @@ namespace GameMaker.Screens
             else yield return StyleMotion();
         }
 
+        // ─────────── 공격 이펙트 프리미티브 — 전투(Unit.cs)와 동일 수치 ───────────
+
+        Image AtkFx(float fx, float fy, Vector2 size, Color c, float ang = 0f)
+        {
+            var i = Fx(SpriteBank.Circle, c, size * th, "AtkFx");
+            i.rectTransform.anchoredPosition = basePos + new Vector2(fx * th * Dir, fy * th);
+            i.rectTransform.localRotation = Quaternion.Euler(0, 0, ang * -Dir);
+            return i;
+        }
+
+        IEnumerator FxFade(Image r, float dur, float growTo, float rotSpeed)
+        {
+            if (r == null) yield break;
+            Vector2 s0 = r.rectTransform.sizeDelta;
+            Color c0 = r.color;
+            float t = 0f;
+            while (t < dur)
+            {
+                t += Time.unscaledDeltaTime;
+                if (r == null) yield break;
+                float k = Mathf.Clamp01(t / dur);
+                r.rectTransform.sizeDelta = s0 * (1f + (growTo - 1f) * k);
+                r.rectTransform.Rotate(0, 0, rotSpeed * -Dir * Time.unscaledDeltaTime);
+                r.color = new Color(c0.r, c0.g, c0.b, c0.a * (1f - k));
+                yield return null;
+            }
+            if (r != null) Destroy(r.gameObject);
+        }
+
+        void FxSlash(float fx, float fy, float ang, float len, Color c, float rotSpeed = 220f) =>
+            StartCoroutine(FxFade(AtkFx(fx, fy, new Vector2(len, len * 0.2f), c, ang), 0.18f, 1.3f, rotSpeed));
+
+        void FxPop(float fx, float fy, float d, Color c) =>
+            StartCoroutine(FxFade(AtkFx(fx, fy, new Vector2(d, d), c), 0.16f, 2.1f, 0f));
+
+        void FxPuff(float fx, float fy, Color c, int n = 3)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                float spread = (i - (n - 1) * 0.5f) * 0.09f;
+                StartCoroutine(FxFade(AtkFx(fx + spread, fy + Mathf.Abs(spread) * 0.4f,
+                    new Vector2(0.11f, 0.09f), c), 0.26f, 2.4f, 0f));
+            }
+        }
+
+        void FxRing(float fx, float fy, float d, Color c, bool flat = false) =>
+            StartCoroutine(FxFade(AtkFx(fx, fy, new Vector2(d, flat ? d * 0.35f : d), c), 0.28f, 1.9f, 0f));
+
         /// <summary>공격 스타일별 몸 움직임 — 전투(Unit.StyleMotion)와 동일 수치.</summary>
         IEnumerator StyleMotion()
         {
@@ -397,61 +445,91 @@ namespace GameMaker.Screens
             switch (data.atkStyle)
             {
                 case "spin": // 제자리 좌우(세로축) 회전 — 전투와 동일
+                    FxRing(0f, 0.05f, 1.1f, new Color(1f, 1f, 1f, 0.35f));
+                    FxSlash(0.3f, 0.05f, 0f, 0.7f, new Color(1f, 1f, 0.9f, 0.7f), 320f);
+                    FxSlash(-0.3f, 0.05f, 180f, 0.7f, new Color(1f, 1f, 0.9f, 0.7f), 320f);
                     yield return Phase(0.36f, k => Pose(0.08f * Mathf.Sin(k * Mathf.PI), 0, 0, Mathf.Cos(k * Mathf.PI * 2f), 1));
                     break;
                 case "flurry":
+                    StartCoroutine(FlurryPops());
                     yield return Phase(0.42f, k => Pose(0.16f * Mathf.Abs(Mathf.Sin(k * Mathf.PI * 3f)), 0, 5f * Mathf.Sin(k * Mathf.PI * 6f), 1, 1));
                     break;
                 case "bite":
                     yield return Phase(0.1f, k => Pose(-0.05f * k, 0, -6f * k, 1f, 1f - 0.1f * k));
+                    FxSlash(0.3f, 0.14f, -35f, 0.42f, new Color(1f, 1f, 1f, 0.85f), 140f);
+                    FxSlash(0.3f, -0.08f, 35f, 0.42f, new Color(1f, 1f, 1f, 0.85f), -140f);
+                    FxPop(0.32f, 0.03f, 0.24f, new Color(1f, 0.85f, 0.8f, 0.8f));
                     yield return Phase(0.09f, k => Pose(-0.05f + 0.27f * k, 0, -6f + 20f * k, 1f + 0.06f * k, 0.9f + 0.1f * k));
                     yield return Phase(0.14f, k => Pose(0.22f * (1f - k), 0, 14f * (1f - k), 1, 1));
                     break;
                 case "peck":
                     yield return Phase(0.08f, k => Pose(-0.04f * k, 0.03f * k, -12f * k, 1, 1));
+                    FxPop(0.24f, -0.04f, 0.16f, new Color(1f, 0.92f, 0.45f, 0.9f));
                     yield return Phase(0.07f, k => Pose(-0.04f + 0.18f * k, 0.03f - 0.06f * k, -12f + 34f * k, 1, 1));
                     yield return Phase(0.12f, k => Pose(0.14f * (1f - k), -0.03f * (1f - k), 22f * (1f - k), 1, 1));
                     break;
                 case "horn":
                     yield return Phase(0.12f, k => Pose(-0.08f * k, -0.04f * k, 10f * k, 1, 1));
+                    FxSlash(0.26f, 0.02f, 60f, 0.6f, new Color(1f, 0.8f, 0.45f, 0.8f), -300f);
+                    FxPuff(0.18f, -0.42f, new Color(0.75f, 0.68f, 0.55f, 0.7f));
                     yield return Phase(0.09f, k => Pose(-0.08f + 0.26f * k, -0.04f + 0.1f * k, 10f - 26f * k, 1, 1));
                     yield return Phase(0.14f, k => Pose(0.18f * (1f - k), 0.06f * (1f - k), -16f * (1f - k), 1, 1));
                     break;
                 case "buck":
                     yield return Phase(0.1f, k => Pose(0.05f * k, 0, 14f * k, 1, 1));
+                    FxPuff(-0.24f, -0.35f, new Color(0.72f, 0.62f, 0.48f, 0.8f), 4);
                     yield return Phase(0.08f, k => Pose(0.05f - 0.2f * k, 0.04f * k, 14f - 34f * k, 1, 1));
                     yield return Phase(0.14f, k => Pose(-0.15f * (1f - k), 0.04f * (1f - k), -20f * (1f - k), 1, 1));
                     break;
                 case "trample":
                     yield return Phase(0.13f, k => Pose(0, 0.2f * k, -4f * k, 0.96f, 1f + 0.08f * k));
                     yield return Phase(0.07f, k => Pose(0.04f * k, 0.2f * (1f - k), -4f + 8f * k, 0.96f + 0.1f * k, 1.08f - 0.24f * k));
+                    FxRing(0.04f, -0.42f, 0.8f, new Color(0.8f, 0.73f, 0.6f, 0.6f), true);
+                    FxPuff(0.04f, -0.4f, new Color(0.78f, 0.7f, 0.58f, 0.65f));
                     yield return Phase(0.13f, k => Pose(0.04f * (1f - k), 0, 4f * (1f - k), Mathf.Lerp(1.06f, 1f, k), Mathf.Lerp(0.84f, 1f, k)));
                     break;
                 case "squash":
                     yield return Phase(0.12f, k => Pose(0, -0.05f * k, 0, 1f + 0.16f * k, 1f - 0.22f * k));
+                    FxPuff(0.2f, -0.38f, new Color(0.75f, 0.9f, 1f, 0.7f), 2);
+                    FxPuff(-0.16f, -0.38f, new Color(0.75f, 0.9f, 1f, 0.7f), 2);
                     yield return Phase(0.09f, k => Pose(0.14f * k, -0.05f + 0.09f * k, 5f * k, 1.16f - 0.22f * k, 0.78f + 0.32f * k));
                     yield return Phase(0.13f, k => Pose(0.14f * (1f - k), 0.04f * (1f - k), 5f * (1f - k), Mathf.Lerp(0.94f, 1f, k), Mathf.Lerp(1.1f, 1f, k)));
                     break;
                 case "flap":
                     yield return Phase(0.14f, k => Pose(-0.03f * k, 0.24f * k, -8f * k, 1, 1));
+                    FxSlash(0.16f, 0.1f, -60f, 0.55f, new Color(0.85f, 0.97f, 1f, 0.7f), 90f);
+                    FxSlash(0.06f, 0.24f, -60f, 0.45f, new Color(0.85f, 0.97f, 1f, 0.5f), 90f);
                     yield return Phase(0.1f, k => Pose(-0.03f + 0.23f * k, 0.24f * (1f - k), -8f + 20f * k, 1, 1));
                     yield return Phase(0.13f, k => Pose(0.2f * (1f - k), 0, 12f * (1f - k), 1, 1));
                     break;
                 case "cast":
                     yield return Phase(0.16f, k => Pose(0, 0.06f * k, -4f * k, 1f - 0.06f * k, 1f + 0.04f * k));
+                    FxRing(0f, 0.1f, 0.95f, new Color(0.75f, 0.5f, 1f, 0.55f));
+                    FxPop(0f, 0.16f, 0.4f, new Color(0.85f, 0.65f, 1f, 0.7f));
                     yield return Phase(0.09f, k => Pose(0, 0.06f * (1f - k), -4f + 6f * k, Mathf.Lerp(0.94f, 1.12f, k), Mathf.Lerp(1.04f, 1.08f, k)));
                     yield return Phase(0.13f, k => Pose(0, 0, 2f * (1f - k), Mathf.Lerp(1.12f, 1f, k), Mathf.Lerp(1.08f, 1f, k)));
                     break;
                 case "swing":
                     yield return Phase(0.12f, k => Pose(-0.06f * k, 0, -16f * k, 1, 1));
+                    FxSlash(0.28f, 0.08f, -28f, 0.85f, new Color(1f, 1f, 0.88f, 0.85f), 300f);
                     yield return Phase(0.09f, k => Pose(-0.06f + 0.26f * k, 0, -16f + 42f * k, 1, 1));
                     yield return Phase(0.15f, k => Pose(0.2f * (1f - k), 0, 26f * (1f - k), 1, 1));
                     break;
                 default:
+                    FxPop(0.24f, 0.03f, 0.18f, new Color(1f, 1f, 1f, 0.55f));
                     yield return Lunge();
                     yield break;
             }
             Pose(0, 0, 0, 1, 1);
+
+            IEnumerator FlurryPops()
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    yield return new WaitForSecondsRealtime(j == 0 ? 0.06f : 0.14f);
+                    FxPop(0.28f, 0.02f + 0.04f * (j - 1), 0.17f, new Color(1f, 0.95f, 0.6f, 0.85f));
+                }
+            }
         }
 
         IEnumerator PlayAttackAnim()
@@ -493,6 +571,7 @@ namespace GameMaker.Screens
                 body.anchoredPosition = basePos + new Vector2(Dir * dist * p, rise * 4f * p * (1f - p));
                 yield return null;
             }
+            FxPuff(0.38f, -0.42f, new Color(0.78f, 0.72f, 0.6f, 0.7f)); // 착지 흙먼지 (전투와 동일)
             t = 0f;
             while (t < 0.12f)
             {
@@ -519,6 +598,7 @@ namespace GameMaker.Screens
                 body.anchoredPosition = basePos + new Vector2(Mathf.Lerp(-Dir * back, Dir * dist, Mathf.Clamp01(t / 0.08f)), 0);
                 yield return null;
             }
+            FxPop(0.5f, 0.02f, 0.26f, new Color(1f, 0.9f, 0.7f, 0.8f)); // 들이받는 순간 임팩트 (전투와 동일)
             t = 0f;
             while (t < 0.16f) // 복귀
             {

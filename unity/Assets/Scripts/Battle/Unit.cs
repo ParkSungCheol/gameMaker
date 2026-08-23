@@ -163,6 +163,67 @@ namespace GameMaker.Battle
             }
         }
 
+        // ─────────── 공격 이펙트 프리미티브 (Circle 스프라이트 합성) ───────────
+
+        SpriteRenderer AtkFx(float fx, float fy, Vector2 size, Color c, float ang = 0f)
+        {
+            float dir = IsOur ? 1f : -1f;
+            var go = new GameObject("AtkFx");
+            go.transform.position = transform.position +
+                new Vector3(fx * targetHeight * dir, bodyBaseY + fy * targetHeight, 0);
+            go.transform.rotation = Quaternion.Euler(0, 0, ang * -dir);
+            var r = go.AddComponent<SpriteRenderer>();
+            r.sprite = SpriteBank.Circle;
+            r.color = c;
+            r.sortingOrder = 31;
+            go.transform.localScale = new Vector3(size.x * targetHeight / 64f, size.y * targetHeight / 64f, 1f);
+            Destroy(go, 1f); // 안전장치
+            return r;
+        }
+
+        IEnumerator FxFade(SpriteRenderer r, float dur, float growTo, float rotSpeed)
+        {
+            float dir = IsOur ? 1f : -1f;
+            if (r == null) yield break;
+            Vector3 s0 = r.transform.localScale;
+            Color c0 = r.color;
+            float t = 0f;
+            while (t < dur)
+            {
+                t += Time.deltaTime;
+                if (r == null) yield break;
+                float k = Mathf.Clamp01(t / dur);
+                r.transform.localScale = s0 * (1f + (growTo - 1f) * k);
+                r.transform.Rotate(0, 0, rotSpeed * -dir * Time.deltaTime);
+                r.color = new Color(c0.r, c0.g, c0.b, c0.a * (1f - k));
+                yield return null;
+            }
+            if (r != null) Destroy(r.gameObject);
+        }
+
+        /// <summary>참격 궤적 — 길쭉한 타원이 살짝 돌며 사라진다.</summary>
+        void FxSlash(float fx, float fy, float ang, float len, Color c, float rotSpeed = 220f) =>
+            StartCoroutine(FxFade(AtkFx(fx, fy, new Vector2(len, len * 0.2f), c, ang), 0.18f, 1.3f, rotSpeed));
+
+        /// <summary>임팩트 팝 — 원이 확 커지며 사라진다.</summary>
+        void FxPop(float fx, float fy, float d, Color c) =>
+            StartCoroutine(FxFade(AtkFx(fx, fy, new Vector2(d, d), c), 0.16f, 2.1f, 0f));
+
+        /// <summary>흙먼지 — 작은 원 여러 개가 부챗살로 퍼진다.</summary>
+        void FxPuff(float fx, float fy, Color c, int n = 3)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                float spread = (i - (n - 1) * 0.5f) * 0.09f;
+                StartCoroutine(FxFade(AtkFx(fx + spread, fy + Mathf.Abs(spread) * 0.4f,
+                    new Vector2(0.11f, 0.09f), c), 0.26f, 2.4f, 0f));
+            }
+        }
+
+        /// <summary>스타일 링 — 몸 주위로 퍼지는 원형 파동.</summary>
+        void FxRing(float fx, float fy, float d, Color c, bool flat = false) =>
+            StartCoroutine(FxFade(AtkFx(fx, fy, new Vector2(d, flat ? d * 0.35f : d), c), 0.28f, 1.9f, 0f));
+
         /// <summary>공격 스타일별 몸 움직임 — 스프라이트 프레임과 짝을 이루는 시그니처 모션.
         /// 모든 변위는 몸집(targetHeight)의 45% 이내라 다른 유닛 영역을 침범하지 않는다.
         /// 알 수 없는/빈 스타일은 기본 런지.</summary>
@@ -194,61 +255,91 @@ namespace GameMaker.Battle
             {
                 case "spin": // 제자리에서 좌우(세로축)로 한 바퀴 — 가로 폭을 cos 으로 눌러
                              // 앞→옆→뒤→옆→앞 으로 서서 도는 느낌 (공중제비 아님)
+                    FxRing(0f, 0.05f, 1.1f, new Color(1f, 1f, 1f, 0.35f));
+                    FxSlash(0.3f, 0.05f, 0f, 0.7f, new Color(1f, 1f, 0.9f, 0.7f), 320f);
+                    FxSlash(-0.3f, 0.05f, 180f, 0.7f, new Color(1f, 1f, 0.9f, 0.7f), 320f);
                     yield return Phase(0.36f, k => Pose(0.08f * Mathf.Sin(k * Mathf.PI), 0, 0, Mathf.Cos(k * Mathf.PI * 2f), 1));
                     break;
-                case "flurry": // 3연속 잽
+                case "flurry": // 3연속 잽 — 잽마다 임팩트 팝
+                    StartCoroutine(FlurryPops());
                     yield return Phase(0.42f, k => Pose(0.16f * Mathf.Abs(Mathf.Sin(k * Mathf.PI * 3f)), 0, 5f * Mathf.Sin(k * Mathf.PI * 6f), 1, 1));
                     break;
-                case "bite": // 웅크렸다 콱 물기
+                case "bite": // 웅크렸다 콱 물기 — 위아래 이빨 궤적 + 팝
                     yield return Phase(0.1f, k => Pose(-0.05f * k, 0, -6f * k, 1f, 1f - 0.1f * k));
+                    FxSlash(0.3f, 0.14f, -35f, 0.42f, new Color(1f, 1f, 1f, 0.85f), 140f);
+                    FxSlash(0.3f, -0.08f, 35f, 0.42f, new Color(1f, 1f, 1f, 0.85f), -140f);
+                    FxPop(0.32f, 0.03f, 0.24f, new Color(1f, 0.85f, 0.8f, 0.8f));
                     yield return Phase(0.09f, k => Pose(-0.05f + 0.27f * k, 0, -6f + 20f * k, 1f + 0.06f * k, 0.9f + 0.1f * k));
                     yield return Phase(0.14f, k => Pose(0.22f * (1f - k), 0, 14f * (1f - k), 1, 1));
                     break;
-                case "peck": // 고개 콱 찍기
+                case "peck": // 고개 콱 찍기 — 부리 끝 스파크
                     yield return Phase(0.08f, k => Pose(-0.04f * k, 0.03f * k, -12f * k, 1, 1));
+                    FxPop(0.24f, -0.04f, 0.16f, new Color(1f, 0.92f, 0.45f, 0.9f));
                     yield return Phase(0.07f, k => Pose(-0.04f + 0.18f * k, 0.03f - 0.06f * k, -12f + 34f * k, 1, 1));
                     yield return Phase(0.12f, k => Pose(0.14f * (1f - k), -0.03f * (1f - k), 22f * (1f - k), 1, 1));
                     break;
-                case "horn": // 숙였다 퍼올리는 박치기
+                case "horn": // 숙였다 퍼올리는 박치기 — 위로 쓸리는 궤적 + 흙먼지
                     yield return Phase(0.12f, k => Pose(-0.08f * k, -0.04f * k, 10f * k, 1, 1));
+                    FxSlash(0.26f, 0.02f, 60f, 0.6f, new Color(1f, 0.8f, 0.45f, 0.8f), -300f);
+                    FxPuff(0.18f, -0.42f, new Color(0.75f, 0.68f, 0.55f, 0.7f));
                     yield return Phase(0.09f, k => Pose(-0.08f + 0.26f * k, -0.04f + 0.1f * k, 10f - 26f * k, 1, 1));
                     yield return Phase(0.14f, k => Pose(0.18f * (1f - k), 0.06f * (1f - k), -16f * (1f - k), 1, 1));
                     break;
-                case "buck": // 앞으로 숙였다 뒤로 차기
+                case "buck": // 앞으로 숙였다 뒤로 차기 — 뒤쪽 흙먼지
                     yield return Phase(0.1f, k => Pose(0.05f * k, 0, 14f * k, 1, 1));
+                    FxPuff(-0.24f, -0.35f, new Color(0.72f, 0.62f, 0.48f, 0.8f), 4);
                     yield return Phase(0.08f, k => Pose(0.05f - 0.2f * k, 0.04f * k, 14f - 34f * k, 1, 1));
                     yield return Phase(0.14f, k => Pose(-0.15f * (1f - k), 0.04f * (1f - k), -20f * (1f - k), 1, 1));
                     break;
-                case "trample": // 곧추섰다 내리누르기
+                case "trample": // 곧추섰다 내리누르기 — 납작 링 + 먼지
                     yield return Phase(0.13f, k => Pose(0, 0.2f * k, -4f * k, 0.96f, 1f + 0.08f * k));
                     yield return Phase(0.07f, k => Pose(0.04f * k, 0.2f * (1f - k), -4f + 8f * k, 0.96f + 0.1f * k, 1.08f - 0.24f * k));
+                    FxRing(0.04f, -0.42f, 0.8f, new Color(0.8f, 0.73f, 0.6f, 0.6f), true);
+                    FxPuff(0.04f, -0.4f, new Color(0.78f, 0.7f, 0.58f, 0.65f));
                     yield return Phase(0.13f, k => Pose(0.04f * (1f - k), 0, 4f * (1f - k), Mathf.Lerp(1.06f, 1f, k), Mathf.Lerp(0.84f, 1f, k)));
                     break;
-                case "squash": // 눌렀다 튕기는 슬라임
+                case "squash": // 눌렀다 튕기는 슬라임 — 양옆 점액 튐
                     yield return Phase(0.12f, k => Pose(0, -0.05f * k, 0, 1f + 0.16f * k, 1f - 0.22f * k));
+                    FxPuff(0.2f, -0.38f, new Color(0.75f, 0.9f, 1f, 0.7f), 2);
+                    FxPuff(-0.16f, -0.38f, new Color(0.75f, 0.9f, 1f, 0.7f), 2);
                     yield return Phase(0.09f, k => Pose(0.14f * k, -0.05f + 0.09f * k, 5f * k, 1.16f - 0.22f * k, 0.78f + 0.32f * k));
                     yield return Phase(0.13f, k => Pose(0.14f * (1f - k), 0.04f * (1f - k), 5f * (1f - k), Mathf.Lerp(0.94f, 1f, k), Mathf.Lerp(1.1f, 1f, k)));
                     break;
-                case "flap": // 솟았다 앞으로 덮치기
+                case "flap": // 솟았다 앞으로 덮치기 — 아래로 쓸리는 돌풍 줄기
                     yield return Phase(0.14f, k => Pose(-0.03f * k, 0.24f * k, -8f * k, 1, 1));
+                    FxSlash(0.16f, 0.1f, -60f, 0.55f, new Color(0.85f, 0.97f, 1f, 0.7f), 90f);
+                    FxSlash(0.06f, 0.24f, -60f, 0.45f, new Color(0.85f, 0.97f, 1f, 0.5f), 90f);
                     yield return Phase(0.1f, k => Pose(-0.03f + 0.23f * k, 0.24f * (1f - k), -8f + 20f * k, 1, 1));
                     yield return Phase(0.13f, k => Pose(0.2f * (1f - k), 0, 12f * (1f - k), 1, 1));
                     break;
-                case "cast": // 모았다가 방출
+                case "cast": // 모았다가 방출 — 마법 파동 링 + 글로우 팝
                     yield return Phase(0.16f, k => Pose(0, 0.06f * k, -4f * k, 1f - 0.06f * k, 1f + 0.04f * k));
+                    FxRing(0f, 0.1f, 0.95f, new Color(0.75f, 0.5f, 1f, 0.55f));
+                    FxPop(0f, 0.16f, 0.4f, new Color(0.85f, 0.65f, 1f, 0.7f));
                     yield return Phase(0.09f, k => Pose(0, 0.06f * (1f - k), -4f + 6f * k, Mathf.Lerp(0.94f, 1.12f, k), Mathf.Lerp(1.04f, 1.08f, k)));
                     yield return Phase(0.13f, k => Pose(0, 0, 2f * (1f - k), Mathf.Lerp(1.12f, 1f, k), Mathf.Lerp(1.08f, 1f, k)));
                     break;
-                case "swing": // 감았다 크게 휘두르기
+                case "swing": // 감았다 크게 휘두르기 — 참격 궤적
                     yield return Phase(0.12f, k => Pose(-0.06f * k, 0, -16f * k, 1, 1));
+                    FxSlash(0.28f, 0.08f, -28f, 0.85f, new Color(1f, 1f, 0.88f, 0.85f), 300f);
                     yield return Phase(0.09f, k => Pose(-0.06f + 0.26f * k, 0, -16f + 42f * k, 1, 1));
                     yield return Phase(0.15f, k => Pose(0.2f * (1f - k), 0, 26f * (1f - k), 1, 1));
                     break;
-                default: // 기본 런지
+                default: // 기본 런지 — 접촉 지점 소형 팝
+                    FxPop(0.24f, 0.03f, 0.18f, new Color(1f, 1f, 1f, 0.55f));
                     yield return Lunge();
                     yield break;
             }
             Pose(0, 0, 0, 1, 1);
+
+            IEnumerator FlurryPops()
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    yield return new WaitForSeconds(j == 0 ? 0.06f : 0.14f);
+                    FxPop(0.28f, 0.02f + 0.04f * (j - 1), 0.17f, new Color(1f, 0.95f, 0.6f, 0.85f));
+                }
+            }
         }
 
         /// <summary>점프 덮치기 — 포물선으로 뛰어올라 적 위로 떨어지며 타격 (개·고양이·개구리류).</summary>
@@ -269,6 +360,7 @@ namespace GameMaker.Battle
                 body.localPosition = p;
                 yield return null;
             }
+            FxPuff(0.38f, -0.42f, new Color(0.78f, 0.72f, 0.6f, 0.7f)); // 착지 흙먼지
             if (target != null && !target.Dead) target.TakeDamage(data.attack);
             // 복귀
             t = 0f;
@@ -311,6 +403,7 @@ namespace GameMaker.Battle
                 body.localPosition = p;
                 yield return null;
             }
+            FxPop(0.5f, 0.02f, 0.26f, new Color(1f, 0.9f, 0.7f, 0.8f)); // 들이받는 순간 임팩트
             if (target != null && !target.Dead) target.TakeDamage(data.attack);
             t = 0f;
             while (t < 0.16f) // 복귀
